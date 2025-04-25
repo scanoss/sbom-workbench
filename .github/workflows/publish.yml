@@ -33,6 +33,7 @@ jobs:
         shell: bash
         run: |
           cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -122,6 +123,7 @@ jobs:
         shell: bash
         run: |
           cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -176,6 +178,7 @@ jobs:
         run: |
           mkdir -p assets/data
           cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json assets/data/scanoss-crypto-library-rules.json
+          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3

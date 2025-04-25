@@ -116,7 +116,8 @@ The structure of `scanoss-crypto-algorithm-rules.json` should be formatted as fo
 ```json
 [
    {
-     "algorithm": "md5",
+     "algorithmId": "md5",
+     "algorithm": "MD5 Message-Digest Algorithm",
      "strength": "128",
      "keywords": [
        "md5_file",

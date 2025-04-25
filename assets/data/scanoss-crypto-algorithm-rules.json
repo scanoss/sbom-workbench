@@ -1,1752 +1,4186 @@
 [
   {
-    "algorithm": "3des",
+    "algorithmId": "3des",
+    "algorithm": "",
     "strength": "128",
     "keywords": [
-      "botan-3.dll",
-      "botan.dll",
-      "libbotan-3.dylib",
-      "libbotan-2.dylib",
-      "libbotan-3.so",
-      "libbotan-2.so",
-      "libbotan-2.s"
-    ]
+      "des3-kd",
+      "tripledes",
+      "triple_des"
+
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "3way",
+    "algorithmId": "3way",
+    "algorithm": "3 Way",
     "strength": "128",
     "keywords": [
       "3way.h",
-      "CRYPTOPP_THREEWAY_H"
-    ]
+      "cryptopp_threeway_h"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "aes",
+    "algorithmId": "ASN1",
+    "algorithm": "Abstract Syntax Notation One",
     "strength": "256",
     "keywords": [
-      "GibberishAES",
-      "aes.h",
-      "tiny-AES-c",
-      "AES_set_encrypt_key",
-      "AES_set_decrypt_key",
-      "AES_ige_encrypt",
-      "AES_ofb128_encrypt",
-      "AES_ecb_encrypt",
-      "AES_cbc_encrypt",
-      "AES_cfb8_encrypt",
-      "AES_cfb128_encrypt",
-      "AES_wrap_key",
-      "AES_cfb1_encrypt",
-      "AES_unwrap_key",
-      "aes.js",
-      "require('aes-js')",
-      "require('sjcl')",
-      "require('crypto-js');",
-      "CryptoJS.AES.encrypt",
-      "CryptoJS.AES.decryp",
-      "<openssl/aes.h>",
-      ".getInstance(\"AES\");",
-      "module.exports = AES",
-      "AES.prototype",
-      "aes.AES",
-      "AES/CBC/NoPadding",
-      "AES/CBC/PKCS5Padding ",
-      "AES/ECB/NoPadding",
-      "AES/ECB/PKCS5Padding",
-      "AES/GCM/NoPadding"
-    ]
+      "asn1_tag",
+      "asn1integer",
+      "asn1_integer_new",
+      "#include \u003copenssl/asn1.h\u003e",
+      "forge.asn1.class.universal",
+      "from pyasn1.codec.der import encoder",
+      "import org.bouncycastle.asn1.asn1integer"
+    ],
+    "category": "Certificate Formats"
   },
   {
-    "algorithm": "aria",
+    "algorithmId": "CMAC",
+    "algorithm": "Cipher-based Message Authentication Codes",
     "strength": "128",
     "keywords": [
-      "aria.cpp",
-      "aria.h",
-      "r.re.nsri.aria",
-      "ARIAEngine",
-      "ossl_aria_set_encrypt_key",
-      "ossl_aria_set_decrypt_key",
-      "ossl_aria_encrypt",
-      "#include <openssl/aria.h>",
-      "ARIA_set_encrypt_key",
-      "ARIA_encrypt",
-      ".getInstance(\"ARIA/ECB/NoPadding\"",
-      ".createCipheriv('ARIA-128-ECB'",
-      "crypto/aria",
-      "aria.NewCipher",
-      "ARIA-128-ECB",
-      "from Cryptodome.Cipher import ARIA",
-      "ARIA.new("
-    ]
+      "cmac.new",
+      "cmac.copy",
+      "cmac_init",
+      "cmac_final",
+      "cmac.digest",
+      "cmac.update",
+      "cmac.verify",
+      "cmac_update",
+      "cmac_verify",
+      "cmac_ctx_new",
+      "cmac_ctx_free",
+      "cmac_generate",
+      "cmac.hexdigest",
+      "cmac_ctx_reset",
+      ".getinstance(\"aescmac\");",
+      "#include \u003copenssl/cmac.h\u003e",
+      "from crypto.hash import cmac"
+    ],
+    "category": "Message Authentication Codes"
   },
   {
-    "algorithm": "ASN1",
-    "strength": "256",
+    "algorithmId": "adler32",
+    "algorithm": "Adler-32 Checksum Algorithm",
+    "strength": "32",
     "keywords": [
-      "#include <openssl/asn1.h>",
-      "ASN1_INTEGER_new",
-      "import org.bouncycastle.asn1.ASN1Integer",
-      "ASN1Integer",
-      "forge.asn1.Class.UNIVERSAL",
-      "from pyasn1.codec.der import encoder"
-    ]
+      "adler32",
+      "adler-32"
+    ],
+    "category": "Polynomial Functions"
   },
   {
-    "algorithm": "bcrypt",
+    "algorithmId": "aes",
+    "algorithm": "",
+    "strength": "128-256",
+    "keywords": [
+      "aes.h",
+      "\"aes.js\"",
+      "aes128",
+      "aes256",
+      "aeskey",
+      "aes.aes",
+      "aes_cfb",
+      "aes_key",
+      "aescmac",
+      "_aes_ctr",
+      "aes/cbc/",
+      "aes_cbc_",
+      "aes_ecb_",
+      "tiny-aes-c",
+      "aes_decrypt",
+      "aes_encrypt",
+      "aes_ofb128_",
+      "aes_wrap_key",
+      "gibberishaes",
+      "aes.prototype",
+      "cryptojs.aes.",
+      "aes_block_size",
+      "aes_unwrap_key",
+      "<openssl/aes.h>",
+      "aes_ige_encrypt",
+      "require('sjcl')",
+      ".getinstance(\"aes",
+      "aes/ecb/nopadding",
+      "aes/gcm/nopadding",
+      "require('aes-js')",
+      "aes_set_decrypt_key",
+      "aes_set_encrypt_key",
+      "aes/ecb/pkcs5padding",
+      "module.exports = aes",
+      "advanced encryption standard\""
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "argon2",
+    "algorithm": "Cipher-based Message Authentication Codes",
+    "strength": "-",
+    "keywords": [],
+    "category": "Message Authentication Codes"
+  },
+  {
+    "algorithmId": "aria",
+    "algorithm": "ARIA Block Cipher",
+    "strength": "128-256",
+    "keywords": [
+      "aria.h",
+      "aria-128",
+      "aria-192",
+      "aria-256",
+      "aria.cpp",
+      "aria.new(",
+      "ossl_aria",
+      "ariaengine",
+      "crypto/aria",
+      "aria_encrypt",
+      "aria.newcipher",
+      "openssl/aria.h",
+      "r.re.nsri.aria",
+      "aria/ecb/nopadding",
+      "aria_set_decrypt_key",
+      "aria_set_encrypt_key",
+      "from cryptodome.cipher import aria"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "bcrypt",
+    "algorithm": "Bcrypt Password Hashing Function",
     "strength": "320",
     "keywords": [
       "bcrypt",
-      "pycabcrypt.h",
-      "BCrypt.java",
-      "jBCrypt"
-    ]
+      "jbcrypt",
+      "bcrypt.java",
+      "pycabcrypt.h"
+    ],
+    "category": "Key Derivation Functions"
   },
   {
-    "algorithm": "blakex",
+    "algorithmId": "bearlion",
+    "algorithm": "BearLion",
+    "strength": "128",
+    "keywords": [
+      "bbearlion",
+      "bear_lion",
+      "bearlionhash",
+      "bearliondecrypt",
+      "bearlionencrypt",
+      "bearlionkeyderive",
+      "bearlionkeyexchange"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "blake2",
+    "algorithm": "BLAKE2",
     "strength": "256/512",
     "keywords": [
-      "blake3.h",
-      "blake3_hasher_update",
-      "blake3_impl.h",
-      "BLAKE2b512",
-      "BLAKE2b256",
-      "blake2",
-      "pycabcrypt.h"
-    ]
+      "blake2.h",
+      "blake256",
+      "blake2::",
+      "blake2b.",
+      "blake2b_",
+      "blake2s.",
+      "blake2s_",
+      "blake2sp",
+      "blake2xb",
+      "blake2xs",
+      "blake512",
+      "'blake2b'",
+      "'blake2s'",
+      "blake 512",
+      "blake-256",
+      "blake-512",
+      "blake2b::",
+      "blake2bp_",
+      "blake2s::",
+      "blake_256",
+      "blake_512",
+      "blake2b256",
+      "blake2b384",
+      "blake2b512",
+      "blake2s128",
+      "blake2s256",
+      "blake2bdigest",
+      "blake2sdigest",
+      "crypto/blake2",
+      "digest/blake2",
+      "import blake2b, blake2s"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "blowfish",
+    "algorithmId": "blake3",
+    "algorithm": "BLAKE3",
+    "strength": "256/512",
+    "keywords": [
+      "/blake3",
+      "blake3(",
+      "blake3.",
+      "blake3_",
+      "'blake3'",
+      "blake3::",
+      "blake3hash",
+      "blake3state",
+      "blake3digest",
+      "blake3result",
+      "blake3context",
+      "import blake3",
+      "blake3_compress",
+      "blake3hashstate"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "blowfish",
+    "algorithm": "",
     "strength": "320",
     "keywords": [
+      "bf_cbc",
+      "bf_cfb",
+      "bf_ecb",
+      "bf_ofb",
+      "bf_set_key",
+      "blowfish_f",
+      "blowfish.new(",
+      "blowfish_init",
+      "blowfish_decrypt",
+      "blowfish_encrypt",
+      "blowfish_p_array",
+      "blowfish_s_boxes",
       "egoroof-blowfish",
-      "blowfish"
-    ]
+      "blowfish_decipher",
+      "blowfish_encipher",
+      "blowfish_key_size",
+      "blowfish_block_size",
+      "blowfish_max_key_size",
+      "blowfish_generate_subkeys"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "blum-goldwasser",
+    "algorithmId": "blum-goldwasser",
+    "algorithm": "Blum-Goldwasser Probabilistic Public-key Encryption",
     "strength": "320",
     "keywords": [
+      "blumgoldwasser",
       "blumgoldwasser.py",
-      "BlumGoldwasser",
-      "sage.crypto.public_key.blum_goldwasser.BlumGoldwasser"
-    ]
+      "sage.crypto.public_key.blum_goldwasser.blumgoldwasser"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "cast",
-    "strength": "320",
-    "keywords": [
-      "CAST_ecb_encrypt",
-      "CAST_encrypt",
-      "CAST_decrypt",
-      "CAST_cbc_encrypt",
-      "CAST_set_key",
-      "CAST3.h",
-      "cast5.h",
-      "pyCast6"
-    ]
-  },
-  {
-    "algorithm": "cmea",
-    "strength": "64",
-    "keywords": [
-      "startCMEA",
-      "CmeaSys"
-    ]
-  },
-  {
-    "algorithm": "cms",
-    "strength": "64",
-    "keywords": [
-      "#include <openssl/cms.h>",
-      "CMS_ContentInfo_new",
-      "CMS_encrypt",
-      "import org.bouncycastle.cms.",
-      "CMSEnvelopedDataGenerator"
-    ]
-  },
-  {
-    "algorithm": "crc16",
-    "strength": "16",
-    "keywords": [
-      "CRC_16",
-      "CRC_16CCITT",
-      "CRC_16XModem",
-      "CRC16"
-    ]
-  },
-  {
-    "algorithm": "crc32",
-    "strength": "32",
-    "keywords": [
-      "crc32h.h",
-      "crc32.c",
-      "crc32_table",
-      "xcrc32"
-    ]
-  },
-  {
-    "algorithm": "camellia",
+    "algorithmId": "camellia",
+    "algorithm": "Camellia",
     "strength": "256",
     "keywords": [
       "camellia.core",
-      "CIPHERCAMELLIA256",
-      "CAMELLIA-256-CBC",
-      "Camellia_cfb8_encrypt",
-      "Camellia_ctr128_encrypt",
-      "Camellia_set_key",
-      "Camellia_EncryptBlock_Rounds",
-      "Camellia_DecryptBlock",
-      "Camellia_decrypt",
-      "Camellia_DecryptBlock_Rounds",
-      "Camellia_cfb128_encrypt",
-      "Camellia_Ekeygen",
-      "Camellia_EncryptBlock",
-      "Camellia_cbc_encrypt",
-      "Camellia_cfb1_encrypt",
-      "Camellia_ecb_encrypt",
-      "Camellia_encrypt",
-      "Camellia_ofb128_encrypt"
-    ]
+      "camellia.final",
+      "camellia.update",
+      "camellia_cfb128",
+      "camellia_ctr128",
+      "camellia_ofb128",
+      "camellia-256-cbc",
+      "camellia.decrypt",
+      "camellia.encrypt",
+      "camellia_decrypt",
+      "camellia_ekeygen",
+      "camellia_encrypt",
+      "camellia_set_key",
+      "camellia_set_key",
+      "ciphercamellia256",
+      "camellia.newcipher",
+      "camellia_cbc_encrypt",
+      "camellia_ecb_decrypt",
+      "camellia_ecb_encrypt",
+      "evp_camellia_128_cbc",
+      "evp_camellia_192_cbc",
+      "evp_camellia_256_cbc",
+      "camellia.createcipher",
+      "camellia_cfb1_encrypt",
+      "camellia_cfb8_encrypt",
+      "camellia.createdecipher",
+      "camellia::camellia::new",
+      "crypto.cipher.camellia.",
+      "camellia::camellia::decrypt",
+      "camellia::camellia::encrypt"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "chacha(salsa)",
+    "algorithmId": "cast",
+    "algorithm": "CAST Block Cipher Family",
+    "strength": "320",
+    "keywords": [
+      "cast5",
+      "cast6",
+      "cast128",
+      "cast256",
+      "cast3.h",
+      "cast5.h",
+      "pycast6",
+      "cast-128",
+      "cast-256",
+      "cast_128",
+      "cast_256",
+      "cast_cbc",
+      "cast_ecb",
+      "cast_ecb",
+      "cast_key",
+      "cast_mac",
+      "cast_set",
+      "cast3_cbc",
+      "cast3_ecb",
+      "cast3_key",
+      "cast3_mac",
+      "cast5_cbc",
+      "cast5_ecb",
+      "cast5_key",
+      "cast5_mac",
+      "cast6_key",
+      "cast_sbox",
+      "cast_rounds",
+      "cast6_rounds",
+      "cast_decrypt",
+      "cast_encrypt",
+      "cast6_decrypt",
+      "cast6_encrypt",
+      "cast6_set_key",
+      "cast_block_size",
+      "cast6_block_size"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "cbc",
+    "algorithm": "Cipher Block Chaining",
+    "strength": "",
+    "keywords": [
+      "bf_cbc",
+      "aes-cbc",
+      "aes/cbc",
+      "des_cbc",
+      "rc2-cbc",
+      "rc2_cbc",
+      "rc4-cbc",
+      "rc4_cbc",
+      "rc5-cbc",
+      "rc5_cbc",
+      "aes/cbc/",
+      "aes_cbc_",
+      "cast_cbc",
+      "cast3_cbc",
+      "cast5_cbc",
+      "idea_cbc_",
+      "desede/cbc",
+      "sms4_cbc_e",
+      "ice_cbc_mode",
+      "tea_cbc_mode",
+      "safer_mode_cbc",
+      "tdes_flags_cbc",
+      "xtea_decodecbc",
+      "camellia-256-cbc",
+      "rc5_32_cbc_encrypt",
+      "camellia_cbc_encrypt",
+      "evp_camellia_128_cbc",
+      "evp_camellia_192_cbc",
+      "evp_camellia_256_cbc",
+      "crypto.cipher.camellia.mode_cbc"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "cfb",
+    "algorithm": "Cipher Feedback",
+    "strength": "",
+    "keywords": [
+      "bf_cfb",
+      "des_cfb",
+      "rc2-cfb",
+      "rc4-cfb",
+      "rc5-cfb",
+      "rc5_cfb",
+      "aes_cfb1_",
+      "aes_cfb8_",
+      "sms4_cfb_",
+      "aes_cfb128_",
+      "safer_mode_cfb",
+      "tdes_flags_cfb8",
+      "tdes_flags_cfb16",
+      "tdes_flags_cfb32",
+      "tdes_flags_cfb64",
+      "rc5_32_cfb64_encrypt",
+      "camellia_cfb1_encrypt",
+      "camellia_cfb8_encrypt",
+      "camellia_cfb128_encrypt",
+      "crypto.cipher.camellia.mode_cfb"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "ccm",
+    "algorithm": "Counter with CBC-MAC",
+    "strength": "",
+    "keywords": [
+      "aesccm",
+      "ccm_iv",
+      "ccmaut",
+      "128-ccm",
+      "128_ccm",
+      "192_ccm",
+      "256_ccm",
+      "aes_ccm",
+      "ccm_set",
+      "ccm_tag",
+      "ccmmode",
+      "aes/ccm/",
+      "ccm_auth",
+      "ccm_init",
+      "ccm_max_",
+      "ccm_mode",
+      "ccm_star",
+      "ccm_tlen",
+      ".mode.ccm",
+      "ccm_final",
+      "ccm_flags",
+      "ccm_ivlen",
+      "ccm_start",
+      "ccmcipher",
+      "cryptoccm",
+      "modes.ccm",
+      "ccm_finish",
+      "ccm_gettag",
+      "ccm_max_iv",
+      "ccm_update",
+      "ccm_verify",
+      "ccmcontext",
+      "ccm_compute",
+      "ccm_context",
+      "ccm_decrypt",
+      "ccm_default",
+      "ccm_encrypt",
+      "ccm_process",
+      "openssl_ccm",
+      "ccmprocessor",
+      "ccmtagparams",
+      "cryptopp::ccm",
+      "ccm_block_size",
+      "ccmblockcipher",
+      "createccminstance",
+      "#include \"ccm_mode.h\"",
+      "#include \u003cbotan/ccm.h\u003e",
+      "#include \u003cmbedtls/ccm.h\u003e",
+      "#include \u003copenssl/ccm.h\u003e",
+      "#include \u003ccryptopp/ccm.h\u003e"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "chacha20",
+    "algorithm": "ChaCha",
     "strength": "256",
     "keywords": [
-      "TLS_RSA_WITH_CHACHA20_SHA",
-      "TLS_ECDHE_RSA_WITH_CHACHA20_SHA",
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_SHA",
-      "TLS_RSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305 ",
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-      "TLS_DHE_RSA_WITH_CHACHA20_POLY1305",
-      "TLS_DHE_PSK_WITH_CHACHA20_POLY1305",
-      "TLS_PSK_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305",
-      "TLS_RSA_PSK_WITH_CHACHA20_POLY1305",
-      "chacha20_core",
-      "ChaCha20_ctr32",
-      "#include <openssl/chacha.h>",
-      ".getInstance(\"ChaCha20\")",
-      "createCipheriv('chacha20'",
-      "golang.org/x/crypto/chacha20poly1305",
-      "chacha20poly1305",
-      "sodium_crypto_stream_xchacha20_xor",
-      "from cryptography.hazmat.primitives.ciphers import ChaCha20",
-      "ChaCha20Poly1305",
-      "chacha_encrypt"
-    ]
+      "chacha20"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "cobra",
-    "strength": "128",
-    "keywords": [
-      "Cobra_algorithm",
-      "cobra.java"
-    ]
-  },
-  {
-    "algorithm": "dcc",
+    "algorithmId": "cmea",
+    "algorithm": "Cellular Message Encryption Algorithm",
     "strength": "64",
     "keywords": [
-      "DCC.py"
-    ]
+      "cmeasys",
+      "cmea_sbox",
+      "startcmea",
+      "cmea_decrypt",
+      "cmea_encrypt",
+      "cmea_key_size",
+      "cmea_block_size",
+      "cmea_initialize",
+      "cmea_num_rounds",
+      "cmea_init_vector",
+      "cmea_key_schedule",
+      "cmea_feistel_round",
+      "cmea_process_block"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "des",
+    "algorithmId": "cms",
+    "algorithm": "Count-Min Sketch",
+    "strength": "64",
+    "keywords": [
+      "cm-sketch",
+      "cms_encrypt",
+      "openssl/cms.h",
+      "countminsketch",
+      "cms_contentinfo_new",
+      "cmsenvelopeddatagenerator",
+      "import org.bouncycastle.cms."
+    ],
+    "category": "Message Authentication Codes"
+  },
+  {
+    "algorithmId": "cobra",
+    "algorithm": "Cobra Stream Cipher",
+    "strength": "128",
+    "keywords": [
+      "cobra.java",
+      "cobra_algorithm"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "crc16",
+    "algorithm": "Cyclic Redundancy Check 16-bit",
+    "strength": "16",
+    "keywords": [
+      "crc16_",
+      "crc_16 ",
+      "crc_16_",
+      "crc_16ccitt",
+      "crc_16xmodem"
+    ],
+    "category": "Polynomial Functions"
+  },
+  {
+    "algorithmId": "crc32",
+    "algorithm": "Cyclic Redundancy Check 32-bit",
+    "strength": "32",
+    "keywords": [
+      "crc32_",
+      "xcrc32",
+      "crc32.c",
+      "crc_32_",
+      "crc32h.h",
+      "crc32.ieee",
+      "crc32_init",
+      "crc32_poly",
+      "crc32_table",
+      "java.util.zip.crc32"
+    ],
+    "category": "Polynomial Functions"
+  },
+  {
+    "algorithmId": "ctr",
+    "algorithm": "Counter Cipher",
+    "strength": "",
+    "keywords": [
+      "_aes_ctr",
+      "ctr_drbg",
+      "drbg_ctr",
+      "sms4_ctr_",
+      "ice_ctr_mode",
+      "hc256_ctr_size",
+      "camellia_ctr128_encrypt",
+      "ideastreamctrrandomaccessinit",
+      "crypto.cipher.camellia.mode_ctr"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "crystals-kyber",
+    "algorithm": "Crystals-Kyber",
+    "strength": "-",
+    "keywords": [
+      "kyber.h",
+      "kyber512",
+      "kyber512",
+      "kyber768",
+      "kyber768",
+      "kyber_ke",
+      "kyber1024",
+      "kyber1024",
+      "kyber_dec",
+      "kyber_enc",
+      "kyber_rej",
+      "pqc_kyber",
+      "crypto_kem",
+      "kyber_ct_t",
+      "kyber_pack",
+      "kyber_pk_t",
+      "kyber_poly",
+      "kyber_sk_t",
+      "kyber_kem.h",
+      "import kyber",
+      "kyber_unpack",
+      "kybercontext",
+      "kyber_context",
+      "crystals-kyber",
+      "crystals.kyber",
+      "crystals_kyber",
+      "kyberpublickey",
+      "pqcrypto.kyber",
+      "kyberciphertext",
+      "kyberprivatekey",
+      "kyber_ciphertext",
+      "kyber_public_key",
+      "pqcrypto_kyber::",
+      "pqcrystals_kyber",
+      "kyber_private_key",
+      "kyber_shake256_prf"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "csprng",
+    "algorithm": "Cryptographically Secure Pseudo-Random Number Generator",
+    "strength": "-",
+    "keywords": [
+      "csprng.h",
+      ".crypto.prng.",
+      "rng_algorithm",
+      "csprng_strength",
+      "csprng_reseed_interval",
+      "rngcryptoserviceprovider",
+      "csprng_max_bytes_per_request"
+    ],
+    "category": "Random Number Generation"
+  },
+  {
+    "algorithmId": "dcc",
+    "algorithm": "Dynamic Contrastive Clustering",
+    "strength": "64",
+    "keywords": [
+      "dcc.py",
+      "check_convergence",
+      "recompute_centroids",
+      "compute_dissimilarity"
+    ],
+    "category": "Data Clustering"
+  },
+  {
+    "algorithmId": "des",
+    "algorithm": "Data Encryption Standard",
     "strength": "168",
     "keywords": [
+      "des__p",
+      "des_fp",
+      "des_ip",
+      "des_pc",
+      "des_cbc",
+      "des_cfb",
+      "des_key",
+      "des_ofb",
+      "des_ecb_",
+      "des_sbox",
+      "des_set_",
+      "des_crypt",
+      "des_ecb3_",
+      "des_ede3_",
+      "des_ncbc_",
+      "des_pcbc_",
+      "des_xcbc_",
+      "des_fcrypt",
+      "desede/cbc",
+      "desede/ecb",
+      "des_encrypt",
+      "des_feistel",
+      "deserr_none",
+      "des_key_size",
+      "des algorithm",
+      "des_key_sched",
       "des_setparity",
-      "DESERR_NONE",
-      "DES_encrypt",
-      "DES_ncbc_",
-      "DES_set_",
-      "DES_ede3_",
-      "DES_ecb_",
-      "DES_pcbc_",
-      "DES_cfb",
-      "DES_cbc_",
-      "DES_random_key",
-      "DES_ecb3_",
-      "DES_ofb",
-      "DES_is_weak_key",
-      "DES_check_key_parity",
-      "DES_key_sched",
-      "DES_crypt",
-      "DES_quad_cksum",
-      "DES_string_to_key",
-      "DES_xcbc_",
-      "DES_string_to_2keys",
-      "DES_fcrypt",
-      "DESede/CBC",
-      "DESede/ECB"
-    ]
+      "des_block_size",
+      "des_num_rounds",
+      "des_quad_cksum",
+      "des_random_key",
+      "des_is_weak_key",
+      "des_round_shift",
+      "des_string_to_key",
+      "des_string_to_2keys",
+      "des_check_key_parity",
+      "des_final_permutation",
+      "des_initial_permutation",
+      "data encryption standard"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "desede",
+    "algorithmId": "desede",
+    "algorithm": "Triple Data Encryption Standard (DESede)",
     "strength": "168",
     "keywords": [
-      "javax.crypto.spec.DESedeKeySpec",
-      "DESedeKeySpec",
-      "DES_EDE_KEY_LEN"
-    ]
+      "desedekeyspec",
+      "des_ede_key_len",
+      "javax.crypto.spec.desedekeyspec"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "CMAC",
+    "algorithmId": "dhe",
+    "algorithm": "Diffie-Hellman Ephemeral",
     "strength": "128",
     "keywords": [
-      "#include <openssl/cmac.h>",
-      ".getInstance(\"AESCMAC\");",
-      "from Crypto.Hash import CMAC"
-    ]
+      "dhe-rsa-aes",
+      "ecdhe-rsa-aes",
+      "dhparameterspec",
+      "crypto.createecdh",
+      "dhe-rsa-camellia128-sha",
+      "dhe-rsa-camellia256-sha"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "diffiehellman",
+    "algorithmId": "dhies",
+    "algorithm": "Diffie-Hellman Integrated Encryption Scheme",
     "strength": "128",
     "keywords": [
-      "getDhObjectFromEvent",
-      "RSA_DH.cpp",
-      "dh_cmp_parameters",
+      "dhies_",
+      "dhiesdecrypt",
+      "dhiesencrypt",
+      "dhies_decrypt",
+      "dhies_encrypt"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "dhe",
+    "algorithm": "Diffie-Hellman Ephemeral",
+    "strength": "128",
+    "keywords": [
+      "dh_get0_",
+      "dh_meth_",
       "dh_pkey_",
-      "DH_get_ex_data",
-      "DH_meth_",
-      "DH_check_params_ex",
-      "dh_gen_named_group",
-      "dh_param_init",
-      "DH_set_ex_data",
+      "dh_set0_",
+      "dhpubkey",
       "ossl_dh_",
-      "DH_test_flags",
-      "DH_set0_",
-      "DH_security_bits",
-      "DH_set_default_method",
-      "DH_get0_",
-      "dh_public_print"
-    ]
+      "dhprivkey",
+      "rsa_dh.cpp",
+      "dhe-rsa-aes",
+      "dhpublickey",
+      "dhprivatekey",
+      "cryptopp/dh.h",
+      "dh_param_init",
+      "dh_test_flags",
+      "diffiehellman",
+      "ecdhe-rsa-aes",
+      "dh_compute_key",
+      "dh_get_ex_data",
+      "dh_set_ex_data",
+      "diffie hellman",
+      "diffie-hellman",
+      "diffie.hellman",
+      "diffie_hellman",
+      "dh_generate_key",
+      "dh_public_print",
+      "dhparameterspec",
+      "dhparameterspec",
+      "dh_security_bits",
+      "crypto.createecdh",
+      "dh_cmp_parameters",
+      "dh_check_params_ex",
+      "dh_gen_named_group",
+      "getdhobjectfromevent",
+      "dh_set_default_method",
+      "dhe-rsa-camellia128-sha",
+      "dhe-rsa-camellia256-sha",
+      "0xffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd1"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "dhe",
-    "strength": "128",
+    "algorithmId": "drbg",
+    "algorithm": "Deterministic Random Bit Generator",
+    "strength": "-",
     "keywords": [
-      "ECDHE-RSA-AES",
-      "DHE-RSA-AES",
-      "DHE-RSA-CAMELLIA256-SHA",
-      "DHE-RSA-CAMELLIA128-SHA"
-    ]
+      "ec_drbg",
+      "ctr_drbg",
+      "drbg_ctr",
+      "hashdrbg",
+      "hmacdrbg",
+      "drbg_hash",
+      "drbg_hmac",
+      "drbg_init",
+      "hash_drbg",
+      "hmac_drbg",
+      "rand_drbg",
+      "drbg_reseed",
+      "drbg_update",
+      "drbg_generate",
+      "drbg_health_test",
+      "drbg_instantiate",
+      "crypto.prng.drbg.",
+      "drbg_uninstantiate"
+    ],
+    "category": "Random Number Generation"
   },
   {
-    "algorithm": "dhies",
+    "algorithmId": "dsa",
+    "algorithm": "Digital Signature Algorithm",
     "strength": "128",
     "keywords": [
-      "DHIES"
-    ]
+      "dsa.h",
+      "dsa.dsa",
+      "dsa.sign",
+      "dsa.sign",
+      "dsa_bits",
+      "dsa_init",
+      "dsa_meth_",
+      "dsa_print",
+      "dsa_sign_",
+      "ossl_dsa_",
+      "pkey_dsa_",
+      "crypto/dsa",
+      "dsa.verify",
+      "dsa_finish",
+      "dsa_up_ref",
+      "dsa_verify",
+      "dsa_do_sign",
+      "dsa_sig_new",
+      "dsa.generate",
+      "dsa_set0_key",
+      "int_dsa_free",
+      "dsa_generate_",
+      "dsa_pkey_ctrl",
+      "dsa_pub_print",
+      "dsaparams_dup",
+      "i2d_dsaparams",
+      "dsa_pub_encode",
+      "dsa_set_method",
+      "dsa_test_flags",
+      "dsa_clear_flags",
+      "dsa_param_print",
+      "dsa_priv_decode",
+      "dsa_priv_encode",
+      "dsa_set_ex_data",
+      ".getinstance(\"dsa\")",
+      "dsa_copy_parameters",
+      "openssl_keytype_dsa",
+      "ossl_ffc_params_cmp",
+      "dsa_mod_inverse_fermat",
+      "dsa_set_default_method",
+      "#include \u003copenssl/dsa.h\u003e",
+      "dsa_keygen_pairwise_test",
+      ".getinstance(\"sha256withdsa\")",
+      "crypto.generatekeypairsync('dsa'",
+      "evp_pkey_ctx_set_dsa_paramgen_md",
+      "from crypto.publickey import dsa",
+      "keypairgenerator.generatekeypair",
+      "java.security.spec.dsaparameterspec"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "ecdh",
-    "strength": "128",
+    "algorithmId": "ecb",
+    "algorithm": "Electronic Codebook",
+    "strength": "",
     "keywords": [
-      "ecdh_generate_keys",
-      "ecdh_shared_secret",
-      "ECC_PRV_KEY_SIZE"
-    ]
+      "rc2-ecb",
+      "rc2_ecb",
+      "rc4-ecb",
+      "rc5-ecb",
+      "rc5_ecb",
+      "des_ecb_",
+      "idea_ecb",
+      "rsa/ecb/",
+      "sms4_ecb_",
+      "desede/ecb",
+      "multi2_ecb",
+      "ice_ecb_mode",
+      "safer_mode_ecb",
+      "tdes_flags_ecb",
+      "xtea_encodeecb",
+      "rc5_32_ecb_encrypt"
+    ],
+    "category": "Block Cipher Modes"
   },
   {
-    "algorithm": "ecmqv",
+    "algorithmId": "ecdh",
+    "algorithm": "Elliptic Curve Diffie-Hellman",
     "strength": "128",
     "keywords": [
-      "ECMQV",
-      "IEEEP1363",
-      "#include <openssl/ecdh.h>",
-      "EC_KEY_generate_key",
-      ".getInstance(\"EC\"",
-      "import org.bouncycastle.jce.ECNamedCurveTable",
-      "require('elliptic').ec",
-      "crypto/elliptic",
+      "ec.ecdh",
       "crypto/ecdsa",
-      "secp256r1"
-    ]
+      "ecdiffiehellman",
+      "crypto.createecdh",
+      "ecdh.getpublickey",
+      "ecdh.computesecret",
+      "ecdh.getprivatekey",
+      "ecdh.setprivatekey"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "elgamal",
+    "algorithmId": "ecc",
+    "algorithm": "Elliptic Curve Cryptography",
     "strength": "128",
     "keywords": [
-      "egKey",
-      "elgamal.py",
+      "ec_group",
+      "cryptopp::ec",
+      "ec_point_mul",
+      "crypto/elliptic",
+      "ecc_prv_key_size",
+      "openssl::pkey::ec",
+      "eccurve.namedcurves",
+      "ec_key_new_by_curve_name"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "ecdsa",
+    "algorithm": "Elliptic Curve Digital Signature Algorithm",
+    "strength": "128",
+    "keywords": [
+      "ecdsa.",
+      "ecdsa_",
+      "ecdsasign",
+      "ecdsawith",
+      "signecdsa",
+      "withecdsa",
+      "createecdsa",
+      "ecdsaverify",
+      "verifyecdsa",
+      "createecdsasignature",
+      "validateecdsasignature"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "ecmqv",
+    "algorithm": "Elliptic Curve Menezes-Qu-Vanstone",
+    "strength": "128",
+    "keywords": [
+      "_ecmqv",
+      "ecmqv_",
+      "ecmqv.h",
+      "ecmqvpublic",
+      "ecmqvshared",
+      "ecmqvprivate",
+      "import ecmqv",
+      "ecmqvephemeral",
+      "ecmqvbasicagreement"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "ed25519",
+    "algorithm": "Edwards-curve Digital Signature Algorithm",
+    "strength": "",
+    "keywords": [
+      "x25519",
+      "ed25519",
+      "edeckey",
+      "eddsaengine",
+      "eddsaparameterspec",
+      "net.i2p.crypto.eddsa"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "elgamal",
+    "algorithm": "ElGamal",
+    "strength": "128",
+    "keywords": [
+      "elgamal",
+      "el gamal",
+      "el-gamal",
+      "el_gamal",
+      "elg_sign",
       "elgamal.h",
-      "ElGamalEncryptor",
-      "ElGamalDecryptor",
-      "CRYPTOPP_ELGAMAL_H"
-    ]
+      "elg_verify",
+      "elgamal.py",
+      "elg_decrypt",
+      "elg_encrypt",
+      "elg_generate",
+      "elg_public_key",
+      "elg_secret_key",
+      "elgamaldecryptor",
+      "elgamalencryptor",
+      "cryptopp_elgamal_h"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "f8",
+    "algorithmId": "f8",
+    "algorithm": "F8 Mode of Operation",
     "strength": "128",
     "keywords": [
-      "SrtpCipherF8",
-      "F8Context",
-      "processPacketAesF8"
-    ]
+      "f8_init",
+      "f8_update",
+      "f8context",
+      "f8_decrypt",
+      "f8_encrypt",
+      "f8_iv_size",
+      "f8_finalize",
+      "f8_key_size",
+      "srtpcipherf8",
+      "f8_block_size",
+      "processpacketaesf8"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "fasthash",
+    "algorithmId": "fasthash",
+    "algorithm": "FastHash",
     "strength": "256",
     "keywords": [
-      "AQUAHASH_H"
-    ]
+      "aquahash_h",
+      "fnv_32_prime",
+      "fnv_64_prime",
+      "fnv_offset_basis"
+    ],
+    "category": "Polynomial Functions"
   },
   {
-    "algorithm": "fcrypt",
+    "algorithmId": "fcrypt",
+    "algorithm": "",
     "strength": "128",
     "keywords": [
-      "fcrypt.encrypt",
-      "fcrypt.decrypt",
       "fcrypt_ctx",
-      "fcrypt_mod_init",
-      "F_ENCRYPT"
-    ]
+      "fcrypt.decrypt",
+      "fcrypt.encrypt",
+      "fcrypt_mod_init"
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "fnv1",
+    "algorithmId": "feal",
+    "algorithm": "Fast Data Encipherment Algorithm",
+    "strength": "64",
+    "keywords": [
+      "feal_sbox",
+      "feal_rounds",
+      "createlmhash",
+      "feal_key_size",
+      "lmhashconstant",
+      "feal_block_size"
+    ],
+    "category": "Secure Protocols"
+  },
+  {
+    "algorithmId": "fletcher",
+    "algorithm": "Fletcher",
+    "strength": "64",
+    "keywords": [
+      "fletcher16",
+      "fletcher32",
+      "fletcher64",
+      "fletcher_hash",
+      "fletcher_update",
+      "fletcher_finaliz",
+      "fletcher_checksum"
+    ],
+    "category": "Polynomial Functions"
+  },
+  {
+    "algorithmId": "fnv1",
+    "algorithm": "Fowler-Noll-Vo",
     "strength": "1024",
     "keywords": [
-      "Fnv1a1024",
-      "Fnv1a256",
-      "Fnv1a512",
-      "Fnv1aBigBase"
-    ]
+      "fnv1_32",
+      "fnv1_64",
+      "fnv1a256",
+      "fnv1a512",
+      "fnv1a_32",
+      "fnv1a_64",
+      "fnv1a1024",
+      "fnv_32_init",
+      "fnv_64_init",
+      "fnv1abigbase",
+      "fnv_32_prime",
+      "fnv_64_prime"
+    ],
+    "category": "Polynomial Functions"
   },
   {
-    "algorithm": "feal",
+    "algorithmId": "fortuna",
+    "algorithm": "Fortuna",
     "strength": "64",
     "keywords": [
-      "FEAL_key_schedule",
-      "FEAL_Encrypt",
-      "FEAL_Decrypt",
-      "feal8.h"
-    ]
+      "fortuna_mix",
+      "fortuna_init",
+      "fortuna_seed",
+      "fortuna_reset",
+      "fortuna_random",
+      "fortuna_reseed",
+      "fortuna_update",
+      "fortuna_process",
+      "fortuna_generate",
+      "fortuna_get_state",
+      "fortuna_pool_size",
+      "fortuna_seed_size",
+      "fortuna_set_state",
+      "fortuna_block_size",
+      "fortuna_next_bytes",
+      "fortuna_state_size",
+      "fortuna_add_entropy",
+      "fortuna_periodicity",
+      "fortuna_update_pool",
+      "fortuna_entropy_pool"
+    ],
+    "category": "Random Number Generation"
   },
   {
-    "algorithm": "fletcher",
-    "strength": "64",
+    "algorithmId": "gcm",
+    "algorithm": "Galois/Counter Mode",
+    "strength": "",
     "keywords": [
-      "fletcher64",
-      "fletcher32",
-      "fletcher16"
-    ]
+      "aesgcm",
+      "gcm_iv",
+      "newgcm",
+      "128-gcm",
+      "128_gcm",
+      "192-gcm",
+      "256-gcm",
+      "256_gcm",
+      "256_gcm",
+      "aes-gcm",
+      "aes/gcm",
+      "aes_gcm",
+      "gcm_tag",
+      "aes_gcm_",
+      "gcm(aes)",
+      "gcm.init",
+      "gcm_mode",
+      "mode_gcm",
+      "gcm_mode.",
+      "_ctrl_gcm_",
+      "botan::gcm",
+      "gcm\u003caes\u003e::",
+      "gcm.process",
+      "mbedtls_gcm",
+      "gcm.aadappend",
+      "gcmparameters",
+      "gcmblockcipher",
+      "gcm.setkeywithiv",
+      "gcm.truncatedfinal",
+      "copymbedtls_gcm_init",
+      "#include \u003cbotan/gcm.h\u003e",
+      "gcm.specifydatalengths",
+      "#include \u003cmbedtls/gcm.h\u003e"
+    ],
+    "category": "Block Cipher Modes"
   },
   {
-    "algorithm": "fortuna",
-    "strength": "64",
-    "keywords": [
-      "fortuna"
-    ]
-  },
-  {
-    "algorithm": "feal",
-    "strength": "64",
-    "keywords": [
-      "FEAL_key_schedule",
-      "FEAL_Encrypt",
-      "FEAL_Decrypt",
-      "feal8.h"
-    ]
-  },
-  {
-    "algorithm": "gea0-x",
+    "algorithmId": "gea0-x",
+    "algorithm": "GSM Encryption Algorithm",
     "strength": "64-128",
     "keywords": [
-      "LL_GEA",
+      "ll_gea",
+      "gea0_x_",
+      "libgea0_x-",
       "hf_nas_eps_emm_gea"
-    ]
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "gost",
+    "algorithmId": "gecc",
+    "algorithm": "Generic elliptic curve",
+    "strength": "-",
+    "keywords": [
+      "ed448",
+      "ed25519",
+      "secp192",
+      "secp224",
+      "secp256",
+      "curve448",
+      "frp256v1",
+      "secp384r1",
+      "secp521r1",
+      "ansix9p256",
+      "ansix9p384",
+      "ansix9p521",
+      "curve25519",
+      "prime256v1",
+      "brainpoolp256",
+      "brainpoolp384",
+      "brainpoolp512"
+    ],
+    "category": "Generic curves"
+  },
+  {
+    "algorithmId": "gost",
+    "algorithm": "GOST Block Cipher",
     "strength": "64",
     "keywords": [
-      "gost_28147_89",
+      "libgost",
       "gost.hpp",
-      "GOST28147_COMPRESSED_SBOX",
-      "GOST28147EncryptCycle",
-      "GOST28147EncryptBlock",
-      "GOST28147SBoxTransformation"
-    ]
+      "gost28147",
+      "gost-28147",
+      "gost_28147",
+      "gost_34_11_94_",
+      "gost_34_11_2012_",
+      "gost_34_12_2015_"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "grain",
+    "algorithmId": "grain",
+    "algorithm": "Grain",
     "strength": "128",
     "keywords": [
-      "grain128aead.h",
-      "Grain-128AEAD",
+      "grain.h",
+      "grainhash",
+      "graininit",
       "grain_data",
+      "grainfinal",
       "grain_state",
-      "Grain128Engine",
-      "grain.h"
-    ]
+      "grainupdate",
+      "grain-128aead",
+      "grain128aead.h",
+      "grain128engine"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "haval",
+    "algorithmId": "haval",
+    "algorithm": "HAVAL Hash Function",
     "strength": "128",
     "keywords": [
       "haval.h",
+      "haval-128",
+      "haval-160",
+      "haval-192",
+      "haval-224",
+      "haval-256",
+      "haval_128",
+      "haval_160",
+      "haval_192",
+      "haval_224",
+      "haval_256",
       "haval_context",
-      "Haval-160",
-      "Haval-192",
-      "Haval-224",
-      "Haval-256",
-      "Haval-128"
-    ]
+      "haval_version",
+      "haval_hash_size",
+      "haval_block_size"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "hc128",
+    "algorithmId": "hc128",
+    "algorithm": "HC-128",
     "strength": "128",
     "keywords": [
-      "CRYPTOPP_HC128_H",
-      "HC-128",
-      "HC128Info",
-      "Hc128Rng"
-    ]
+      "hc128_p",
+      "hc128_q",
+      "hc128_r",
+      "hc128rng",
+      "hc128info",
+      "hc128_iv_size",
+      "hc128_key_size",
+      "cryptopp_hc128_h",
+      "hc128_block_size",
+      "hc128_state_size"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "hc256",
+    "algorithmId": "hc256",
+    "algorithm": "HC-256",
     "strength": "256",
     "keywords": [
-      "hc256_generate",
-      "hc256_setkey",
       "hc256_crypt",
-      "CRYPTOPP_HC256_H"
-    ]
+      "hc256_setkey",
+      "hc256_update",
+      "hc256_iv_size",
+      "hc256_process",
+      "hc256_ctr_size",
+      "hc256_finalize",
+      "hc256_generate",
+      "hc256_key_size",
+      "hc256_xor_mask",
+      "hc256_sbox_size",
+      "hc256_seed_size",
+      "cryptopp_hc256_h",
+      "hc256_block_size",
+      "hc256_state_size",
+      "hc256_round_count",
+      "hc256_stream_size",
+      "hc256_keystream_size"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "ice",
+    "algorithmId": "hmac",
+    "algorithm": "Hash-based Message Authentication Codes",
+    "strength": "-",
+    "keywords": [
+      "/hmac",
+      "hmac(",
+      "hmac.",
+      "hmac_",
+      "::hmac",
+      "hmac::",
+      "hmacctx",
+      "hmackey",
+      "hmacmd5",
+      "hmacspi",
+      "hmaccore",
+      "hmacsha1",
+      "hash_hmac",
+      "hmacstate",
+      "hmacbuffer",
+      "hmacdigest",
+      "hmacresult",
+      "hmacsha256",
+      "createhmac(",
+      "hmacinstance",
+      "hmacgenerator",
+      "hmaccalculator"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "hmac",
+    "algorithm": "Hash-based Message Authentication Codes",
+    "strength": "-",
+    "keywords": [],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "ice",
+    "algorithm": "Indispensable Cryptographic Engine",
     "strength": "128",
     "keywords": [
+      "icekey",
+      "ice_init",
       "node-ice",
-      "iceKey",
-      "__RUBY_ICE_KEY_H",
+      "icesubkey",
+      "ice_rounds",
       "ice_cipher_",
-      "IceSubkey"
-    ]
+      "ice_decrypt",
+      "ice_encrypt",
+      "ice_padding",
+      "ice_set_key",
+      "ice_cbc_mode",
+      "ice_cfb_mode",
+      "ice_ctr_mode",
+      "ice_ecb_mode",
+      "ice_key_size",
+      "ice_ofb_mode",
+      "ice_block_size",
+      "ice_no_padding",
+      "__ruby_ice_key_h",
+      "ice_decrypt_mode",
+      "ice_encrypt_mode",
+      "ice_key_schedule",
+      "ice_max_key_size",
+      "ice_min_key_size",
+      "ice_pkcs5_padding",
+      "ice_iso10126_padding"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "isaac",
-    "strength": "256",
-    "keywords": [
-      "isaacCSPRNG",
-      "isaacRandomPool.h"
-    ]
-  },
-  {
-    "algorithm": "idea",
+    "algorithmId": "idea",
+    "algorithm": "International Data Encryption Algorithm",
     "strength": "64",
     "keywords": [
-      "IdeaMode_h",
-      "IdeaEncryptStreamStatus",
-      "IdeaStreamEncrypt",
-      "IdeaStreamDecrypt",
-      "IdeaStreamCTRRandomAccessInit",
-      "IdeaStreamPCB",
-      "IdeaStreamCFB"
-    ]
+      "idea_cfb",
+      "idea_ecb",
+      "idea_key",
+      "idea_cbc_",
+      "idea_ofb_",
+      "ideamode_h",
+      "idea_decrypt",
+      "idea_encrypt",
+      "idea_decrypt\"",
+      "idea_encrypt\"",
+      "ideastreamcfb",
+      "ideastreampcb",
+      "idea_key_size\"",
+      "idea_block_size\"",
+      "idea_num_rounds\"",
+      "idea_key_schedule",
+      "ideastreamdecrypt",
+      "ideastreamencrypt",
+      "ideaencryptstreamstatus",
+      "ideastreamctrrandomaccessinit"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "juniper",
+    "algorithmId": "isaac",
+    "algorithm": "ISAAC Stream Cipher",
+    "strength": "256",
+    "keywords": [
+      "isaac32",
+      "isaac64",
+      "isaaccsprng",
+      "isaac_rounds",
+      "isaac_iv_size",
+      "isaac_constant",
+      "isaac_key_size",
+      "isaac_prng_seed",
+      "isaac_seed_array",
+      "isaac_state_size",
+      "isaac_output_size",
+      "isaacrandompool.h",
+      "isaac_initial_seed",
+      "isaac_mix_constant"
+    ],
+    "category": "Random Number Generation"
+  },
+  {
+    "algorithmId": "juniper",
+    "algorithm": "Juniper",
     "strength": "",
     "keywords": [
-      "mod_Juniper_Decrypt",
-      "juniper_decrypt"
-    ]
+      "juniper_init",
+      "juniper::init",
+      "juniperdecrypt",
+      "juniperencrypt",
+      "juniper::setkey",
+      "juniper_decrypt",
+      "juniper_encrypt",
+      "juniper_set_key",
+      "juniper::decrypt",
+      "juniper::encrypt",
+      "juniper_key_size",
+      "juniper::key_size",
+      "juniper_block_size",
+      "juniper::block_size",
+      "mod_juniper_decrypt",
+      "juniper::generatekey"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "khazad",
-    "strength": "16",
+    "algorithmId": "kazumi",
+    "algorithm": "Kasumi",
+    "strength": "128",
     "keywords": [
-      "KHAZAD_ROUNDS",
-      "khazad_setkey",
-      "khazad_crypt",
-      "khazad_encrypt",
-      "khazad_decrypt",
-      "khazad_mod_fini",
-      "khazad-min.h",
-      "KHAZAD_H",
-      "KHAZAD_BLOCK_SIZE",
-      "KHAZAD_NUM_ROUNDS",
-      "KHAZAD_KEY_"
-    ]
-  },
-  {
-    "algorithm": "kazumi",
-    "strength": "64",
-    "keywords": [
-      "__KASUMI_H__",
       "kasumi.h",
-      "kasumi_desc"
-    ]
+      "kasumi_desc",
+      "__kasumi_h__",
+      "kazumidecrypt",
+      "kazumiencrypt"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "keccak",
+    "algorithmId": "keccak",
+    "algorithm": "Keecak",
     "strength": "256",
     "keywords": [
-      "KeccakHash.h",
-      "Keccak_HashFinal",
-      "KeccakSum"
-    ]
+      "keccak_",
+      "keccak256",
+      "keccak512",
+      "keccaksum",
+      "keccakhash.h",
+      "keccak_hashfinal"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "feal",
-    "strength": "64",
+    "algorithmId": "khazad",
+    "algorithm": "Khazad",
+    "strength": "128",
     "keywords": [
-      "lmhashConstant",
-      "unKnownLMHashes",
-      "createLMHash"
-    ]
+      "khazad_h",
+      "khazad_key_",
+      "khazad-min.h",
+      "khazad_crypt",
+      "khazad_rounds",
+      "khazad_setkey",
+      "khazad_decrypt",
+      "khazad_encrypt",
+      "khazad_mod_fini",
+      "khazad_block_size",
+      "khazad_num_rounds"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "loki91",
+    "algorithmId": "loki91",
+    "algorithm": "LOKI-91 Block Cipher",
     "strength": "64",
     "keywords": [
       "loki.h",
       "loki.i",
-      "loki_lib_ver",
+      "loki91_",
       "setlokikey",
-      "setlokikey"
-    ]
+      "setlokikey",
+      "loki_lib_ver"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "luc",
+    "algorithmId": "luc",
+    "algorithm": "LUC Public Key Cryptosystem",
     "strength": "64",
     "keywords": [
-      "CRYPTOPP_LUC_H",
-      "LUCFunction",
-      "luc.h"
-    ]
+      "luc.h",
+      "lucfunction",
+      "cryptopp_luc_h"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "lucifer",
+    "algorithmId": "lucifer",
+    "algorithm": "Lucifer Block Cipher",
     "strength": "128",
     "keywords": [
-      "lucifer.h"
-    ]
+      "lucifer.h",
+      "lucifer_setup",
+      "lucifer_decrypt",
+      "lucifer_encrypt",
+      "lucifer_permute",
+      "lucifer_key_size",
+      "lucifer_block_size",
+      "lucifer_num_rounds",
+      "lucifer_key_schedule",
+      "lucifer_round_function"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "md160",
+    "algorithmId": "mceliece",
+    "algorithm": "McEliece",
     "strength": "64",
     "keywords": [
-      "ripemd160.h",
-      "ripemd160_Init",
-      "ripemd160_process",
-      "ripemd160_update"
-    ]
+      "mceliece.h",
+      "mceliece_g",
+      "mceliece_h",
+      "mceliece_dec",
+      "mceliece_enc",
+      "mceliece_init",
+      "delete_mceliece",
+      "mceliece_keygen\"",
+      "mceliececipher.py"
+    ],
+    "category": "Post-Quantum Cryptography"
   },
   {
-    "algorithm": "md2",
+    "algorithmId": "md160",
+    "algorithm": "RIPEMD-160 Hash Function",
+    "strength": "64",
+    "keywords": [
+      "md160-",
+      "md160.",
+      "md160_",
+      "ripemd160.h",
+      "ripemd160_init",
+      "ripemd160_update",
+      "ripemd160_process"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "md2",
+    "algorithm": "Message Digest Algorithm 2",
     "strength": "256",
     "keywords": [
-      "MD2.py",
+      "md2.py",
+      "md2sum",
+      "md2::md2",
+      "md2_init",
       "md2_block",
-      "MD2_Init",
-      "MD2_Update",
-      "MD2_Final"
-    ]
+      "md2_final",
+      "md2_update",
+      "digest::md2",
+      "insecure.md2",
+      ".createhash('md2')",
+      "hashlib.new('md2')"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "md4",
+    "algorithmId": "md4",
+    "algorithm": "MD4 Message-Digest Algorithm",
     "strength": "128",
     "keywords": [
-      "MD4.h",
-      "MD4_HMAC_BLOCK_SIZE",
-      "MD4_BLOCK_WORDS",
-      "MD4_HASH_WORDS",
-      "MD4_DIGEST_SIZE",
-      "md4_update",
+      "md4 ",
+      "md4.h",
+      "md4_hash",
       "md4_init",
       "md4_final",
-      "MD4_Init",
-      "md4_block_data_order",
-      "#include <openssl/md4.h>",
-      "MD4_DIGEST_LENGTH",
-      ".createHash('md4')",
+      "md4_magic",
       "crypto/md4",
-      "hashlib.new('md4'"
-    ]
+      "md4_digest",
+      "md4_update",
+      "md4_padding",
+      "md4_transform",
+      "hashlib.new('md4'",
+      ".createhash('md4')",
+      "md4_hmac_block_size",
+      "md4_block_data_order",
+      "#include \u003copenssl/md4.h\u003e",
+      "md4_block_words - md4_hash_"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "md5",
+    "algorithmId": "md5",
+    "algorithm": "MD5 Message-Digest Algorithm",
     "strength": "128",
     "keywords": [
-      "md5_file",
-      "md5",
-      "md5crypt",
+      "md5.",
+      "md5_",
+      "md5sum",
+      "md5hash",
+      "md5hash",
       "aprcrypt",
-      "md5_encrypt",
-      "md5_block_data_order",
+      "hash_md5",
+      "md5_file",
+      "md5_init",
+      "md5crypt",
+      "mdstring",
+      "md5digest",
+      "0x5a827999",
+      "0xd76aa478",
+      "0xe8c7b756",
+      "md5compute",
+      "md5_encrypt\"",
       "ossl_md5_sha1_",
-      "MD5_Init"
-    ]
+      "md5_block_data_order"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "md6",
+    "algorithmId": "md6",
+    "algorithm": "MD6 Message-Digest Algorithm",
     "strength": "512",
     "keywords": [
-      "MD6.py",
+      "md6.",
+      "md6_",
       "md6_encrypt",
-      "CatMD6Crypto",
-      "md6Crypto.hash"
-    ]
+      "catmd6crypto",
+      "md6crypto.hash"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "mdc2",
+    "algorithmId": "mdc2",
+    "algorithm": "MDC-2",
     "strength": "128",
     "keywords": [
-      "MDC2.h",
       "mdc2",
+      "::md2",
+      "mdc2.h",
+      "mdc2.new",
+      "mdc2_body",
+      "mdc2_init",
+      "mdc2_final",
+      "mdc2_update",
       "mdc2_with_aes.py",
-      "MDC2_Init",
-      "MDC2_Update",
-      "MDC2_Final",
-      "mdc2_body"
-    ]
+      "getinstance(\"mdc2\")",
+      "crypto.createhash('mdc2')"
+    ],
+    "category": "Hash Functions"
   },
   {
-    "algorithm": "misty1",
+    "algorithmId": "misty1",
+    "algorithm": "MISTY1 Block Cipher",
     "strength": "32",
     "keywords": [
-      "misty1_keyinit",
-      "misty1_encrypt_block",
-      "MISTY1_KEYSIZE"
-    ]
+      "misty1_"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "mqv",
+    "algorithmId": "mqv",
+    "algorithm": "Menezes-Qu-Vanstone",
     "strength": "512",
     "keywords": [
+      "ecmqv",
+      "fhmqv",
       "mqv.h",
       "hmqv.h",
-      "ECMQV",
-      "EQV_Domain",
-      "ECHMQV512",
-      "ECHMQV384",
-      "ECHMQV256",
-      "ECHMQV128",
-      "FHMQV",
-      "FHMQV512",
-      "FHMQV384",
-      "FHMQV256",
-      "FHMQV128"
-    ]
+      "fhmqv128",
+      "fhmqv256",
+      "fhmqv384",
+      "fhmqv512",
+      "eqv_domain",
+      "mqv_signing",
+      "mqv_key_agreement",
+      "mqv_key_exchange\"",
+      "mqv_verification\"",
+      "menezes-qu-vanstone"
+    ],
+    "category": "Asymmetric Encryption"
   },
   {
-    "algorithm": "mscash",
+    "algorithmId": "mscash",
+    "algorithm": "Microsoft Cache Hash (MSCASH)",
     "strength": "256",
     "keywords": [
-      "mscash.x.gz",
-      "mscash"
-    ]
+      "mscash.",
+      "mscash_",
+      "mscash.x.gz"
+    ],
+    "category": "Password Hashing"
   },
   {
-    "algorithm": "mscash2",
+    "algorithmId": "mscash2",
+    "algorithm": "Microsoft Cache Hash v2 (MSCASH2)",
     "strength": "128",
     "keywords": [
       "mascash2"
-    ]
+    ],
+    "category": "Password Hashing"
   },
   {
-    "algorithm": "multi2",
+    "algorithmId": "multi2",
+    "algorithm": "Multi2",
     "strength": "128",
     "keywords": [
       "multi2.h",
-      "LTC_MULTI2",
+      "ltc_multi2",
+      "multi2_dec",
+      "multi2_ecb",
+      "multi2_enc",
       "multi2_desc",
-      "multi2_setup",
-      "multi2_ecb_encrypt",
-      "multi2_ecb_decrypt"
-    ]
+      "multi2_setup"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "mceliece",
-    "strength": "64",
-    "keywords": [
-      "MCELIECE_H",
-      "mceliece.h",
-      "mceliece_init",
-      "delete_mceliece",
-      "mceliececipher.py"
-    ]
-  },
-  {
-    "algorithm": "ntruencrypt",
-    "strength": "128",
-    "keywords": [
-      "NTRU_NTRU_H",
-      "ntru.h",
-      "ntruprime_gen_key_pair",
-      "ntru_gen_key_pair_multi",
-      "ntru_gen_pub",
-      "ntru_encrypt",
-      "ntru_decrypt",
-      "net.sf.ntru.util"
-    ]
-  },
-  {
-    "algorithm": "nimbus",
+    "algorithmId": "nimbus",
+    "algorithm": "Nimbus",
     "strength": "256",
     "keywords": [
-      "nimbusds.jose",
-      "JOSEObjectType "
-    ]
+
+      "nimbus_",
+      "nimbusds.jose"
+
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "noekeon",
+    "algorithmId": "noekeon",
+    "algorithm": "",
     "strength": "128",
     "keywords": [
-      "NoekeonIndirectRef",
+
+      "noekeon_",
       "noekeon.h",
-      "NoekeonEngine",
-      "NoekeonEngine.cs"
-    ]
+      "noekeonengine",
+      "noekeonengine.cs",
+      "noekeonindirectref"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "pbe",
+    "algorithmId": "ntruencrypt",
+    "algorithm": "NTRUEncrypt",
     "strength": "128",
     "keywords": [
-      "org.xeustechnologies.crypto.kpbe",
-      "PBE",
-      "KPBE"
-    ]
+      "decryptntru",
+      "encryptntru",
+      "decryptwithntru",
+      "encryptwithntru",
+      "generatentrukeys",
+      "net.sf.ntru.util",
+      "generatentrukeypair",
+      "generatentrukeypair",
+      "ntrugeneratekeypair",
+      "ntrugeneratekeypair",
+      "ntruprime_gen_key_pair"
+    ],
+    "category": "Post-Quantum Cryptography"
   },
   {
-    "algorithm": "pbes1",
+    "algorithmId": "ofb",
+    "algorithm": "Output Feedback",
+    "strength": "",
+    "keywords": [
+      "des_ofb",
+      "rc2-ofb",
+      "rc2_ofb",
+      "rc4-ofb",
+      "rc5-ofb",
+      "rc5_ofb",
+      "idea_ofb_",
+      "sms4_ofb_",
+      "aes_ofb128_",
+      "ice_ofb_mode",
+      "tea_ofb_mode",
+      "safer_mode_ofb",
+      "tdes_flags_ofb",
+      "rc5_32_ofb64_encrypt",
+      "camellia_ofb128_encrypt",
+      "crypto.cipher.camellia.mode_ofb"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "panama",
+    "algorithm": "PANAMA",
     "strength": "128",
     "keywords": [
-      "PBEWithMD5AndDES",
-      "getPBES1EncryptionObject",
-      "getPBES1Hash",
-      "getPBES1KDF",
-      "PKCS5_SCHEME_PBES1"
-    ]
+
+      "panama.h\"",
+      "panamainit",
+      "panamafinal",
+      "panama_ltx__",
+      "panamaupdate",
+      "panamacontext",
+      "panamaencrypt",
+      "panamakeysetup"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "pbes2",
+    "algorithmId": "pbe",
+    "algorithm": "Password-Based Encryption",
+    "strength": "128",
+    "keywords": [
+      "pbewith",
+      "pbekeyspec",
+      "pbes2parameters",
+      "pbeparameterspec",
+      "org.xeustechnologies.crypto.kpbe"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "pbes1",
+    "algorithm": " Password-Based Encryption Scheme 1",
+    "strength": "128",
+    "keywords": [
+      "getpbes1kdf",
+      "getpbes1hash",
+      "pbewithmd5anddes",
+      "pkcs5_scheme_pbes1",
+      "getpbes1encryptionobject"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "pbes2",
+    "algorithm": "Password-Based Encryption Scheme 2",
     "strength": "256",
     "keywords": [
-      "getPBES2EncryptionObject",
-      "id-PBES2",
-      "PBES2HS256A128KW",
-      "PBES2AESKW",
-      "PBES2-HS256+A128K"
-    ]
+      "_pbes2",
+      "pbes2_",
+      "id-pbes2",
+      "pbes2aeskw",
+      "pbes2hs256a128kw",
+      "pbes2-hs256+a128k",
+      "getpbes2encryptionobject"
+    ],
+    "category": "Key Derivation Functions"
   },
   {
-    "algorithm": "panama",
+    "algorithmId": "pbkdf1",
+    "algorithm": "Password-Based Key Derivation Function 1",
     "strength": "128",
     "keywords": [
-      "panama.h",
-      "panama_LTX__"
-    ]
+      "pbkdf1"
+    ],
+    "category": "Key Derivation Functions"
   },
   {
-    "algorithm": "quad",
+    "algorithmId": "pbkdf2",
+    "algorithm": "Password-Based Key Derivation Function 2",
     "strength": "128",
     "keywords": [
-      "QUAD.pack",
-      "QUAD.unpack"
-    ]
+      "_pbkdf2",
+      "pbkdf2.js",
+      "ikonoshirt_pbkdf2_model_encryption"
+    ],
+    "category": "Key Derivation Functions"
   },
   {
-    "algorithm": "rc2",
+    "algorithmId": "pgp",
+    "algorithm": "Pretty Good Privacy",
     "strength": "128",
     "keywords": [
-      "rc2_LTX__mcrypt_",
-      "RC2_encrypt",
-      "RC2_decrypt",
-      "RC2_ecb_encrypt",
-      "RC2_set_key",
-      "RC2_cfb64_encrypt",
-      "RC2_ofb64_encrypt",
-      "RC2_cbc_encrypt",
-      "#include <openssl/rc2.h>"
-    ]
+      "_pgp",
+      "gpg_",
+      "gnupg",
+      "libpgp\"",
+      "pgp_crc",
+      "pgp_hash_",
+      "pgp_cipher",
+      "pgp_format",
+      "pgp_material",
+      "pgp_signature",
+      "pgp_public_key",
+      "pgp_file_header",
+      "pgp_private_key",
+      "pgp_file_trailer"
+    ],
+    "category": "Certificate Formats"
   },
   {
-    "algorithm": "rc4",
-    "strength": "2048",
-    "keywords": [
-      "RC4_H",
-      "RC4_KEY_S",
-      "RC4_key",
-      "RC4",
-      "RC4_set_key"
-    ]
-  },
-  {
-    "algorithm": "rc4-hmac",
-    "strength": "2048",
-    "keywords": [
-      "RC4-HMAC-MD5",
-      "RC4HMAC",
-      "RC4-HMAC.go"
-    ]
-  },
-  {
-    "algorithm": "rc5",
+    "algorithmId": "pkcs12",
+    "algorithm": "PKCS #12: Personal Information Exchange Syntax",
     "strength": "128",
     "keywords": [
-      "RC5.new",
-      "rc5.rb",
-      "RC5Enc",
-      "RC5Dec",
-      "RC5Enc.java",
-      "RC5Dec.java",
-      "RC5_32_decrypt",
-      "RC5_32_set_key",
-      "RC5_32_cfb64_encrypt",
-      "RC5_32_ofb64_encrypt",
-      "RC5_32_ecb_encrypt",
-      "RC5_32_cbc_encrypt",
-      "RC5_32_encrypt",
-      "import org.bouncycastle.crypto.engines.RC532Engine",
-      "require('rc5-cipher')",
-      "rc5.encrypt(",
-      "github.com/inge6/gorc5",
-      "gorc5.NewCipher",
-      "require 'RC5.php'",
-      "RC5::encrypt",
-      "from rc5 import RC5"
-    ]
+      "pkcs8_",
+      "pkcs12_",
+      "parse_pk12",
+      "openssl_asc2uni"
+    ],
+    "category": "Certificate Formats"
   },
   {
-    "algorithm": "rc6",
+    "algorithmId": "pkcs7",
+    "algorithm": "PKCS #7: Cryptographic Message Syntax",
     "strength": "128",
     "keywords": [
-      "AlgorithmRC6",
-      "RC6.encrypt",
-      "RC6.decript",
-      "RC6_HPP__"
-    ]
+      "pkcs7_",
+      "pkcs7data",
+      "pkcs7padding",
+      "pkcs7signature",
+      "pkcs7data_final",
+      "pkcs7contentinfo",
+      "pkcs7contenttype",
+      "smime_write_pkcs7",
+      "smime_write_asn1_ex",
+      "ossl_x509_add_cert_new"
+    ],
+    "category": "Certificate Formats"
   },
   {
-    "algorithm": "ripemd",
+    "algorithmId": "quad",
+    "algorithm": "Quad",
     "strength": "128",
     "keywords": [
-      "RIPEMD160_DIGEST_LENGTH",
-      "RIPEMD160_CTX",
-      "ripemd160_Init",
-      "ripemd160_process",
-      "ripemd160_Update",
-      "RIPEMD160_Init",
-      "ripemd160_block_data_order",
-      "ripemd160_block_x86",
-      "ripemd160_block",
-      "#include <openssl/ripemd.h>",
-      "RIPEMD160_Init",
-      "RIPEMD160_Update",
-      "RIPEMD160_Final",
-      ".getInstance(\"RIPEMD160\")",
-      "crypto.createHash('ripemd160')",
-      "golang.org/x/crypto/ripemd160",
-      "ripemd160.New()",
-      "hash('ripemd160'",
-      "hashlib.new('ripemd160'"
-    ]
+      "quad.pack",
+      "quad_key_",
+      "quad.unpack",
+      "quad_block_",
+      "quad_decrypt",
+      "quad_encrypt"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "rsa-oaep",
+    "algorithmId": "rabbit",
+    "algorithm": "Rabbit",
     "strength": "128",
     "keywords": [
-      "encryptRSAWithOAEP",
-      "decryptRSAWithOAEP",
-      "RSA_OAEP_H",
-      "RSA_OAEP"
-    ]
-  },
-  {
-    "algorithm": "rsa",
-    "strength": "128",
-    "keywords": [
-      "forge.pki.rsa.",
-      "require('node-rsa')",
-      "RSACRYPT_H",
-      "RSAcrypt",
-      "RSAdecrypt",
-      "JSEncryptRSAKey",
-      "ossl_rsa_acvp_",
-      "RSA_size",
-      "rsa_priv_print",
-      "RSA_verify_PKCS1_PSS",
-      "RSA_get0_crt_params",
-      "RSA_meth_set_",
-      "RSA_meth_free",
-      "RSA_padding_check_none",
-      "pkey_rsa_ctrl_str",
-      "ossl_rsa_check_",
-      "ossl_rsa_pss_get_param_unverified",
-      "rsa_pkey_dirty_cnt",
-      "rsa_int_import_from",
-      "rsa_pkey_import_from",
-      "ossl_rsa_dup",
-      "rsa_new_intern",
-      "RSA_set_method",
-      "RSA_sign_ASN1_OCTET_STRIN",
-      "rsa_validate_rng_strength",
-      "rsa_validate_keypair_multiprime",
-      "RSA_meth_new",
-      "RSA_verify_ASN1_OCTET_STRING",
-      "RSA_X931_generate_key_ex",
-      "RSA_generate_multi_prime_key",
-      "RSA_get_ex_data",
-      "RSA_padding_add_PKCS1_type_2",
-      "rsa_pub_encode",
-      "rsa_item_sign",
-      "EVP_PKEY_CTX_set_rsa_keygen_primes",
-      "RSA_padding_add_PKCS1_OAEP",
-      "RSA/ECB/",
-      "RSAES-PKCS1-V1_5-ENCRYPT",
-      "RSAES-PKCS1-V1_5"
-    ]
-  },
-  {
-    "algorithm": "rabin",
-    "strength": "128",
-    "keywords": [
-      "Rabin.genKey",
-      "Rabin.encrypt",
-      "Rabin.decrypt"
-    ]
-  },
-  {
-    "algorithm": "rabbit",
-    "strength": "128",
-    "keywords": [
-      "Rabbit_Util",
-      "Rabbit_ctx",
-      "Rabbit_state",
-      "Rabbit_Cipher.py",
-      "#include \"rabbit.h\"",
+      "rabbit_ctx",
+      "rabbit_util",
+      "rabbit_state",
+      "rabbit_cipher",
+      "rabbit_crypto",
+      "rabbit_cypher",
+      "rabbit_set_iv",
+      "rabbit_decrypt",
       "rabbit_encrypt",
-      "SecretKeySpec(key, \"Rabbit\")",
-      "createCipheriv('Rabbit'",
-      "from Crypto.Cipher import Rabbit"
-    ]
+      "rabbit_encrypt",
+      "rabbit_set_key",
+      "rabbit_key_setup",
+      "rabbit_crypt_bytes",
+      "#include \"rabbit.h\"",
+      "rabbit_process_bytes",
+      "createcipheriv('rabbit'",
+      "secretkeyspec(key, \"rabbit\")",
+      "from crypto.cipher import rabbit"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "rijndael",
+    "algorithmId": "rabin",
+    "algorithm": "Rabin",
+    "strength": "128",
+    "keywords": [
+      "rabin_dec",
+      "rabin_enc",
+      "rabin.genkey",
+      "rabin.decrypt",
+      "rabin.encrypt",
+      "rabin_generate_key",
+      "rabin_compute_signature",
+      "rabin_validate_signature"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "rc2",
+    "algorithm": "RC2 Block Cipher",
+    "strength": "128",
+    "keywords": [
+      "rc2-cbc",
+      "rc2-cfb",
+      "rc2-ecb",
+      "rc2-ofb",
+      "rc2.new",
+      "rc2_128",
+      "rc2_cbc",
+      "rc2_cfb",
+      "rc2_ecb",
+      "rc2_key",
+      "rc2_ofb",
+      "rc2context",
+      "rc2engine.",
+      "cipher::rc2",
+      "rc2.decrypt",
+      "rc2.encrypt",
+      "rc2_decrypt",
+      "rc2_encrypt",
+      "rc2_set_key",
+      "rc2_set_key",
+      "rc2.key_size",
+      "rc2 algorithm",
+      "rc2.newcipher",
+      "rc2.block_size",
+      "rc2.block_size",
+      "rc2_block_size",
+      "rc2_ltx__mcrypt_",
+      "createcipheriv('rc2'",
+      "createdecipheriv('rc2'",
+      "#include \u003copenssl/rc2.h\u003e"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "rainbow",
+    "algorithm": "Rainbow",
+    "strength": "-",
+    "keywords": [
+      "rainbow.h",
+      "rainbow_key",
+      "rainbow_sign",
+      "rainbowsigner",
+      "crypto.rainbow",
+      "rainbow_genkey",
+      "rainbow_params",
+      "rainbow_verify",
+      "rainbowkeypair",
+      "rainbowverifier",
+      "rainbow_instance",
+      "rainbowpublickey",
+      "rainbowsignature",
+      "rainbow_signature",
+      "rainbowparameters",
+      "rainbowprivatekey",
+      "rainbow_public_map",
+      "rainbow_central_map",
+      "rainbow_private_map",
+      "pqcsignature.rainbow",
+      "rainbow_verification",
+      "rainbow_solve_equation",
+      "rainbowkeypairgenerator",
+      ".jcajce.provider.rainbow",
+      "rainbow_generate_keypair",
+      "rainbow_compute_oil_variables",
+      "rainbow_compute_vinegar_variable"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "rc4-hmac",
+    "algorithm": "RC4 with HMAC",
+    "strength": "2048",
+    "keywords": [
+      "rc4hmac",
+      "rc4-hmac.go",
+      "rc4-hmac-md5",
+      "cryptopp::rc4",
+      "crypto.hash.hmac"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "rc4",
+    "algorithm": "RC4 Stream Cipher",
+    "strength": "2048",
+    "keywords": [
+      "_rc4",
+      "rc4_h",
+      "rc4-cbc",
+      "rc4-cfb",
+      "rc4-ecb",
+      "rc4-ofb",
+      "rc4_gen",
+      "rc4_key",
+      "rc4_ksa",
+      "rc4_decr",
+      "rc4_encr",
+      "rc4_init",
+      "rc4_init",
+      "rc4_prga",
+      "rc4_setup",
+      "crypto/rc4",
+      "rc4_cipher",
+      "rc4context",
+      "rc4_context",
+      "rc4_set_key",
+      "rc4_generate",
+      "::cipher::rc4",
+      "rc4_key_setup",
+      "rc4_pseudo_random"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "rc5",
+    "algorithm": "RC5 Block Cipher",
+    "strength": "128",
+    "keywords": [
+      "rc5.rb",
+      "rc5dec",
+      "rc5enc",
+      "rc5-cbc",
+      "rc5-cfb",
+      "rc5-ecb",
+      "rc5-ofb",
+      "rc5.new",
+      "rc5_cbc",
+      "rc5_cfb",
+      "rc5_dec",
+      "rc5_ecb",
+      "rc5_enc",
+      "rc5_key",
+      "rc5_ofb",
+      "rc5context",
+      "rc5dec.java",
+      "rc5enc.java",
+      "rc5.encrypt(",
+      "rc5::encrypt",
+      "rc5_finalize",
+      "rc5_32_decrypt",
+      "rc5_32_encrypt",
+      "rc5_32_set_key",
+      "rc5_block_size",
+      "rc5_initialize",
+      "gorc5.newcipher",
+      "require 'rc5.php'",
+      "rc5_32_cbc_encrypt",
+      "rc5_32_ecb_encrypt",
+      "from rc5 import rc5",
+      "rc5_32_cfb64_encrypt",
+      "rc5_32_ofb64_encrypt",
+      "require('rc5-cipher')",
+      "github.com/inge6/gorc5",
+      "import org.bouncycastle.crypto.engines.rc532engine"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "rc6",
+    "algorithm": "RC6 Block Cipher",
+    "strength": "128",
+    "keywords": [
+      "rc6_dec",
+      "rc6_enc",
+      "rc6_key",
+      "rc6_hpp__",
+      "rc6_rounds",
+      "rc6.decript",
+      "rc6.encrypt",
+      "rc6_set_key",
+      "algorithmrc6",
+      "rc6_finalize",
+      "rc6_block_size",
+      "rc6_initialize"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "rijndael",
+    "algorithm": "Rijndael",
     "strength": "256",
     "keywords": [
-      "Rijndael.h",
-      "Rijndael256"
-    ]
+      "rijndaeli",
+      "rijndaels",
+      "rijndael.h",
+      "rijndael256",
+      "rijndaelkey",
+      "rijndaelfinal",
+      "rijndaelround",
+      "rijndaelcipher",
+      "rijndaelupdate",
+      "rijndaeldecrypt",
+      "rijndaelencrypt",
+      "rijndaelexpandkey",
+      "rijndaelmixcolumns",
+      "rijndaeladdroundkey",
+      "rijndaelgeneratekey"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "salsa10",
+    "algorithmId": "ripemd",
+    "algorithm": "RIPEMD Family of Hash Functions",
+    "strength": "128",
+    "keywords": [
+      "ripemd128",
+      "ripemd160",
+      "ripemd256",
+      "ripemd320",
+      "#include \u003copenssl/ripemd.h\u003e"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "rsa-oaep",
+    "algorithm": "RSA with Optimal Asymmetric Encryption Padding",
+    "strength": "128",
+    "keywords": [
+      "rsa_oaep",
+      "rsa_oaep_h",
+      "decryptrsawithoaep",
+      "encryptrsawithoaep"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "rsa",
+    "algorithm": "",
+    "strength": "128",
+    "keywords": [
+      "ossl_rsa",
+      "rsa/ecb/",
+      "rsa_meth",
+      "rsa_oaep",
+      "rsa_sha1",
+      "rsa_size",
+      "rsacrypt",
+      "ossl_rsa_",
+      "rsa_key_s",
+      "rsa_pkcs1",
+      "rsa_priv_",
+      "rsa_sign_",
+      "rsapubkey",
+      "rsa_pkcs1_",
+      "rsa_sha256",
+      "rsa_sha512",
+      "rsadecrypt",
+      "rsaprivkey",
+      "rsa.newkeys",
+      "rsa.private",
+      "rsa_decrypt",
+      "rsa_encrypt",
+      "rsa_modulus",
+      "rsa_padding",
+      "rsa_public_",
+      "rsa_public_",
+      "rsa_verify_",
+      "rsa_padding_",
+      "rsa_private_",
+      "rsa_private_",
+      "rsapublickey",
+      "openssl/rsa.h",
+      "rsa_algorithm",
+      "rsa_generate_",
+      "rsa_item_sign",
+      "rsa_validate_",
+      "rsaprivatekey",
+      "cryptopp/rsa.h",
+      "forge.pki.rsa.",
+      "rsa_decryption",
+      "rsa_encryption",
+      "rsa_new_intern",
+      "rsa_no_padding",
+      "rsa_pkcs1_v1_5",
+      "rsa_pub_encode",
+      "rsa_set_method",
+      "rsa_gen_keypair",
+      "rsa_get_ex_data",
+      "rsa_get_padding",
+      "rsa_set_padding",
+      " rsa private key",
+      "rsa_max_key_size",
+      "rsa_min_key_size",
+      "rsa_oaep_padding",
+      "rsaes-pkcs1-v1_5",
+      ".getinstance(\"rsa",
+      "pkey_rsa_ctrl_str",
+      "rsa_pkcs1_padding",
+      "rsa_pkey_dirty_cnt",
+      "rsa_public_encrypt",
+      "require('node-rsa')",
+      "rsa_get0_crt_params",
+      "rsa_int_import_from",
+      "rsa_public_exponent",
+      "rsa_signing_padding",
+      "rsa_private_exponent",
+      "rsa_verify_signature",
+      "rsa_verify_signature",
+      "rsa_compute_signature",
+      "rsa_encryption_padding",
+      "rsa_x931_generate_key_ex",
+      "rsaes-pkcs1-v1_5-encrypt",
+      "evp_pkey_ctx_set_rsa_keygen_primes"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "safer",
+    "algorithm": "Secure And Fast Encryption Routine",
+    "strength": "128",
+    "keywords": [
+      "saferk",
+      "safer-k",
+      "safer_k",
+      "safersk",
+      "safer-sk",
+      "safer_sk",
+      "safer_mode_cbc",
+      "safer_mode_cfb",
+      "safer_mode_ecb",
+      "safer_mode_ofb"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "salsa20",
+    "algorithm": "Salsa20",
+    "strength": "256",
+    "keywords": [
+      "s20_iv",
+      "s20_key",
+      "salsa20",
+      "s20_block"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "salsa10",
+    "algorithm": "Salsa10 Stream Cipher",
     "strength": "64",
     "keywords": [
       "salsa10",
       "salsa10-src.bin",
       "salsa10-nonce.bin"
-    ]
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "salsa20",
+    "algorithmId": "salsa20",
+    "algorithm": "Salsa20 Stream Cipher",
     "strength": "128",
     "keywords": [
-      "ESTREAM_SALSA20",
-      "wrap_salsa20_set_nonce",
+      "salsa20.new",
       "c_salsa20_crypt",
+      "estream_salsa20",
       "#include \"salsa20.h\"",
-      ".createCipheriv('salsa20'",
-      "from Crypto.Cipher import Salsa20",
-      "Salsa20.new"
-    ]
+      "wrap_salsa20_set_nonce",
+      ".createcipheriv('salsa20'",
+      "from crypto.cipher import salsa20"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "shs",
-    "strength": "128",
-    "keywords": [
-      "secret-handshake",
-      "shsInit",
-      "shs1",
-      "shsInit",
-      "SHS_CTX",
-      "shsUpdate",
-      "shs.h"
-    ]
-  },
-  {
-    "algorithm": "sms4",
-    "strength": "128",
-    "keywords": [
-      "sm4_encdec",
-      "CRYPTOPP_SM4_H",
-      "CRYPTOPP_SM4_ADVANCED_PROCESS_BLOCKS",
-      "sms4.h",
-      "SMS4CROL",
-      "SMS4MASK"
-    ]
-  },
-  {
-    "algorithm": "snow",
-    "strength": "128",
-    "keywords": [
-      "snow5_aes_round",
-      "snow-3g.h",
-      "RTE_CRYPTO_CIPHER_SNOW3G_UEA2",
-      "RTE_CRYPTO_AUTH_SNOW3G_UIA2"
-    ]
-  },
-  {
-    "algorithm": "snerfu",
-    "strength": "256",
-    "keywords": [
-      "Snefru"
-    ]
-  },
-  {
-    "algorithm": "sosemanuk",
-    "strength": "128",
-    "keywords": [
-      "SOSEMANUK_H__",
-      "sosemanuk_key_context",
-      "sosemanuk_schedule",
-      "sosemanuk_init",
-      "sosemanuk_encrypt",
-      "SosemanukSlow",
-      "SosemanukFast"
-    ]
-  },
-  {
-    "algorithm": "ssha",
-    "strength": "128",
-    "keywords": [
-      "checkssha",
-      "SSHA",
-      "SSHA224PasswordEncoder",
-      "SSHA224PasswordDecoder",
-      "SSHA256PasswordEncoder",
-      "SSHA256PasswordDecoder"
-    ]
-  },
-  {
-    "algorithm": "seal",
-    "strength": "128",
-    "keywords": [
-      "SEALContext",
-      "seal.h",
-      "SEALWrapper",
-      "toSealObject",
-      "fromSealObject"
-    ]
-  },
-  {
-    "algorithm": "seed",
-    "strength": "256",
-    "keywords": [
-      "seed128Cipher",
-      "seed.go"
-    ]
-  },
-  {
-    "algorithm": "shax",
-    "strength": "128-512",
-    "keywords": [
-      "SHA-1",
-      "SHA-224",
-      "SHA-256",
-      "SHA-384",
-      "SHA-512",
-      "SHA3-224",
-      "SHA3-256",
-      "SHA3-384",
-      "SHA3-512",
-      "jsSHA1",
-      "jsSHA256",
-      "jsSHA512",
-      "jsSHA3",
-      "sha3.sha3_256",
-      "sha.ts",
-      "SHA512_Update",
-      "SHA512_Init",
-      "sha512_block_data_order",
-      "SHA512_Transform",
-      "sha512_block_p8",
-      "SHA512_Final",
-      "SHA256_Init",
-      "SHA224_Update",
-      "SHA224_Final",
-      "sha512_256_init",
-      "sha512_block_ppc",
-      "import org.bouncycastle.crypto.digests.SHA256Digest",
-      "import org.bouncycastle.crypto.digests.SHA512Digest",
-      "forge.md.sha256.",
-      "createHash('sha256')",
-      "CryptoJS.SHA256",
-      "DigestUtils.sha256Hex",
-      ".getInstance(\"SHA-256\")",
-      "'sha512'",
-      "openssl/sha.h",
-      "cryptopp/sha.h",
-      "crypto/sha1",
-      "crypto/sha256",
-      "crypto/sha512",
-      "hash('sha256'",
-      "sha256("
-    ]
-  },
-  {
-    "algorithm": "shacal",
-    "strength": "128",
-    "keywords": [
-      "Shacal",
-      "isShacal1",
-      "CRYPTOPP_SHACAL2_H",
-      "SHACAL2Encryption",
-      "SHACAL2",
-      "#include \"shacal.h\"",
-      ".getInstance(\"Shacal2\");",
-      "require('shacal')",
-      "crypto/shacal2",
-      "from Crypto.Cipher import SHACAL2",
-      "SHACAL2.new"
-    ]
-  },
-  {
-    "algorithm": "shark",
-    "strength": "64",
-    "keywords": [
-      "voipshark",
-      "shark.h",
-      "SHARKTransform",
-      "CRYPTOPP_SHARK_H"
-    ]
-  },
-  {
-    "algorithm": "skein",
-    "strength": "256",
-    "keywords": [
-      "skeincrypto.h",
-      "skein",
-      "sk_init",
-      "sk_encrypt",
-      "sk_decrypt"
-    ]
-  },
-  {
-    "algorithm": "skipjack",
-    "strength": "32",
-    "keywords": [
-      "FastSkipJack",
-      "SkipJack",
-      "skipjackCipher",
-      "skipjack.go"
-    ]
-  },
-  {
-    "algorithm": "sober",
-    "strength": "128",
-    "keywords": [
-      "LTC_SOBER128",
-      "sober128_start",
-      "sober128_add_entropy",
-      "sober128_ready",
-      "sober128_read",
-      "sober128_done",
-      "sober128_export",
-      "sober128_import",
-      "sober128_test"
-    ]
-  },
-  {
-    "algorithm": "tdes",
-    "strength": "128",
-    "keywords": [
-      "TDES_FLAGS_ENCRYPT",
-      "TDES_FLAGS_OPMODE_MASK",
-      "TDES_FLAGS_ECB",
-      "TDES_FLAGS_CBC",
-      "TDES_FLAGS_OFB",
-      "TDES_FLAGS_CFB64",
-      "TDES_FLAGS_CFB32",
-      "TDES_FLAGS_CFB16",
-      "TDES_FLAGS_CFB8",
-      "DES_ecb3_encrypt"
-    ]
-  },
-  {
-    "algorithm": "tea",
-    "strength": "128",
-    "keywords": [
-      "tea_encrypt",
-      "tea_decrypt",
-      "tea_cbc_mode",
-      "tea_ofb_mode"
-    ]
-  },
-  {
-    "algorithm": "tnepres",
-    "strength": "256",
-    "keywords": [
-      "TnepresEngine",
-      "Cipher.Tnepres",
-      "KeyGenerator.Tnepres",
-      "AlgorithmParameters.Tnepres"
-    ]
-  },
-  {
-    "algorithm": "threefish",
-    "strength": "1024",
-    "keywords": [
-      "Crypto.Threefish.Common",
-      "newThreefish256",
-      "newThreefish512",
-      "newThreefish1024",
-      "threefish_mod_fini",
-      "threefish_algs",
-      "threefish_round",
-      "threefish_roundinv",
-      "threefish_encrypt_generic"
-    ]
-  },
-  {
-    "algorithm": "tiger",
-    "strength": "256",
-    "keywords": [
-      "tiger_compress_macro",
-      "tiger_compress",
-      "ausTigerTokens1"
-    ]
-  },
-  {
-    "algorithm": "twofish",
-    "strength": "64",
-    "keywords": [
-      "twofish.h",
-      "Twofish_fatal",
-      "Twofish_Byte",
-      "exp_Twofish_prepare_key",
-      "Twofish_prepare_key",
-      "twofish.h"
-    ]
-  },
-  {
-    "algorithm": "vmpc",
-    "strength": "",
-    "keywords": [
-      "VMPCEngine.java ",
-      "VMPCrypt.py",
-      "_VMPC_H_",
-      "VmpcInitKeyRound",
-      "VmpcInitKey",
-      "VmpcInitKeyBASIC",
-      "VmpcEncrypt",
-      "VmpcEncryptMAC",
-      "VmpcDecryptMAC",
-      "VmpcOutputMAC"
-    ]
-  },
-  {
-    "algorithm": "wake",
-    "strength": "64",
-    "keywords": [
-      "WAKE.h",
-      "WAKE_TestInstantiations",
-      "WAKE_Base",
-      "WAKE_Policy",
-      "WAKE_Output"
-    ]
-  },
-  {
-    "algorithm": "whirpool",
-    "strength": "128",
-    "keywords": [
-      "whirlpool.New",
-      "whirpool.go",
-      "rhash_whirlpool_init",
-      "rhash_whirlpool_sbox",
-      "rhash_whirlpool_process_block",
-      "WHIRLPOOL_OP",
-      "WHIRLPOOL_Update",
-      "WHIRLPOOL_BitUpdate",
-      "WHIRLPOOL_Final",
-      "whirlpool_block_mmx",
-      "whirlpool_block",
-      "WHIRLPOOL_Init",
-      "#include <whirlpool.h>",
-      "#include \"whirlpool.h\"",
-      "import org.bouncycastle.crypto.digests.WhirlpoolDigest",
-      "crypto.createHash('whirlpool')",
-      "github.com/jzelinskie/whirlpool",
-      "hashlib.new('whirlpool')"
-    ]
-  },
-  {
-    "algorithm": "xtr",
-    "strength": "64",
-    "keywords": [
-      "CRYPTOPP_XTR_H",
-      "XTR_FindPrimesAndGenerator",
-      "XTR_Exponentiate"
-    ]
-  },
-  {
-    "algorithm": "yarrow",
-    "strength": "160",
-    "keywords": [
-      "yarrow_start",
-      "yarrow_desc",
-      "yarrow_start",
-      "yarrow_add_entropy",
-      "yarrow_ready",
-      "yarrow_read",
-      "yarrow_done",
-      "yarrow_export",
-      "yarrow_import",
-      "yarrow_test",
-      "LTC_YARROW",
-      "LTC_YARROW_AES",
-      "#include <yarrow.h>",
-      "yarrow256_done",
-      "yarrow256_context"
-    ]
-  },
-  {
-    "algorithm": "zuc",
-    "strength": "128",
-    "keywords": [
-      "ZUC_H",
-      "__ZUC_H__",
-      "zuc.asm",
-      "_zuc_init",
-      "_zuc_generate_keystream"
-    ]
-  },
-  {
-    "algorithm": "zipcrypt",
-    "strength": "64",
-    "keywords": [
-      "zipcloak",
-      "zipbare"
-    ]
-  },
-  {
-    "algorithm": "dsa",
-    "strength": "128",
-    "keywords": [
-      "ossl_dsa_generate_ffc_parameters",
-      "DSA_set_method",
-      "ossl_dsa_sign_int",
-      "DSA_set_ex_data",
-      "DSA_print",
-      "DSA_SIG_new",
-      "DSA_do_sign",
-      "dsa_finish",
-      "ossl_dsa_key_from_pkcs8",
-      "DSA_bits",
-      "dsa_pkey_ctrl",
-      "dsa_keygen_pairwise_test",
-      "pkey_dsa_keygen",
-      "pkey_dsa_copy",
-      "dsa_param_print",
-      "dsa_pub_print",
-      "DSA_meth_set_",
-      "ossl_dsa_key_fromdata",
-      "DSA_set_default_method",
-      "pkey_dsa_cleanup",
-      "pkey_dsa_ctrl_str",
-      "ossl_dsa_is_foreign",
-      "ossl_dsa_check_pairwise",
-      "DSA_meth_set0_app_data",
-      "pkey_dsa_init",
-      "dsa_sign_setup",
-      "ossl_dsa_check_params",
-      "DSA_up_ref",
-      "DSA_set0_key",
-      "DSA_meth_set1_name",
-      "dsa_init",
-      "dsa_mod_inverse_fermat",
-      "ossl_dsa_ffc_params_fromdata",
-      "DSA_meth_new",
-      "pkey_dsa_verify",
-      "DSA_generate_",
-      "ossl_dsa_get0_params",
-      "dsa_pub_encode",
-      "ossl_ffc_params_cmp",
-      "DSAparams_dup",
-      "DSA_meth_dup",
-      "EVP_PKEY_CTX_set_dsa_paramgen_md",
-      "dsa_priv_decode",
-      "int_dsa_free",
-      "ossl_dsa_check_",
-      "DSA_clear_flags",
-      "DSA_verify",
-      "i2d_DSAparams",
-      "DSA_test_flags",
-      "DSA_meth_get_",
-      "dsa_sign_setup_no_digest",
-      "dsa_priv_encode",
-      "dsa_copy_parameters",
-      "#include <openssl/dsa.h>",
-      ".getInstance(\"DSA\")",
-      ".getInstance(\"SHA256withDSA\")",
-      "crypto.generateKeyPairSync('dsa'",
-      "dsa.GenerateKey",
-      "crypto/dsa",
-      "dsa.Sign",
-      "OPENSSL_KEYTYPE_DSA",
-      "from Crypto.PublicKey import DSA"
-    ]
-  },
-  {
-    "algorithm": "pbkdf1",
-    "strength": "128",
-    "keywords": [
-      "pbkdf1.js"
-    ]
-  },
-  {
-    "algorithm": "pbkdf2",
-    "strength": "128",
-    "keywords": [
-      "pbkdf2.js",
-      "Ikonoshirt_Pbkdf2_Model_Encryption",
-      "KeyDerivation.Pbkdf2",
-      "_pbkdf2"
-    ]
-  },
-  {
-    "algorithm": "pkcs12",
-    "strength": "128",
-    "keywords": [
-      "PKCS7_digest_from_attributes",
-      "PKCS7_set_content",
-      "ossl_x509_add_cert_new",
-      "PKCS7_add_",
-      "PKCS7_type_is_other",
-      "PKCS7_find_digest",
-      "pkcs7_ecdsa_or_dsa_sign_verify_setup",
-      "pkcs7_rsa_sign_verify_setup",
-      "PKCS7_RECIP_INFO_set",
-      "i2d_PKCS7_bio_stream",
-      "PKCS7_final",
-      "ASN1_INTEGER_cmp",
-      "PKCS7_dataDecode",
-      "PKCS7_encrypt_ex",
-      "ossl_err_load_PKCS7_strings",
-      "PKCS7_RECIP_INFO_get0_alg",
-      "PKCS7_sign_add_signer",
-      "PKCS7_verify",
-      "pkcs7_cmp_ri",
-      "PKCS7_SIGNER_INFO_sign",
-      "PKCS7_set_type",
-      "PKCS7_encrypt",
-      "PKCS7_dataInit",
-      "PKCS7_set_attributes",
-      "PKCS7_SIGNER_INFO_set",
-      "pkcs7_bio_add_digest",
-      "ossl_pkcs7_ctx_propagate",
-      "PKCS7_stream",
-      "PKCS7_decrypt",
-      "PKCS7_get_octet_string",
-      "PKCS7_get_attribute",
-      "PKCS7_content_new",
-      "ossl_pkcs7_set0_libctx",
-      "ossl_pkcs7_ctx_get0_libctx",
-      "PKCS7_SIGNER_INFO_get0_algs",
-      "PKCS7_sign",
-      "PKCS7_new",
-      "pkcs7_decrypt_rinfo",
-      "PKCS7_dataFinal",
-      "ossl_pkcs7_resolve_libctx",
-      "PEM_write_bio_PKCS7_stream",
-      "PKCS7_ctrl",
-      "SMIME_write_PKCS7",
-      "SMIME_write_ASN1_ex",
-      "PKCS7_add1_attrib_digest",
-      "PKCS7_get_issuer_and_serial",
-      "PKCS7_get_signed_attribute",
-      "PKCS7_sign_ex",
-      "PKCS12_get0_mac",
-      "PKCS12_pack_p7encdata",
-      "PKCS12_add_",
-      "PKCS12_PBE_",
-      "PKCS12_item_i2d_encrypt",
-      "PKCS12_init",
-      "PKCS12_gen_mac",
-      "PKCS12_decrypt_skey",
-      "PKCS12_add1_attr_by_NID",
-      "PKCS12_key_gen_utf8_ex",
-      "PKCS12_get_attr",
-      "PKCS8_get_attr",
-      "PKCS12_SAFEBAG_create0_pkcs8",
-      "PKCS12_init_ex",
-      "parse_pk12",
-      "PKCS12_pack_",
-      "PKCS12_item_i2d_encrypt_ex",
-      "PKCS12_verify_mac",
-      "PKCS12_SAFEBAG_get_nid",
-      "OPENSSL_asc2uni",
-      "PKCS12_SAFEBAG_create_pkcs8_encrypt",
-      "PKCS8_decrypt_ex",
-      "PKCS12_key_gen_asc_ex",
-      "pkcs12_gen_mac",
-      "PKCS8_decrypt",
-      "PKCS12_decrypt_skey_ex"
-    ]
-  },
-  {
-    "algorithm": "pkcs7",
-    "strength": "128",
-    "keywords": [
-      "PKCS7_digest_from_attributes",
-      "PKCS7_set_content",
-      "ossl_x509_add_cert_new",
-      "PKCS7_add_attrib_smimecap",
-      "PKCS7_type_is_other",
-      "PKCS7_find_digest",
-      "pkcs7_ecdsa_or_dsa_sign_verify_setup",
-      "pkcs7_rsa_sign_verify_setup",
-      "PKCS7_RECIP_INFO_set",
-      "i2d_PKCS7_bio_stream",
-      "PKCS7_final",
-      "ASN1_INTEGER_cmp",
-      "PKCS7_dataDecode",
-      "PKCS7_encrypt_ex",
-      "ossl_err_load_PKCS7_strings",
-      "PKCS7_RECIP_INFO_get0_alg",
-      "PKCS7_sign_add_signer",
-      "PKCS7_verify",
-      "pkcs7_cmp_ri",
-      "PKCS7_SIGNER_INFO_sign",
-      "PKCS7_set_type",
-      "PKCS7_add_recipient",
-      "PKCS7_encrypt",
-      "PKCS7_dataInit",
-      "PKCS7_set_attributes",
-      "PKCS7_SIGNER_INFO_set",
-      "pkcs7_bio_add_digest",
-      "PKCS7_add_signed_attribute",
-      "PKCS7_add_crl",
-      "PKCS7_add_signer",
-      "PKCS7_add_signature",
-      "ossl_pkcs7_ctx_propagate",
-      "PKCS7_stream",
-      "PKCS7_decrypt",
-      "PKCS7_get_octet_string",
-      "PKCS7_get_attribute",
-      "PKCS7_content_new",
-      "ossl_pkcs7_set0_libctx",
-      "ossl_pkcs7_ctx_get0_libctx",
-      "PKCS7_SIGNER_INFO_get0_algs",
-      "PKCS7_sign",
-      "PKCS7_new",
-      "pkcs7_decrypt_rinfo",
-      "PKCS7_dataFinal",
-      "ossl_pkcs7_resolve_libctx",
-      "PEM_write_bio_PKCS7_stream",
-      "PKCS7_ctrl",
-      "PKCS7_add_certificate",
-      "SMIME_write_PKCS7",
-      "SMIME_write_ASN1_ex",
-      "PKCS7_add1_attrib_digest",
-      "PKCS7_get_issuer_and_serial",
-      "PKCS7_get_signed_attribute",
-      "PKCS7_sign_ex"
-    ]
-  },
-  {
-    "algorithm": "sapphire",
+    "algorithmId": "sapphire",
+    "algorithm": "Sapphire Stream Cipher",
     "strength": "256",
     "keywords": [
       "sapphire.h",
       "sapphire::keyrand",
-      "sapphire::initialize",
-      "sapphire::init_hash"
-    ]
+      "sapphire::init_hash",
+      "sapphire::initialize"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "serpent",
+    "algorithmId": "seal",
+    "algorithm": "Software-optimized Encryption Algorithm",
     "strength": "128",
     "keywords": [
-      "serpent_subkey_t",
-      "serpent_blk"
-    ]
+      "seal.h",
+      "sealcontext",
+      "sealwrapper",
+      "tosealobject",
+      "fromsealobject"
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "srp",
+    "algorithmId": "seed",
+    "algorithm": "SEED Block Cipher",
+    "strength": "256",
+    "keywords": [
+      "seed.go",
+      "seed_setkey",
+      "seed_decrypt",
+      "seed_encrypt",
+      "seed128cipher"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "serpent",
+    "algorithm": "Serpent Block Cipher",
     "strength": "128",
     "keywords": [
-      "SRP_VBASE_get1_by_user",
-      "SRP_create_verifier_BN_ex",
-      "SRP_Calc_client_key",
-      "SRP_get_gN_by_id",
-      "SRP_VBASE_get_by_user",
-      "SRP_create_verifier_BN",
-      "SRP_Calc_x_ex",
-      "SRP_Verify_B_mod_N",
-      "SRP_user_pwd_set_gN",
-      "SRP_user_pwd_set1_ids",
-      "SRP_VBASE_add0_user",
-      "SRP_Calc_server_key",
-      "SRP_Calc_B_ex",
-      "SRP_get_default_gN",
-      "SRP_VBASE_new",
-      "SRP_user_pwd_set_sv",
-      "SRP_VBASE_free",
-      "SRP_gN_free",
-      "SRP_create_verifier_ex",
-      "SRP_gN_new_init",
-      "SRP_gN_place_bn",
-      "SRP_VBASE_init",
-      "SRP_Calc_u_ex",
-      "SRP_Calc_x",
-      "SRP_check_known_gN_param",
-      "srp_user_pwd_dup",
-      "SRP_Calc_B",
-      "SRP_Verify_A_mod_N",
-      "SRP_user_pwd_new",
-      "SRP_user_pwd_set0_sv",
-      "SRP_create_verifier",
-      "SRP_Calc_A",
-      "SRP_Calc_client_key_ex",
-      "SRP_user_pwd_free",
-      "SRPClient",
-      "SRPServer",
-      "libsrp",
-      "srp",
+      "serpent_blk",
+      "serpent_subkey_t"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "shacal",
+    "algorithm": "SHACAL Block Cipher",
+    "strength": "128",
+    "keywords": [
+      "shacal",
+      "shacal2",
+      "isshacal1",
+      "shacal2.new",
+      "crypto/shacal2",
+      "require('shacal')",
+      "shacal2encryption",
+      "cryptopp_shacal2_h",
+      "#include \"shacal.h\"",
+      ".getinstance(\"shacal2\");",
+      "from crypto.cipher import shacal2"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "shark",
+    "algorithm": "",
+    "strength": "64",
+    "keywords": [
+      "voipshark",
+      "sharktransform",
+      "cryptopp_shark_h"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "sha1",
+    "algorithm": "Secure Hash Algorithm 1",
+    "strength": "160",
+    "keywords": [
+      "sha1_",
+      "sha1.h",
+      "'sha-1'",
+      "::sha1.",
+      "sha1::{",
+      "(\"sha1\")",
+      "sha1.hex",
+      "sha1_ctx",
+      "sha1hash",
+      "sha1hex(",
+      "(\"sha-1\")",
+      "sha1.new(",
+      "sha1.sum(",
+      "sha1_hash",
+      "sha1state",
+      ".sha1digest",
+      "crypto.sha1",
+      "digest/sha1",
+      "hash('sha1'",
+      "import sha1",
+      "digest::sha1",
+      "sha1.create(",
+      "sha1_context",
+      "sha1managed(",
+      "cryptojs.sha1",
+      "hashlib.sha1(",
+      "openssl/sha.h",
+      "sha1($string)",
+      "sha1.computehash(",
+      "crypto.createhash('sha1')",
+      "sha1cryptoserviceprovider("
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "sha2",
+    "algorithm": "Secure Hash Algorithm 2",
+    "strength": "224-512",
+    "keywords": [
+      "sha-2",
+      "sha224",
+      "sha256",
+      "sha384",
+      "sha512",
+      "digest/sha2"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "sha3",
+    "algorithm": "Secure Hash Algorithm 3",
+    "strength": "224-512",
+    "keywords": [
+      "sha3.h",
+      "sha3-224",
+      "sha3-256",
+      "sha3-384",
+      "sha3-512",
+      "sha3_224",
+      "sha3_256",
+      "sha3_384",
+      "sha3_512",
+      "sha3_ctx",
+      "sha3_init",
+      "sha3_final",
+      "sha3_round",
+      "sha3_state",
+      "sha3digest",
+      "crypto/sha3",
+      "digest/sha3",
+      "sha3_update",
+      "use sha3::{",
+      ".digest.sha3",
+      "digest::sha3",
+      "sha3_context",
+      "sha3hashstate",
+      "sha3_delimited"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "shs",
+    "algorithm": "Secure Hash Standard",
+    "strength": "128",
+    "keywords": [
+      "shs1",
+      "shs.h",
+      "shs_ctx",
+      "shsinit",
+      "shsinit",
+      "shsupdate",
+      "secret-handshake"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "sike",
+    "algorithm": "Supersingular Isogeny Key Encapsulation",
+    "strength": "-",
+    "keywords": [
+      "sike.h",
+      "sike_p",
+      "libsidh",
+      "libsike",
+      "sidh_ctx",
+      "get_3_isog",
+      "sidh_prime",
+      "eval_4_isog",
+      "sike_crypto",
+      "sike_shared",
+      "sidh_compute",
+      "sike_context",
+      "sike_keypair",
+      "sidh_generate",
+      "sike_params.h",
+      "sikepublickey",
+      "sikeciphertext",
+      "sikeprivatekey",
+      "sike_ciphertext",
+      "sike_decapsulate",
+      "sike_encapsulate",
+      "#include \"sidh.h\"",
+      "pqcrypto.kem.sike"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "skein",
+    "algorithm": "Skein Hash Function",
+    "strength": "256",
+    "keywords": [
+      "sk_init",
+      "skein256_",
+      "skein512_",
+      "skein_fin",
+      "sk_decrypt",
+      "sk_encrypt",
+      "skein1024_",
+      "skein_get_",
+      "skein_hash",
+      "skein_init",
+      "skein_set_",
+      "skein_clear",
+      "skein_reset",
+      "skein_xform",
+      "skein_digest",
+      "skein_update",
+      "skein_compute",
+      "skein_process",
+      "skeincrypto.h",
+      "skein_add_data"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "skipjack",
+    "algorithm": "SKIPJACK Block Cipher",
+    "strength": "32",
+    "keywords": [
+      "skipjack",
+      "skipjack.go",
+      "fastskipjack",
+      "skipjack_key",
+      "skipjack_init",
+      "skipjack_num_",
+      "skipjackcipher",
+      "skipjack_decrypt",
+      "skipjack_encrypt"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "sms4",
+    "algorithm": "SMS4 Block Cipher",
+    "strength": "128",
+    "keywords": [
+      "sms4.h",
+      "sms4_rk",
+      "sms4_pck",
+      "sms4crol",
+      "sms4mask",
+      "sms4_cfb_",
+      "sms4_ctr_",
+      "sms4_ecb_",
+      "sms4_init",
+      "sms4_mode",
+      "sms4_ofb_",
+      "sms4_sbox",
+      "sm4_encdec",
+      "sms4_cbc_e",
+      "sms4_final",
+      "sms4_cipher",
+      "sms4_update",
+      "sms4_decrypt",
+      "sms4_encrypt",
+      "sms4_set_key",
+      "cryptopp_sm4_h",
+      "cryptopp_sm4_advanced_process_blocks"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "snerfu",
+    "algorithm": "SNERFU Hash Function",
+    "strength": "256",
+    "keywords": [
+      "snerfu"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "snow",
+    "algorithm": "SNOW Stream Cipher",
+    "strength": "128",
+    "keywords": [
+      "snow_3g",
+      "snow-3g.h",
+      "snow_init",
+      "snow_set_iv",
+      "snow_decrypt",
+      "snow_encrypt",
+      "snow_process",
+      "snow_set_key",
+      "snow5_aes_round",
+      "rte_crypto_auth_snow3g_uia2",
+      "rte_crypto_cipher_snow3g_uea2"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "sober",
+    "algorithm": "SOBER Stream Cipher",
+    "strength": "128",
+    "keywords": [
+      "sober32_",
+      "sober64_",
+      "sober128_",
+      "sober_dec",
+      "sober_enc",
+      "ltc_sober128",
+      "sober_set_iv",
+      "sober_process",
+      "sober_set_key",
+      "sober_finalize",
+      "sober_generate_iv",
+      "sober_generate_key"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "sosemanuk",
+    "algorithm": "Sosemanuk Stream Cipher",
+    "strength": "128",
+    "keywords": [
+      "sosemanuk_",
+      "sosemanukfast",
+      "sosemanukslow"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "sphincs+",
+    "algorithm": "SPHINCS+",
+    "strength": "-",
+    "keywords": [
+      "sphincs.h",
+      "sphincs+.h",
+      "sphincs_pk",
+      "sphincs_sk",
+      "sphincs_ctx",
+      "sphincs_sha",
+      "sphincsplus",
+      "sign.sphincs",
+      "sphincs_hash",
+      "sphincs_plus",
+      "sphincs_sign",
+      "sphincs_tree",
+      "sphincs/api.h",
+      "sphincs_bytes",
+      "sphincsplus.h",
+      "crypto.sphincs",
+      "sphincs_crypto",
+      "sphincs_haraka",
+      "sphincs_height",
+      "sphincs_keygen",
+      "sphincs_verify",
+      "pqclean_sphincs",
+      "sphincs_max_rounds",
+      "crypto_sign/sphincs",
+      "crypto_sign_sphincs",
+      "sphincs_full_height",
+      "sphincs_tree_height",
+      "sphincs_publickeybytes",
+      "sphincs_secretkeybytes",
+      "sphincs_signaturebytes",
+      "sphincs_generate_keypair"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "srp",
+    "algorithm": "Secure Remote Password",
+    "strength": "128",
+    "keywords": [
+      "_ctsrp",
       "_pysrp",
-      "_ctsrp"
-    ]
+      "libsrp",
+      "srp_gn_",
+      "srp_calc_",
+      "srpclient",
+      "srpserver",
+      "srp_vbase_",
+      "srp_verify_",
+      "srp_user_pwd_",
+      "srp_calc_client_",
+      "srp_get_gn_by_id",
+      "srp_get_default_gn",
+      "srp_create_verifier_",
+      "srp_check_known_gn_param"
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "tcrypt",
+    "algorithmId": "ssha",
+    "algorithm": "Salted SHA",
+    "strength": "128",
+    "keywords": [
+      "ssha_",
+      "checkssha",
+      "ssha224password"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "tcrypt",
+    "algorithm": "TCrypt Disk Encryption",
     "strength": "128",
     "keywords": [
       "tcrypt.h",
-      "tcrypt_encrypt",
-      "tcrypt_decrypt",
+      "tcrypt_hash",
       "tcrypt_init",
-      "_CRYPTO_TCRYPT_H"
-    ]
+      "tcrypt_final",
+      "tcrypt_mode_",
+      "tcrypt_error_",
+      "tcrypt_keygen",
+      "tcrypt_set_iv",
+      "tcrypt_update",
+      "tcrypt_verify",
+      "tcrypt_decrypt",
+      "tcrypt_encrypt",
+      "tcrypt_failure",
+      "tcrypt_process",
+      "tcrypt_set_key",
+      "tcrypt_success",
+      "_crypto_tcrypt_h",
+      "tcrypt_block_size",
+      "tcrypt_key_length",
+      "tcrypt_generate_key"
+    ],
+    "category": "Secure Protocols"
   },
   {
-    "algorithm": "xtea",
+    "algorithmId": "tdes",
+    "algorithm": "Triple Data Encryption Standard",
     "strength": "128",
     "keywords": [
-      "xtea_setkey",
+      "tdes_flags_cbc",
+      "tdes_flags_ecb",
+      "tdes_flags_ofb",
+      "tdes_flags_cfb8",
+      "des_ecb3_encrypt",
+      "tdes_flags_cfb16",
+      "tdes_flags_cfb32",
+      "tdes_flags_cfb64",
+      "tdes_flags_encrypt",
+      "tdes_flags_opmode_mask"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "tea",
+    "algorithm": "Tiny Encryption Algorithm",
+    "strength": "128",
+    "keywords": [
+      "tea_decrypt",
+      "tea_encrypt",
+      "tea_cbc_mode",
+      "tea_ofb_mode"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "threefish",
+    "algorithm": "Threefish Block Cipher",
+    "strength": "1024",
+    "keywords": [
+      "threefish_algs",
+      "newthreefish256",
+      "newthreefish512",
+      "threefish_round",
+      "newthreefish1024",
+      "threefishdecrypt",
+      "threefishencrypt",
+      "threefish_decrypt",
+      "threefish_encrypt",
+      "threefish_mod_fini",
+      "threefish_roundinv",
+      "crypto.threefish.common",
+      "threefish_encrypt_generic"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "tiger",
+    "algorithm": "Tiger Hash Function",
+    "strength": "256",
+    "keywords": [
+      "tiger_compress",
+      "austigertokens1",
+      "tiger_compress_macro"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "tnepres",
+    "algorithm": "Serpent Block Cipher (reversed)",
+    "strength": "256",
+    "keywords": [
+      "tnepresengine",
+      "cipher.tnepres",
+      "keygenerator.tnepres",
+      "algorithmparameters.tnepres"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "twofish",
+    "algorithm": "Twofish Block Cipher",
+    "strength": "64",
+    "keywords": [
+      "twofish.h",
+      "twofish.h",
+      "0xbcbc3275",
+      "twofish_key",
+      "twofish_byte",
+      "twofish_fatal",
+      "twofish_decrypt",
+      "twofish_encrypt",
+      "twofish_prepare_key",
+      "twofish_prepare_key",
+      "0xa9, 0x67, 0xb3, 0xe8",
+      "exp_twofish_prepare_key"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "vmpc",
+    "algorithm": "Variably Modified Permutation Composition",
+    "strength": "",
+    "keywords": [
+      "_vmpc_h_",
+      "vmpc_init",
+      "vmpcencrypt",
+      "vmpcinitkey",
+      "vmpcrypt.py",
+      "vmpc_decrypt",
+      "vmpc_encrypt",
+      "vmpc_ivsetup",
+      "vmpc_process",
+      "vmpc_keysetup",
+      "vmpcoutputmac",
+      "vmpcdecryptmac",
+      "vmpcencryptmac",
+      "vmpcengine.java ",
+      "vmpcinitkeybasic",
+      "vmpcinitkeyround"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "wake",
+    "algorithm": "Word Auto Key Encryption",
+    "strength": "64",
+    "keywords": [
+      "wake.h",
+      "wake_base",
+      "wake_output",
+      "wake_policy",
+      "wake_testinstantiations"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "whirpool",
+    "algorithm": "Whirlpool Hash Function",
+    "strength": "128",
+    "keywords": [
+      "whirpool.go",
+      "whirlpool_op",
+      "whirlpool.new",
+      "whirlpool_init",
+      "whirlpool_block",
+      "whirlpool_final",
+      "whirlpool_update",
+      "whirlpool_bitupdate",
+      "whirlpool_block_mmx",
+      "rhash_whirlpool_init",
+      "rhash_whirlpool_sbox",
+      "#include \"whirlpool.h\"",
+      "#include \u003cwhirlpool.h\u003e",
+      "hashlib.new('whirlpool')",
+      "rhash_whirlpool_process_block",
+      "crypto.createhash('whirlpool')",
+      "github.com/jzelinskie/whirlpool",
+      "import org.bouncycastle.crypto.digests.whirlpooldigest"
+    ],
+    "category": "Hash Functions"
+  },
+  {
+    "algorithmId": "xtea",
+    "algorithm": "eXtended Tiny Encryption Algorithm",
+    "strength": "128",
+    "keywords": [
       "xtea.h",
+      "setxteakey",
+      "xtea.setkey",
+      "xtea_declen",
+      "xtea_setkey",
+      "xteadecrypt",
+      "xteaencrypt",
+      "xtea.decrypt",
+      "xtea.encrypt",
+      "xtea::setkey",
+      "xtea_decrypt",
+      "xtea_encrypt",
+      "xtea::decrypt",
+      "xtea::encrypt",
+      "xtea_decodecb",
+      "initializextea",
       "xtea_encodeecb",
-      "xtea_decodecbc",
-      "xtea_declen"
-    ]
+      "xtea.initialize",
+      "xtea_initialize",
+      "xtea::initialize",
+      "xtea.decryptblock",
+      "xtea.encryptblock",
+      "xtea::decryptblock",
+      "xtea::encryptblock"
+    ],
+    "category": "Symmetric Encryption"
   },
   {
-    "algorithm": "X509",
+    "algorithmId": "xtr",
+    "algorithm": "XTR Public Key System",
+    "strength": "64",
+    "keywords": [
+      "libxtr",
+      "xtrlib",
+      "xtrcrypt",
+      "xtr_curve",
+      "xtr_order",
+      "xtr_prime",
+      "xtr_modulus",
+      "cryptopp_xtr_h",
+      "xtr_exponentiate",
+      "xtr_findprimesandgenerator"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "xts",
+    "algorithm": "XEX-Based Codebook mode",
+    "strength": "",
+    "keywords": [
+      "xts.h\u003e",
+      "128_xts",
+      "256_xts",
+      "aes-xts",
+      "aes_xts",
+      "aes_xts",
+      "alg_xts",
+      "xts-128",
+      "xts_dec",
+      "xts_enc",
+      "xts_gf_",
+      "xts_key",
+      "mode.xts",
+      "mode_xts",
+      "xts-256,",
+      "xts\u003caes\u003e",
+      "xts_data",
+      "xts_done",
+      "xts_init",
+      "xts_mode",
+      "xts_mode",
+      "xts_mode",
+      "xts_test",
+      "crypt_xts",
+      "xts_crypt",
+      "xts_setup",
+      "xts_state",
+      "xts_tweak",
+      "cipher_xts",
+      "create_xts",
+      "crypto/xts",
+      "xts_buffer",
+      "xts_sector",
+      "xts_setkey",
+      "xts_context",
+      "xts_decrypt",
+      "xts_encrypt",
+      "xts_parallel",
+      "xtsdecryption",
+      "xtsencryption",
+      "xts_max_blocks",
+      "xtsblockcipher",
+      "botan::xts_mode",
+      "wc_aesxtssetkey",
+      "wc_aesxtsdecrypt",
+      "wc_aesxtsencrypt",
+      "xts_alpha_constant",
+      "register_cipher(\u0026xts_desc)"
+    ],
+    "category": "Block Cipher Modes"
+  },
+  {
+    "algorithmId": "yarrow",
+    "algorithm": "Yarrow Pseudorandom Number Generator",
+    "strength": "160",
+    "keywords": [
+      "yarrow256",
+      "yarrow512",
+      "ltc_yarrow",
+      "yarrowinit",
+      "yarrow.init",
+      "yarrow_desc",
+      "yarrow_done",
+      "yarrow_read",
+      "yarrow_test",
+      "yarrowstate",
+      "yarrow.state",
+      "yarrow::init",
+      "yarrow_ready",
+      "yarrow_start",
+      "yarrowreseed",
+      "yarrowupdate",
+      "yarrow.reseed",
+      "yarrow.update",
+      "yarrow::state",
+      "yarrow_export",
+      "yarrow_import",
+      "yarrowentropy",
+      "yarrow.entropy",
+      "yarrow::reseed",
+      "yarrow::update",
+      "yarrowgenerate",
+      "yarrow.generate",
+      "yarrow::entropy",
+      "yarrow::generate",
+      "yarrow_add_entropy",
+      "#include \u003cyarrow.h\u003e"
+    ],
+    "category": "Random Number Generation"
+  },
+  {
+    "algorithmId": "zipcrypt",
+    "algorithm": "ZipCrypto",
+    "strength": "64",
+    "keywords": [
+      "libzip",
+      "zipbare",
+      "zipcloak",
+      "zip_crypto_"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "zk-snarks",
+    "algorithm": "Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge",
+    "strength": "-",
+    "keywords": [
+      "snarkjs",
+      "libsnark",
+      "mina_snarky",
+      "snarkprover",
+      "snark_prover",
+      "go-rapidsnark",
+      "snarkverifier",
+      "snark_verifier"
+    ],
+    "category": "Zero-Knowledge Proof"
+  },
+  {
+    "algorithmId": "zk-starks",
+    "algorithm": "Zero-Knowledge Scalable Transparent Arguments of Knowledge",
+    "strength": "-",
+    "keywords": [
+      "stark.h",
+      "starkex",
+      "zkstark",
+      "ethstark",
+      "libstark",
+      "stark_gen",
+      "starkware",
+      "stark_blow",
+      "stark_comp",
+      "stark_expa",
+      "stark_fiel",
+      "stark_fri_",
+      "stark_init",
+      "stark_max_",
+      "stark_num_",
+      "stark_prov",
+      "stark_secu",
+      "stark_veri",
+      "starkclaim",
+      "starkproof",
+      "stark_proof",
+      "stark_trace",
+      "starkconfig",
+      "starkcontext",
+      "starksetting",
+      "starkwitness"
+    ],
+    "category": "Zero-Knowledge Proof"
+  },
+  {
+    "algorithmId": "zuc",
+    "algorithm": "",
     "strength": "128",
     "keywords": [
-      "#include <openssl/x509.h>",
-      "PEM_read_X509",
-      "import java.security.cert.X509Certificate",
-      ".getInstance(\"X.509\")",
-      "crypto/x509",
-      "x509.ParseCertificate",
-      "openssl_x509_free",
-      "from cryptography import x509",
-      "x509.load_pem_x509_certificate"
-    ]
+      "zuc_dec",
+      "zuc_enc",
+      "zuc_gen",
+      "zuc_next",
+      "__zuc_h__",
+      "_zuc_init",
+      "zuc_set_key",
+      "_zuc_generate_keystream"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "ansix931",
+    "algorithm": "ANSI X9.31 Random Number Generator",
+    "strength": "128-256",
+    "keywords": [
+      "ANSI X9.31",
+      "X9.31",
+      "ANSIX9.31",
+      "ANSIX931",
+      "X931",
+      "X9_31",
+      "X9_31_DRBG",
+      "X931RNG",
+      "ANSI X.9.31 PRNG",
+      "X9_31_PRNG",
+      "generateX931"
+    ],
+    "category": "Random Number Generation"
+  },
+  {
+    "algorithmId": "ansix942",
+    "algorithm": "ANSI X9.42 Key Agreement",
+    "strength": "1024-3072",
+    "keywords": [
+      "ANSI X9.42",
+      "X9.42",
+      "ANSIX9.42",
+      "ANSIX942",
+      "X942",
+      "X9_42",
+      "X9_42_DH",
+      "X9_42_SCHEME",
+      "ANSI X9.42 Key Agreement",
+      "DH_ANSI_X942"
+    ],
+    "category": "Key Agreement"
+  },
+  {
+    "algorithmId": "ansix963",
+    "algorithm": "ANSI X9.63 Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "ANSI X9.63",
+      "X9.63",
+      "ANSIX9.63",
+      "ANSIX963",
+      "X963",
+      "X9_63",
+      "X9_63_KDF",
+      "X963KDF",
+      "X963_KDF",
+      "ANSI X9.63 KDF",
+      "SEC1-KDF",
+      "SEC1_KDF"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "bike",
+    "keywords": [
+      "Bit Flipping Key Encapsulation",
+      "BIKE-KEM",
+      "BIKE1-CCA",
+      "BIKE2-CCA",
+      "BIKE3-CCA",
+      "post-quantum BIKE",
+      "BIKE cipher"
+    ],
+    "category": "Post-Quantum Cryptography",
+    "algorithm": "Bit Flipping Key Encapsulation",
+    "strength": "128-256"
+  },
+  {
+    "algorithmId": "concatenationkdf",
+    "algorithm": "Concatenation Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "ConcatenationKDF",
+      "Concatenation KDF",
+      "ConcatKDF",
+      "ConcatenationKeyDerivationFunction",
+      "Concatenation_KDF",
+      "concat_kdf",
+      "CKDF",
+      "SP800-56A",
+      "SP800_56A_CONCAT_KDF"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "dss",
+    "algorithm": "Digital Signature Standard",
+    "strength": "1024-3072",
+    "keywords": [
+      "Digital Signature Algorithm Standard",
+      "FIPS 186",
+      "DSS_SIGN",
+      "DSSSigner",
+      "DSS_VERIFY",
+      "DSSSHASigner"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "dstu4145",
+    "algorithm": "DSTU 4145 Digital Signature Algorithm",
+    "strength": "163-431",
+    "keywords": [
+      "DSTU4145",
+      "DSTU-4145",
+      "DSTU 4145",
+      "Ukrainian Signature",
+      "DSTU_4145",
+      "DSTU4145Signer",
+      "DSTU4145ParameterSpec",
+      "DSTU4145PrivateKey",
+      "DSTU4145PublicKey"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "dilithium",
+    "algorithm": "CRYSTALS-Dilithium Signature Algorithm",
+    "strength": "128-256",
+    "keywords": [
+      "Dilithium",
+      "CRYSTALS-Dilithium",
+      "CRYSTALS_Dilithium",
+      "DilithiumSigner",
+      "DilithiumVerifier",
+      "DilithiumKeyPair",
+      "Dilithium2",
+      "Dilithium3",
+      "Dilithium5",
+      "DilithiumParameters"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "eccpwd",
+    "keywords": [
+      "ECCPWD",
+      "ECC-PWD",
+      "ECC_PWD",
+      "Elliptic Curve Password",
+      "ECCPWD_AUTH",
+      "Simultaneous Authentication of Equals",
+      "IEEE 802.11s"
+    ],
+    "category": "Authentication",
+    "algorithm": "Elliptic Curve Password Authenticated Key Exchange",
+    "strength": "128-256"
+  },
+  {
+    "algorithmId": "ecnr",
+    "algorithm": "Elliptic Curve Nyberg-Rueppel Signature Algorithm",
+    "strength": "160-521",
+    "keywords": [
+      "Elliptic Curve Nyberg-Rueppel",
+      "ECNRSigner",
+      "ECNR_sign",
+      "ECNR_verify",
+      "ECNRDigestSigner",
+      "ECNRKeyPairGenerator"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "ed448",
+    "algorithm": "Edwards-Curve Digital Signature Algorithm 448",
+    "strength": "224",
+    "keywords": [
+      "Ed448",
+      "Edwards448",
+      "Ed448-Goldilocks",
+      "ED448_sign",
+      "ED448_verify",
+      "ED448_keygen",
+      "ED448Signer",
+      "ED448Verify",
+      "RFC8032",
+      "448bit"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "eddsa",
+    "algorithm": "Edwards-Curve Digital Signature Algorithm",
+    "strength": "128-224",
+    "keywords": [
+      "Edwards-curve DSA",
+      "EdDSASigner",
+      "EdDSA_sign",
+      "EdDSA_verify",
+      "Ed25519",
+      "Ed448",
+      "Edwards Digital Signature Algorithm",
+      "RFC8032",
+      "EdDSAParameterSpec"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "falcon",
+    "algorithm": "Fast-Fourier Lattice-based Compact Signatures",
+    "strength": "128-256",
+    "keywords": [
+      "Falcon-sign",
+      "Falcon-verify",
+      "FalconKeyPair",
+      "FalconSignature",
+      "Falcon-512",
+      "Falcon-1024",
+      "FALCON_SIGN",
+      "FALCON_VERIFY"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "frodokem",
+    "keywords": [
+      "FrodoKEM",
+      "Frodo_KEM",
+      "FrodoKeyPair",
+      "FrodoParameters",
+      "Frodo-640",
+      "Frodo-976",
+      "Frodo-1344",
+      "FrodoKeyEncapsulation",
+      "FrodoKeyDecapsulation"
+    ],
+    "category": "Post-Quantum Cryptography",
+    "algorithm": "FrodoKEM Post-Quantum Key Encapsulation",
+    "strength": "128-256"
+  },
+  {
+    "algorithmId": "gmss",
+    "algorithm": "Generalized Merkle Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "Generalized Merkle Signature Scheme",
+      "GMSSSigner",
+      "GMSS_sign",
+      "GMSS_verify",
+      "GMSSDigestSigner",
+      "GMSSPrivateKey",
+      "GMSSPublicKey",
+      "GMSSKeyPairGenerator"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "gemss",
+    "algorithm": "Great Multivariate Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "Great Multivariate Signature Scheme",
+      "GeMSS128",
+      "GeMSS192",
+      "GeMSS256",
+      "GeMSSSigner",
+      "GeMSS_sign",
+      "GeMSS_verify",
+      "GeMSSKeyPair",
+      "GeMSSParameters"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "hc",
+    "algorithm": "HC Stream Cipher",
+    "strength": "128-256",
+    "keywords": [
+      "HC-128",
+      "HC-256",
+      "HC128",
+      "HC256",
+      "HC_128",
+      "HC_256",
+      "HCEngine",
+      "HC128Engine",
+      "HC256Engine",
+      "eStream HC"
+    ],
+    "category": "Stream Cipher"
+  },
+  {
+    "algorithmId": "hkdf",
+    "algorithm": "HMAC-based Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "HMAC-based KDF",
+      "HMAC_KDF",
+      "HKDFBytesGenerator",
+      "HKDF_extract",
+      "HKDF_expand",
+      "RFC5869",
+      "HMAC-based Extract-and-Expand",
+      "HKDFParameters"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "hqc",
+    "algorithm": "Hamming Quasi-Cyclic",
+    "strength": "128-256",
+    "keywords": [
+      "Hamming Quasi-Cyclic",
+      "HQC-KEM",
+      "HQC_KEM",
+      "HQCEncapsulation",
+      "HQCDecapsulation",
+      "HQCParameters",
+      "HQC128",
+      "HQC192",
+      "HQC256"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "hss",
+    "algorithm": "Hierarchical Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "Hierarchical Signature Scheme",
+      "LMS/HSS",
+      "HSSSigner",
+      "HSS_sign",
+      "HSS_verify",
+      "HSSPrivateKey",
+      "HSSPublicKey",
+      "HSSKeyPairGenerator",
+      "Hierarchical LMS"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "harakav2",
+    "algorithm": "Haraka v2 Hash Function",
+    "strength": "256-512",
+    "keywords": [
+      "HarakaV2",
+      "Haraka-v2",
+      "Haraka",
+      "HARAKA",
+      "HarakaS",
+      "HarakaHash",
+      "Haraka512",
+      "Haraka256",
+      "HarakaPermutation",
+      "HarakaSponge"
+    ],
+    "category": "Hash Function"
+  },
+  {
+    "algorithmId": "iso9796",
+    "algorithm": "ISO 9796 Digital Signature",
+    "strength": "1024-3072",
+    "keywords": [
+      "ISO9796",
+      "ISO 9796",
+      "ISO-9796",
+      "ISO9796Signer",
+      "ISO9796d2Signer",
+      "ISO9796_sign",
+      "ISO9796_verify",
+      "ISO9796Encoder",
+      "ISO9796Decoder",
+      "ISO9796Algorithm"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "kdf1",
+    "algorithm": "Key Derivation Functions 1",
+    "strength": "128-512",
+    "keywords": [
+      "Key Derivation Functions 1",
+      "KDF1BytesGenerator",
+      "KDF1_generate",
+      "KDF1Parameters",
+      "ISO-18033-2",
+      "ISO_18033_2_KDF",
+      "KDF1_KDF",
+      "KDF1KeyDerivation"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kdf2",
+    "algorithm": "Key Derivation Functions 2",
+    "strength": "128-512",
+    "keywords": [
+      "KDF2",
+      "Key Derivation Functions 2",
+      "KDF2BytesGenerator",
+      "KDF2_generate",
+      "KDF2Parameters",
+      "ISO-18033-2",
+      "ISO_18033_2_KDF",
+      "KDF2_KDF",
+      "KDF2KeyDerivation"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kdfcounter",
+    "algorithm": "Counter Mode Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "KDFCounter",
+      "Counter Mode KDF",
+      "CounterKDF",
+      "KDF_Counter",
+      "SP800-108-Counter",
+      "SP800_108_Counter",
+      "CounterModeKDF",
+      "KDFCounterParameters",
+      "KDFCounterBytesGenerator"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kdfdoublepipeline",
+    "algorithm": "Double Pipeline Iteration Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "KDFDoublePipeline",
+      "Double Pipeline KDF",
+      "DoublePipelineKDF",
+      "KDF_Double_Pipeline",
+      "SP800-108-DoublePipeline",
+      "SP800_108_Double_Pipeline",
+      "DoublePipelineIterationKDF",
+      "KDFDoublePipelineParameters"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kdffeedback",
+    "algorithm": "Feedback Mode Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "KDFFeedback",
+      "Feedback Mode KDF",
+      "FeedbackKDF",
+      "KDF_Feedback",
+      "SP800-108-Feedback",
+      "SP800_108_Feedback",
+      "FeedbackModeKDF",
+      "KDFFeedbackParameters",
+      "KDFFeedbackBytesGenerator"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kdfsession",
+    "algorithm": "Session Key Derivation Functions",
+    "strength": "128-512",
+    "keywords": [
+      "KDFSession",
+      "Session KDF",
+      "SessionKDF",
+      "KDF_Session",
+      "SessionKeyDerivationFunction",
+      "KDFSessionGenerator",
+      "KDFSessionKey",
+      "KDFGenerateSessionKey"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "kmac",
+    "algorithm": "Keccak Message Authentication Codes",
+    "strength": "128-256",
+    "keywords": [
+      "KMAC128",
+      "KMAC256",
+      "Keccak MAC",
+      "KMAC_update",
+      "KMAC_finalize",
+      "KMACDigest",
+      "NIST-KMAC",
+      "KMAC_128",
+      "KMAC_256",
+      "KMACParameters"
+    ],
+    "category": "Message Authentication Codes"
+  },
+  {
+    "algorithmId": "kalyna",
+    "keywords": [
+      "KalynaEngine",
+      "DSTU7624",
+      "DSTU 7624",
+      "Kalyna128",
+      "Kalyna256",
+      "Kalyna512",
+      "KalynaParameters",
+      "Ukrainian cipher"
+    ],
+    "category": "Symmetric Encryption",
+    "algorithm": "Kalyna Block Cipher",
+    "strength": "128-512"
+  },
+  {
+    "algorithmId": "kangarootwelve",
+    "algorithm": "KangarooTwelve Hash Function",
+    "strength": "128",
+    "keywords": [
+      "KangarooTwelve",
+      "Kangaroo12",
+      "KangarooTwelve_hash",
+      "KangarooTwelveDigest",
+      "K12_digest",
+      "K12_update",
+      "K12_finalize",
+      "KangarooTwelveHash"
+    ],
+    "category": "Hash Function"
+  },
+  {
+    "algorithmId": "kerberos",
+    "algorithm": "Kerberos Authentication Protocol",
+    "strength": "56-256",
+    "keywords": [
+      "Kerberos",
+      "KerberosAuth",
+      "KerberosKey",
+      "KerberosTicket",
+      "KerberosAuthentication",
+      "KRB5",
+      "KRB_AP_REQ",
+      "KRB_AP_REP",
+      "KerberosService",
+      "GSS-API Kerberos"
+    ],
+    "category": "Authentication"
+  },
+  {
+    "algorithmId": "kupyna",
+    "keywords": [
+      "KupynaDigest",
+      "DSTU7564",
+      "DSTU 7564",
+      "Kupyna256",
+      "Kupyna384",
+      "Kupyna512",
+      "Ukrainian hash",
+      "KupynaHash"
+    ],
+    "category": "Hash Function",
+    "algorithm": "Kupyna Hash Function",
+    "strength": "256-512"
+  },
+  {
+    "algorithmId": "lea",
+    "algorithm": "Lightweight Encryption Algorithm",
+    "strength": "128-256",
+    "keywords": [
+      "Lightweight Encryption Algorithm",
+      "LEAEngine",
+      "LEA_encrypt",
+      "LEA_decrypt",
+      "LEA128",
+      "LEA192",
+      "LEA256",
+      "LEAKeyGenerator",
+      "LEACipher"
+    ],
+    "category": "Symmetric Encryption"
+  },
+  {
+    "algorithmId": "lms",
+    "algorithm": "Leighton-Micali Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "Leighton-Micali Signature",
+      "LMSSigner",
+      "LMS_sign",
+      "LMS_verify",
+      "LMSPrivateKey",
+      "LMSPublicKey",
+      "LMOTS",
+      "LM-OTS",
+      "LMS-HSS",
+      "RFC8554"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "mgf1",
+    "algorithm": "Mask Generation Function 1",
+    "strength": "128-512",
+    "keywords": [
+      "Mask Generation Function 1",
+      "MGF1BytesGenerator",
+      "MGF1_generate",
+      "MGF1Parameters",
+      "PKCS1MGF",
+      "RSA-MGF1",
+      "MGF1MaskGenerator",
+      "MGF1_mask"
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "mldsa",
+    "algorithm": "Multilevel Digital Signature Algorithm",
+    "strength": "128-256",
+    "keywords": [
+      "Multilevel Digital Signature Algorithm Algorithm",
+      "ML-DSA",
+      "ML_DSA",
+      "MLDSASigner",
+      "MLDSA_sign",
+      "MLDSA_verify",
+      "MLDSAPrivateKey",
+      "MLDSAPublicKey",
+      "Falcon"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "mlkem",
+    "keywords": [
+      "Module Lattice KEM",
+      "ML-KEM",
+      "ML_KEM",
+      "MLKEMEncapsulation",
+      "MLKEMDecapsulation",
+      "MLKEMParameters",
+      "CRYSTALS-Kyber",
+      "MLKEM-512",
+      "MLKEM-768",
+      "MLKEM-1024"
+    ],
+    "category": "Post-Quantum Cryptography",
+    "algorithm": "Module Lattice Key Encapsulation Mechanism",
+    "strength": "128-256"
+  },
+  {
+    "algorithmId": "marsupilamifourteen",
+    "algorithm": "Marsupilami-14 Hash Function",
+    "strength": "256",
+    "keywords": [
+      "MarsupilamiFourteen",
+      "Marsupilami14",
+      "M14_hash",
+      "M14Digest",
+      "Marsupilami14Digest",
+      "M14_update",
+      "M14_finalize",
+      "MarsupilamiHash"
+    ],
+    "category": "Hash Function"
+  },
+  {
+    "algorithmId": "naccachestern",
+    "algorithm": "Naccache-Stern Encryption Algorithm",
+    "strength": "1024-2048",
+    "keywords": [
+      "NaccacheStern",
+      "Naccache-Stern",
+      "NaccacheSternEngine",
+      "NaccacheSternKeyPairGenerator",
+      "NaccacheSternPrivateKey",
+      "NaccacheSternPublicKey",
+      "NSCipher",
+      "NS_encrypt",
+      "NS_decrypt"
+    ],
+    "category": "Asymmetric Encryption"
+  },
+  {
+    "algorithmId": "psk",
+    "algorithm": "Pre-Shared Key Authentication",
+    "strength": "128-256",
+    "keywords": [
+      "Pre-Shared Key",
+      "PSKKeyAgreement",
+      "PSK_TLS",
+      "PSK_Identity",
+      "PSK_hint",
+      "PSKParameters",
+      "TLS-PSK",
+      "DHE-PSK",
+      "ECDHE-PSK"
+    ],
+    "category": "Authentication"
+  },
+  {
+    "algorithmId": "parallelhash",
+    "algorithm": "Parallel Hash Function",
+    "strength": "128-256",
+    "keywords": [
+      "ParallelHash",
+      "ParallelHash128",
+      "ParallelHash256",
+      "NIST-ParallelHash",
+      "ParallelHashDigest",
+      "SP800-185",
+      "ParallelHash_update",
+      "ParallelHash_finalize",
+      "ParallelHashParameters"
+    ],
+    "category": "Hash Function"
+  },
+  {
+    "algorithmId": "picnic",
+    "algorithm": "Picnic Signature Algorithm",
+    "strength": "128-256",
+    "keywords": [
+      "PicnicSigner",
+      "Picnic_sign",
+      "Picnic_verify",
+      "PicnicKeyPair",
+      "PicnicParameters",
+      "Picnic2",
+      "Picnic3",
+      "PicnicL1",
+      "PicnicL3",
+      "PicnicL5"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "qtesla",
+    "algorithm": "Quantum-resistant Tesla Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "QTESLA",
+      "qTESLA",
+      "qTESLASigner",
+      "qTESLA_sign",
+      "qTESLA_verify",
+      "qTESLAKeyPair",
+      "qTESLAParameters",
+      "qTESLA-p-I",
+      "qTESLA-p-III",
+      "quantumTESLA"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "rfc3211wrap",
+    "algorithm": "RFC 3211 Password-based Key Wrapping",
+    "strength": "128-256",
+    "keywords": [
+      "RFC3211Wrap",
+      "RFC3211",
+      "RFC3211Wrapper",
+      "RFC3211_wrap",
+      "RFC3211_unwrap",
+      "PKCS5Scheme2",
+      "RFC3211WrapEngine",
+      "CMS-KeyWrap",
+      "Password Based Key Wrapping"
+    ],
+    "category": "Key Wrapping"
+  },
+  {
+    "algorithmId": "rsakem",
+    "algorithm": "RSA Key Encapsulation Mechanism",
+    "strength": "1024-4096",
+    "keywords": [
+      "RSAKEM",
+      "RSA-KEM",
+      "RSA_KEM",
+      "RSAKEMGenerator",
+      "RSAKEMExtractor",
+      "RSA Key Encapsulation Mechanism",
+      "RSA-KEM Key Exchange",
+      "RSAKEM_encrypt",
+      "RSAKEM_decrypt"
+    ],
+    "category": "Key Encapsulation"
+  },
+  {
+    "algorithmId": "rsassapss",
+    "algorithm": "RSA Signature Scheme with Appendix - Probabilistic Signature Scheme",
+    "strength": "1024-4096",
+    "keywords": [
+      "RSAssaPSS",
+      "RSASSA-PSS",
+      "RSA_PSS",
+      "RSAPSSSigner",
+      "RSAPSS_sign",
+      "RSAPSS_verify",
+      "RSASSA_PSS_sign",
+      "RSASSA_PSS_verify",
+      "PSSSigner",
+      "PSSParameterSpec"
+    ],
+    "category": "Digital Signature Algorithm"
+  },
+  {
+    "algorithmId": "sm3",
+    "algorithm": "SM3 Cryptographic Hash Algorithm",
+    "strength": "256",
+    "keywords": [
+      "SM3Digest",
+      "SM3_hash",
+      "SM3_digest",
+      "SM3_update",
+      "SM3_finalize",
+      "Chinese hash",
+      "ShangMi3",
+      "SM3WithSM2",
+      "GmSSL SM3"
+    ],
+    "category": "Hash Function"
+  },
+  {
+    "algorithmId": "sphincsplus",
+    "algorithm": "SPHINCS+ Signature Algorithm",
+    "strength": "128-256",
+    "keywords": [
+      "SPHINCSPlus",
+      "SPHINCS+",
+      "SPHINCS_Plus",
+      "SPHINCSPlusSigner",
+      "SPHINCSPlus_sign",
+      "SPHINCSPlus_verify",
+      "SPHINCSPlusKeyPair",
+      "SPHINCSPlusParameters",
+      "SPHINCS-256",
+      "SPHINCS-SHA256"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "scrypt",
+    "algorithm": "Scrypt Key Derivation Functions",
+    "strength": "128-256",
+    "keywords": [
+      "SCryptKeyDerivation",
+      "Scrypt_generate",
+      "SCryptParameters",
+      "ScryptDigest",
+      "SCryptPasswordHasher",
+      "SCryptPBKDF",
+      "SCryptFunc",
+      "ScryptProgressMonitor",
+      "SCryptPasswordEncoder",
+      "scrypt.hash",
+      "scrypt.verify",
+      "scrypt_hash",
+      "scrypt_verify",
+      "crypto_scrypt",
+      "libscrypt",
+      "scrypt.encrypt",
+      "scrypt.decrypt",
+      "scryptSync",
+      "scrypt_kdf",
+      "scrypt_module_factory",
+      "scrypt_js",
+      "scrypt_keyderivation",
+      "scrypt_mcf",
+      "SCryptUtil",
+      "SCryptHelper",
+      "SCryptService",
+      "scrypt-js",
+      "scrypt-kdf",
+      "scrypt.scrypt",
+      "scrypt.kdf", "scryptParameters",
+      "SCryptEngine"
+
+
+    ],
+    "category": "Key Derivation Functions"
+  },
+  {
+    "algorithmId": "siphash",
+    "algorithm": "SipHash Pseudorandom Function",
+    "strength": "64-128",
+    "keywords": [
+      "SipHash",
+      "SipHash-2-4",
+      "SipHash24",
+      "SipHasher",
+      "SipHash_2_4",
+      "SipHash_4_8",
+      "SipHash_MAC",
+      "SipHashDigest",
+      "SipHashFunction",
+      "SIP-HASH"
+    ],
+    "category": "Message Authentication Codes"
+  },
+  {
+    "algorithmId": "tuplehash",
+    "keywords": [
+      "TupleHash128",
+      "TupleHash256",
+      "NIST-TupleHash",
+      "TupleHashDigest",
+      "SP800-185",
+      "TupleHash_update",
+      "TupleHash_finalize",
+      "TupleHashParameters"
+    ],
+    "category": "Hash Function",
+    "algorithm": "TupleHash Function",
+    "strength": "128-256"
+  },
+  {
+    "algorithmId": "x25519",
+    "algorithm": "X25519 Key Exchange",
+    "strength": "128",
+    "keywords": [
+      "Curve25519",
+      "X25519KeyAgreement",
+      "X25519KeyPair",
+      "X25519PrivateKey",
+      "X25519PublicKey",
+      "X25519_compute",
+      "RFC7748",
+      "X25519Function",
+      "X25519Agreement"
+    ],
+    "category": "Key Agreement"
+  },
+  {
+    "algorithmId": "x448",
+    "algorithm": "X448 Key Exchange",
+    "strength": "224",
+    "keywords": [
+      "Curve448",
+      "X448KeyAgreement",
+      "X448KeyPair",
+      "X448PrivateKey",
+      "X448PublicKey",
+      "X448_compute",
+      "RFC7748",
+      "X448Function",
+      "X448Agreement"
+    ],
+    "category": "Key Agreement"
+  },
+  {
+    "algorithmId": "xdh",
+    "algorithm": "Extended Diffie-Hellman",
+    "strength": "128-224",
+    "keywords": [
+      "Extended Diffie-Hellman",
+      "XDHKeyAgreement",
+      "XDH_computeKey",
+      "XDHParameters",
+      "XDHUnifiedAgreement",
+      "XDHKeyPair",
+      "XDHPublicKey",
+      "XDHPrivateKey"
+    ],
+    "category": "Key Agreement"
+  },
+  {
+    "algorithmId": "xmss",
+    "algorithm": "eXtended Merkle Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "eXtended Merkle Signature Scheme",
+      "XMSSSigner",
+      "XMSS_sign",
+      "XMSS_verify",
+      "XMSSPrivateKey",
+      "XMSSPublicKey",
+      "XMSSParameters",
+      "XMSS-SHA256",
+      "RFC8391"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "xmssmt",
+    "algorithm": "XMSS Multi-Tree Signature Scheme",
+    "strength": "128-256",
+    "keywords": [
+      "XMSSMT",
+      "XMSS^MT",
+      "XMSS_MT",
+      "XMSSMTSigner",
+      "XMSSMT_sign",
+      "XMSSMT_verify",
+      "XMSSMTPrivateKey",
+      "XMSSMTPublicKey",
+      "XMSSMTParameters",
+      "Multi-Tree XMSS"
+    ],
+    "category": "Post-Quantum Cryptography"
+  },
+  {
+    "algorithmId": "xoodyak",
+    "algorithm": "Xoodyak Cryptographic Primitive",
+    "strength": "128-256",
+    "keywords": [
+      "Xoodyak",
+      "XoodyakDigest",
+      "Xoodyak_hash",
+      "Xoodyak_encrypt",
+      "Xoodyak_decrypt",
+      "XoodyakParameters",
+      "XoodyakMode",
+      "XoodyakEngine",
+      "XoodyakKeyak",
+      "XoodyakSponge"
+    ],
+    "category": "Cryptographic Primitive"
   }
 ]
