@@ -9,6 +9,13 @@ on:
 
 env:
   ARTIFACT_NAME_PREFIX: "sbom-workbench"    ##This is the build.artifactName on package.json prefix
+  CRYPTO_RULES_SOURCE_DIR: scanoss/platform-deployment
+  TARGET_DIR: assets/data
+  CRYPTO_RULES_PATH: platform-deployment/datasets/cryptography
+  CRYPTO_LIBRARIES_SOURCE: scanoss-crypto-libraries.json
+  CRYPTO_LIBRARIES_TARGET: scanoss-crypto-library-rules.json
+  CRYPTO_ALGORITHMS_SOURCE: scanoss-crypto-algorithms.json
+  CRYPTO_ALGORITHMS_TARGET: scanoss-crypto-algorithm-rules.json
 
 jobs:
   build_w:
@@ -18,13 +25,14 @@ jobs:
       contents: read
 
     steps:
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
       - name: Get crypto rules
         uses: actions/checkout@v3
         with:
-          repository: scanoss/platform-deployment
+          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
           path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
           ref: main
@@ -32,8 +40,8 @@ jobs:
       - name: Copy crypto rules
         shell: bash
         run: |
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -108,13 +116,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
       - name: Get crypto rules
         uses: actions/checkout@v3
         with:
-          repository: scanoss/platform-deployment
+          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
           path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
           ref: main
@@ -122,8 +131,8 @@ jobs:
       - name: Copy crypto rules
         shell: bash
         run: |
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json  assets/data/scanoss-crypto-library-rules.json
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -162,13 +171,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
       - name: Get crypto rules
         uses: actions/checkout@v3
         with:
-          repository: scanoss/platform-deployment
+          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
           path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
           ref: main
@@ -176,9 +186,8 @@ jobs:
       - name: Copy crypto rules
         shell: bash
         run: |
-          mkdir -p assets/data
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-libraries.json assets/data/scanoss-crypto-library-rules.json
-          cp platform-deployment/datasets/cryptography/scanoss-crypto-algorithms.json  assets/data/scanoss-crypto-algorithm-rules.json
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
+          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
 
       - name: Install Node and NPM
         uses: actions/setup-node@v3
@@ -186,7 +195,7 @@ jobs:
           node-version: 22
           cache: npm
 
-      - name: Install and build
+      - name: Install dependencies
         run: |
           npm install --legacy-peer-deps
           npm run postinstall
