@@ -108,16 +108,21 @@ const CryptographyReport = () => {
 
   const onTypeChange = (newFilter: ICryptographyFilter) => {
     let detections = [];
-    if (tab === 'local') {
-      newFilter.types.forEach((i) => {
-        detections = [...detections, ...data.current.summary.files.typeDetection[i]]
-      })
+    let validAlgorithms = [];
+    const detectionSource = tab === 'local'
+      ? data.current.summary.files.typeDetection
+      : data.current.summary.components.typeDetection;
+
+    // Populate detections based on whether filter types exist
+    if (newFilter?.types?.length) {
+      detections = newFilter.types.reduce((result, type) => {
+        return [...result, ...detectionSource[type]];
+      }, []);
+      validAlgorithms = newFilter?.algorithm?.filter(algo => detections.includes(algo));
     } else {
-      newFilter.types.forEach((i) => {
-        detections = [...detections, ...data.current.summary.components.typeDetection[i]]
-      })
+      detections = getDetections(detectionSource);
     }
-    const validAlgorithms = newFilter?.algorithm?.filter(algo => detections.includes(algo));
+
     // Create updated filter with valid algorithms only
     const updatedFilter = {
       ...newFilter,

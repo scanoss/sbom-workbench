@@ -102,7 +102,6 @@ class CryptographyService {
       const componentTypeSummary = await modelProvider.model.cryptography.getIdentifiedTypeSummary();
 
       // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
-      // TODO: Review the name
       const fileCryptoSummary = await modelProvider.model.localCryptography.getIdentifiedCryptoSummary();
       const componentCryptoSummary = await modelProvider.model.cryptography.getIdentifiedCryptoSummary();
 

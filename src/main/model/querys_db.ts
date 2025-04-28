@@ -640,25 +640,23 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
         (SELECT COUNT(type) FROM hint_data) as count;`;
 
   SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE = `
-  WITH hints_types AS (
-      SELECT DISTINCT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
-      FROM local_cryptography c, json_each(c.hints)
-      INNER JOIN file_inventories fi ON fi.fileId = c.file_id
-      WHERE json_valid(c.hints)
-    ),
-    hints_detection AS (
-      SELECT DISTINCT type, detected
-      FROM hints_types
-    ),
-    algorithms_detection AS (
-      SELECT 'algorithm' as type, json_extract(value, '$.algorithm') as detected
-      FROM  local_cryptography c, json_each(c.algorithms)
+    WITH algorithms_detection AS (
+      SELECT DISTINCT 'algorithm' as type, json_extract(value, '$.algorithm') as detected
+      FROM local_cryptography c, json_each(c.algorithms)
       INNER JOIN file_inventories fi ON fi.fileId = c.file_id
       WHERE json_valid(c.algorithms)
+    ),
+    hints_detection AS (
+        SELECT DISTINCT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+        FROM local_cryptography c, json_each(c.hints)
+        INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+        WHERE json_valid(c.hints)
     )
-    SELECT type, json_group_array(detected) as detection  FROM algorithms_detection
+    SELECT type, json_group_array(detected) as detection FROM hints_detection
+    GROUP BY type
     UNION
-    SELECT type ,json_group_array(detected) as detection  FROM hints_detection;`;
+    SELECT type, json_group_array(detected) as detection FROM algorithms_detection
+    GROUP BY type;`;
 
   /** *************** END Local Cryptography Queries ************* */
 
