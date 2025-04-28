@@ -40,7 +40,14 @@ const CodeViewSelector = ({ active, setView }) => {
         </Tooltip>
         <Tooltip title={t('Tooltip:DependencyView')} arrow>
           <Button
-            className={classes.button}
+            sx={{
+              fontSize: 16,
+              minWidth: 32,
+              '&:not(.MuiButton-containedPrimary)': {
+                backgroundColor: '#fff',
+                color: '#000',
+              },
+            }}
             onClick={() => setView(CodeViewSelectorMode.GRAPH)}
             color={active === CodeViewSelectorMode.GRAPH ? 'primary' : 'secondary'}
             aria-label="graph"
