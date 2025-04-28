@@ -29,31 +29,10 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v3
 
-      - name: Get crypto rules
-        uses: actions/checkout@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
-          path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
-          ref: main
-
-      - name: Copy crypto rules
-        shell: bash
-        run: |
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
-
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
 
       - name: Build binaries for Windows
         run: |
@@ -116,35 +95,13 @@ jobs:
     runs-on: macos-latest
 
     steps:
-
-      - name: Checkout git repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Get crypto rules
-        uses: actions/checkout@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
-          path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
-          ref: main
-
-      - name: Copy crypto rules
-        shell: bash
-        run: |
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
-
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
 
       - name: Build Binaries for MacOs & Windows
         env:
@@ -175,31 +132,10 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v3
 
-      - name: Get crypto rules
-        uses: actions/checkout@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
-          path: platform-deployment
           token: ${{ secrets.SC_GH_TAG_TOKEN }}
-          ref: main
-
-      - name: Copy crypto rules
-        shell: bash
-        run: |
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
-          cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
-
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
 
       - name: Build binaries for linux
         run: |
