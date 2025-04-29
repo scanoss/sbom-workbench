@@ -43,5 +43,6 @@
   "ExportHintCSV": "导出逗号分隔值报告",
   "ExportHintSPDXLite": "导出符合 SPDX 的 SBOM 报告",
   "ExportHintHTML": "导出识别报告的 HTML 摘要",
-  "ExportHintSettings": "Export a settings file"
+  "ExportHintSettings": "Export a settings file",
+  "ExportCSVVulnerability": "Export Vulnerability Report"
 }

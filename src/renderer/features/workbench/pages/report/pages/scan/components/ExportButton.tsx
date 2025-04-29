@@ -53,6 +53,12 @@ export const ExportButton = ({ empty }) => {
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           type: InventoryType.CRYPTOGRAPHY,
         },
+        {
+          label: 'Vulnerability',
+          hint: t('Tooltip:ExportCSVVulnerability'),
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          type: InventoryType.VULNERABILITY,
+        },
       ],
     },
     CYCLONEDX: {

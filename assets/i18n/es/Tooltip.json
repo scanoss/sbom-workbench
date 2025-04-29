@@ -49,5 +49,6 @@
   "Ignored": "Ignorados",
   "Progress": "Progreso",
   "OpenInReadMode": "Abrir en modo lectura",
-  "ExportHintSettings": "Export archivo de configuracion"
+  "ExportHintSettings": "Exportar archivo de configuracion",
+  "ExportCSVVulnerability": "Exportar reporte de vulnerabilidades"
 }
