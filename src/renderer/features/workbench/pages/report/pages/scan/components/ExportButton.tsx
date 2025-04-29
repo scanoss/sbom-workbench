@@ -105,10 +105,11 @@ export const ExportButton = ({ empty }) => {
   const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
     const attributes = getFormatFilesAttributes(format);
+
     const path = await dialogController.showSaveDialog({
       defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${
         attributes.defaultFileName ? `-${attributes.defaultFileName}` : ''
-      }.${attributes.extension}`,
+      }${inventoryType ? `-${inventoryType.toLowerCase()}` : ''}-${source.toLowerCase()}.${attributes.extension}`,
       filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 

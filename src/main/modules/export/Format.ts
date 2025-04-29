@@ -27,7 +27,7 @@ export abstract class Format {
 
   public async save(path: string): Promise<IExportResult> {
     const { report, status } = await this.generate();
-    log.info('[ Report ]: Invalid report PURLS: ', status);
+    log.info('[ Report ]: Status: ', status);
     try {
       await fs.promises.writeFile(path, report);
       return {

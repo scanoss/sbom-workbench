@@ -1,11 +1,11 @@
-import { Format } from '../Format';
-import { ExportSource, ExportStatusCode } from '../../../../api/types';
-import { CryptographicItem } from '../../../model/entity/Cryptography';
-import { ReportData } from '../ReportData';
-import { isValidPurl } from '../helpers/exportHelper';
-import { ExportRepository } from '../Repository/ExportRepository';
+import { Format } from '../../Format';
+import { ExportSource, ExportStatusCode } from '../../../../../api/types';
+import { CryptographicItem } from '../../../../model/entity/Cryptography';
+import { ReportData } from '../../ReportData';
+import { isValidPurl } from '../../helpers/exportHelper';
+import { ExportRepository } from '../../Repository/ExportRepository';
 
-export class Crypto extends Format {
+export class CryptographyCsv extends Format {
   private source: string;
 
   private repository: ExportRepository;

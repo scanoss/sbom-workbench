@@ -6,7 +6,7 @@ import { ExportResult, Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
-import { getSupplier, toVulnerabilityExportData } from '../../helpers/exportHelper';
+import { getSupplier, resolveVulnerabilityURL, toVulnerabilityExportData } from '../../helpers/exportHelper';
 import { ReportData } from '../../ReportData';
 
 export abstract class CycloneDX extends Format {
@@ -120,7 +120,7 @@ export abstract class CycloneDX extends Format {
         description: v.summary,
         source: new CDX.Models.Vulnerability.Source({
           name: v.source,
-          url: v.source === 'NDV' ? `https://nvd.nist.gov/vuln/detail/${v.cve}` : `https://osv.dev/vulnerability/${v.cve}`,
+          url: resolveVulnerabilityURL(v.source, v.cve),
         }),
         published: new Date(v.published),
         updated: new Date(v.modified),
