@@ -1,0 +1,38 @@
+name: 'Setup and Build'
+description: 'Common setup and build steps for all platforms'
+
+inputs:
+  token:
+    description: 'GitHub token for accessing private repositories'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Get crypto rules
+      uses: actions/checkout@v3
+      with:
+        repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
+        path: platform-deployment
+        token: ${{ inputs.token }}
+        ref: main
+
+    - name: Copy crypto rules
+      shell: bash
+      run: |
+        cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
+        cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
+
+    - name: Install Node and NPM
+      uses: actions/setup-node@v3
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        npm install --legacy-peer-deps
+        npm run postinstall
+        npm run build

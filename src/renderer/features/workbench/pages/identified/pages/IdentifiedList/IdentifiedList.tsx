@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
 import Alert from '@mui/material/Alert';
 import { componentService } from '@api/services/component.service';
@@ -29,25 +28,8 @@ const filter = (items, query) => {
   return result;
 };
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-    width: 420,
-  },
-  input: {
-    marginLeft: theme.spacing(1),
-    flex: 1,
-  },
-  iconButton: {
-    padding: 10,
-  },
-}));
-
 export const IdentifiedList = () => {
   const navigate = useNavigate();
-  const classes = useStyles();
   const dispatch = useDispatch();
   const { limit, onScroll } = usePagination();
   const { t } = useTranslation();

@@ -96,3 +96,7 @@ export interface GroupSearchKeywordDTO {
   words: Array<string>;
 }
 
+
+export interface ExportControlGetAllDTO {
+  type: SourceType,
+}

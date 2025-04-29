@@ -17,11 +17,13 @@
     "PURL": "PURL",
     "URL": "URL",
     "LocalFile": "Local File",
-    "Algorithms": "Algorithms",
+    "Algorithm": "Algorithm",
     "Strength ": "Strength",
     "File": "File",
     "Dependencies ": "Dependencies",
-    "Cryptography": "Cryptography"
+    "Cryptography": "Cryptography",
+    "Type": "Type",
+    "Detected": "Detected"
   },
   "Version": "Version",
   "License": "License"

@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { makeStyles } from '@mui/styles';
+import React, { useEffect, useRef } from 'react';
 import {
   AutoSizer,
   Column,
   Table,
-  TableHeaderProps,
 } from 'react-virtualized';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
-const useStyles = makeStyles({
-  headerColumn: {
+import { styled } from '@mui/material/styles';
+
+const StyledTable = styled(Table)(({ theme }) => ({
+  '& .ReactVirtualized__Table__headerColumn': {
     fontWeight: 600,
     fontSize: '0.875rem',
     lineHeight: '1.5rem',
@@ -20,8 +20,7 @@ const useStyles = makeStyles({
     alignItems: 'center',
     display: 'flex',
   },
-
-  row: {
+  '& .ReactVirtualized__Table__row': {
     fontWeight: 400,
     fontSize: '0.75rem',
     borderBottom: '1px solid rgba(224, 224, 224, 1)',
@@ -38,12 +37,10 @@ const useStyles = makeStyles({
     '&:hover .file': {
       textDecoration: 'underline',
     },
-  },
-
-});
+  }
+}));
 
 const DependenciesDataTable = ({ data }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -74,15 +71,13 @@ const DependenciesDataTable = ({ data }) => {
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Table
+        <StyledTable
           height={height}
           width={width}
           rowHeight={38}
           headerHeight={40}
           rowCount={items.current.length}
           rowGetter={({ index }) => items.current[index]}
-          headerClassName={classes.headerColumn}
-          rowClassName={classes.row}
         >
           <Column
             label={t('Table:Header:File')}
@@ -100,7 +95,7 @@ const DependenciesDataTable = ({ data }) => {
               </div>
             )}
           />
-        </Table>
+        </StyledTable>
       )}
     </AutoSizer>
   );

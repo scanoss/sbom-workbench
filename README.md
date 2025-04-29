@@ -22,7 +22,7 @@ _Find prebuilt binaries for all platforms over at: [Software Transparency Founda
 
 ## Prerequisites
 
-- Node.js v14+
+- Node.js >=v22.12.0
 - NPM (Node Packages Manager)
 
 We strongly recommend handling your node versions using [nvm](https://github.com/nvm-sh/nvm)
@@ -91,34 +91,75 @@ You can disable any SSL errors, to do so you can change this option to true
 
 `"IGNORE_CERT_ERRORS": true`
 
+# Local Cryptography Detection in SBOM-Workbench
 
-### Local Cryptography Detection
+## Overview
 
-Local cryptography can be detected by SBOM-Workbench when an API key is set.
+Local cryptography can be detected by SBOM-Workbench when an API key is configured. This feature enables the detection of cryptographic algorithms and libraries within a codebase.
 
-A default set of rules is defined for local cryptography detection. However, a custom set of rules can be defined at the root of the project to be scanned with the following name  **scanoss-crypto-rules.json**.
-A sample file can be found [here](./samples/scanoss-crypto-rules.json).
+## Default and Custom Detection Rules
 
-Example structure of the file:
+Default rules are provided for the detection of cryptographic algorithms and libraries. However, custom rules may be defined at the root of the project to be scanned.
 
+### Custom Rule Files
+
+Custom rules can be defined through the following JSON files at the project root:
+
+- **Algorithm detection rules**: `scanoss-crypto-algorithm-rules.json`. See: [Algorithm Rules Sample](./samples/scanoss-crypto-rules.json)
+- **Library detection rules**: `scanoss-crypto-library-rules.json`
+
+## Rule File Structure
+
+### Algorithm Rules Structure
+
+The structure of `scanoss-crypto-algorithm-rules.json` should be formatted as follows:
 ```json
 [
    {
-    "algorithm": "md5",
-    "strength": "128",
+     "algorithmId": "md5",
+     "algorithm": "MD5 Message-Digest Algorithm",
+     "strength": "128",
+     "keywords": [
+       "md5_file",
+       "md5",
+       "md5crypt",
+       "aprcrypt",
+       "md5_encrypt",
+       "md5_block_data_order",
+       "ossl_md5_sha1_",
+       "MD5_Init"
+     ]
+   }
+ ]
+``` 
+
+### Library Rules Structure
+
+The structure of `scanoss-crypto-library-rules.json` should be formatted as follows:
+```json
+[
+  {
+    "id": "library/webcrypto",
+    "name": "Web Cryptography API",
+    "description": "A JavaScript API for performing basic cryptographic operations in web applications.",
     "keywords": [
-      "md5_file",
-      "md5",
-      "md5crypt",
-      "aprcrypt",
-      "md5_encrypt",
-      "md5_block_data_order",
-      "ossl_md5_sha1_",
-      "MD5_Init"
+      "window.crypto.subtle",
+      "crypto.subtle.",
+      "crypto.getRandomValues",
+      "NodeWebCrypto",
+      "WebCryptoAPI"
+    ],
+    "url": "https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API",
+    "category": "library",
+    "purl": "pkg:generic/webcrypto",
+    "tags": [
+      "JavaScript"
     ]
   }
-]
-```
+ ]
+``` 
+
+
 # SCANOSS Settings File
 SCANOSS provides a settings file to customize the scanning process. The settings file is a JSON file that contains project information and BOM (Bill of Materials) rules. It allows you to include, remove, or replace components in the BOM before and after scanning.
 

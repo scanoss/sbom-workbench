@@ -43,6 +43,7 @@ export class Queries {
     purl varchar(45) NOT NULL,
     version varchar(35),
     algorithms varchar(500) NOT NULL,
+    hints text NOT NULL,
     CONSTRAINT cryptography_pk PRIMARY KEY (purl, version)
     );`;
 
@@ -50,6 +51,7 @@ export class Queries {
     id integer,
     file_id integer NOT NULL,
     algorithms varchar(500) NOT NULL,
+    hints text NOT NULL,
     CONSTRAINT pk_local_cryptography PRIMARY KEY (id),
     CONSTRAINT fk_local_cryptography FOREIGN KEY (file_id) REFERENCES files(fileId)
     ON DELETE CASCADE
@@ -167,26 +169,6 @@ export class Queries {
 
   SQL_SELECT_INVENTORIES_NOT_HAVING_FILES = "SELECT i.id FROM inventories i  WHERE i.id NOT IN (SELECT inventoryid FROM file_inventories) AND i.source='detected';";
 
-  SQL_GET_IDENTIFIED_DATA = `SELECT DISTINCT i.id AS inventoryId,f.fileId,i.usage, i.notes,i.spdxid AS identified_license,
-    (CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE cv.purl=r.purl AND cv.version=r.version)) THEN rl.spdxid WHEN (EXISTS(SELECT 1 FROM license_component_version lcv WHERE lcv.cvid=cv.id))THEN (SELECT spdxid FROM licenses l INNER JOIN license_component_version lcv ON lcv.licid=l.id INNER JOIN component_versions compv ON compv.id=lcv.cvid WHERE compv.id=cv.id) ELSE (SELECT d.originalLicense FROM dependencies d WHERE d.purl=cv.purl AND d.version=cv.version) END) AS detected_license ,
-    cv.purl,cv.version,(CASE WHEN (EXISTS (SELECT 1 FROM results r WHERE r.purl=cv.purl AND r.version=cv.version)) THEN r.latest_version ELSE NULL END) AS latest_version,cv.url, (CASE WHEN f.path IS NOT NULL THEN f.path ELSE (SELECT f.path FROM files f WHERE f.fileId=dep.fileId) END) AS path,cv.name AS identified_component,(CASE WHEN  r.component IS NOT NULL THEN r.component ELSE dep.component END) AS detected_component,lic.fulltext,lic.official FROM inventories i
-    LEFT JOIN file_inventories fi ON fi.inventoryid=i.id
-    LEFT JOIN files f ON fi.fileId=f.fileId
-    LEFT JOIN results r ON r.fileId=f.fileId
-    LEFT JOIN component_versions cv ON cv.id=i.cvid
-    LEFT JOIN result_license rl ON rl.resultId = r.id
-    LEFT JOIN licenses lic ON lic.spdxid=i.spdxid
-    LEFT JOIN dependencies dep ON cv.purl=dep.purl AND cv.version=dep.version;`;
-
-  SQL_GET_DETECTED_DATA = `SELECT f.fileId, r.idtype as usage , rl.spdxid as identified_license, rl.spdxid as detected_license , r.purl, r.version , r.latest_version, r.url,
-f.path , r.component as identified_compoenent, r.component as detected_component, lic.fulltext, lic.official
-FROM files f INNER JOIN results r ON r.fileId = f.fileId LEFT JOIN result_license rl ON rl.resultid = r.id LEFT JOIN licenses lic ON lic.spdxid = rl.spdxid
-UNION
-SELECT f.fileId, 'dependency' as usage ,CASE WHEN INSTR(dep.originalLicense, ',') > 0 THEN REPLACE(dep.originalLicense, ',', ' AND ') ELSE dep.originalLicense END AS identified_license, CASE WHEN INSTR(dep.originalLicense, ',') > 0 THEN REPLACE(dep.originalLicense, ',', ' AND ') ELSE dep.originalLicense END AS detected_license,
-dep.purl, dep.originalVersion, dep.version as latest_version , NULL as url, f.path, dep.component as identified_component, dep.component as detected_component, lic.fulltext, lic.official
-FROM files f INNER JOIN dependencies dep ON f.fileId  = dep.fileId
-LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
-
   SQL_GET_SUMMARY_BY_PURL_VERSION = 'SELECT identified,pending,ignored FROM summary WHERE purl=? AND version=?;';
 
   SQL_GET_SUMMARY_BY_PURL = 'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
@@ -198,8 +180,6 @@ LEFT JOIN licenses lic ON lic.spdxid = detected_license;`;
   SQL_SET_RESULTS_TO_PENDING_BY_INVID_PURL_VERSION = 'UPDATE files SET identified=0 WHERE fileId IN (SELECT fileId FROM file_inventories WHERE inventoryid=?)';
 
   SQL_GET_SUMMARY_BY_RESULT_ID = 'SELECT f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending FROM files f  WHERE fileId IN #values GROUP BY f.path;';
-
-  SQL_GET_RESULTS_RESCAN = 'SELECT r.idtype,f.path,f.identified ,f.ignored ,(CASE WHEN  f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) as pending, source AS original FROM files f INNER JOIN results r ON f.fileId=r.fileId;';
 
   SQL_COMPONENTS_SUMMARY = `SELECT comp.purl,comp.id,SUM(f.ignored) AS ignored, SUM(f.identified) AS identified,
   SUM(f.identified=0 AND f.ignored=0) AS pending FROM files f LEFT JOIN results r ON f.fileId=r.fileId
@@ -342,36 +322,436 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     INNER JOIN aux.licenses ON aux.licenses.spdxid = aux.inventories.spdxid ) as fdb
     WHERE target.md5_file = fdb.md5_file`;
 
-  // Cryptography
-  SQL_GET_ALL_CRYPTOGRAPHY = 'SELECT purl, version , algorithms FROM cryptography;';
+  /** ************************************************************** */
+  /*                                                                 */
+  /*                         CRYPTOGRAPHY                            */
+  /*                                                                 */
+  /** ************************************************************** */
 
-  SQL_GET_ALL_DETECTED_CRYPTOGRAPHY = `SELECT c.purl, c.version , c.algorithms
+  /** ************** Component Cryptography Queries **************** */
+
+  SQL_GET_ALL_CRYPTOGRAPHY = 'SELECT purl, version, algorithms, hints FROM cryptography;';
+
+  SQL_GET_CRYPTOGRAPHY_ALL_DETECTED = `SELECT c.purl, c.version , c.algorithms, c.hints
     FROM cryptography c
     INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.version AND cv.source = 'engine'
     UNION
-    SELECT c.purl, c.version , c.algorithms
+    SELECT c.purl, c.version, c.algorithms, c.hints
     FROM cryptography c
     INNER JOIN dependencies  d ON c.purl =  d.purl AND c.version = d.originalVersion;`;
 
-  SQL_GET_ALL_IDENTIFIED_CRYPTOGRAPHY = `SELECT crypto.purl, crypto.version, crypto.algorithms FROM
- (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
- SELECT cvid FROM inventories i)) as  ic
- INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
+  SQL_GET_CRYPTOGRAPHY_ALL_IDENTIFIED = `SELECT crypto.purl, crypto.version, crypto.algorithms, crypto.hints FROM
+    (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
+    SELECT cvid FROM inventories i)) as  ic
+    INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
 
-  SQL_DELETE_CRYPTOGRAPHY = 'DELETE FROM cryptography';
+  SQL_CRYPTOGRAPHY_DELETE_ALL = 'DELETE FROM cryptography';
 
-  SQL_GET_ALL_IDENTIFIED_ALGORITHMS = `SELECT  '[' || GROUP_CONCAT(SUBSTR(crypto.algorithms, 2, LENGTH(crypto.algorithms) - 2), ', ') || ']' AS  algorithms FROM
-  (SELECT cv.purl, cv.version FROM component_versions cv WHERE id IN (
-  SELECT cvid FROM inventories i)) as  ic
-  INNER JOIN cryptography crypto ON crypto.purl = ic.purl AND crypto.version = ic.version;`;
+  SQL_GET_CRYPTOGRAPHY_DETECTED_GROUPED_BY_TYPE = `
+    WITH
+    extracted_algorithms AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm, c.purl, c.version
+      FROM cryptography c, json_each(c.algorithms)
+      WHERE json_valid(c.algorithms)
+    ),
+    algorithm_results AS (
+      SELECT purl || '@' || version AS name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+      FROM extracted_algorithms
+      WHERE algorithm IS NOT NULL
+      GROUP BY name
+    ),
+    extracted_hints AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, c.purl, c.version
+      FROM cryptography c, json_each(c.hints)
+      WHERE json_valid(c.hints)
+    ),
+    hint_results AS (
+      SELECT purl || '@' || version AS name, type, json_group_array(hintId) as 'values'
+      FROM extracted_hints
+      GROUP BY name, type
+    )
+    SELECT * FROM algorithm_results
+    UNION
+    SELECT * FROM hint_results;`;
 
-  // Local Cryptography
-  SQL_GET_ALL_LOCAL_CRYPTOGRAPHY = `SELECT lc.id, lc.file_id, lc.algorithms, f.path, f.type  FROM local_cryptography lc
-  INNER JOIN files f ON f.fileId = lc.file_id;`;
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_GROUPED_BY_TYPE = `WITH extracted_algorithms AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm, c.purl, c.version
+      FROM cryptography c, json_each(c.algorithms)
+      INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+      WHERE json_valid(c.algorithms)
+      AND cv.id IN (SELECT cvid FROM inventories)
+    ),
+    algorithm_results AS (
+      SELECT purl || '@' || version AS name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+      FROM extracted_algorithms
+      WHERE algorithm IS NOT NULL
+      GROUP BY name
+    ),
+    extracted_hints AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, c.purl, c.version
+      FROM cryptography c, json_each(c.hints)
+      INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+      WHERE json_valid(c.hints)
+      AND cv.id IN (SELECT cvid FROM inventories)
+    ),
+    hint_results AS (
+      SELECT purl || '@' || version AS name, type, json_group_array(hintId) as 'values'
+      FROM extracted_hints
+      GROUP BY name, type
+    )
+    SELECT * FROM algorithm_results
+    UNION
+    SELECT * FROM hint_results;`;
 
-  SQL_DELETE_LOCAL_CRYPTOGRAPHY = 'DELETE FROM local_cryptography';
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_TYPE_SUMMARY = `
+    WITH hints_types AS (
+    SELECT json_extract(value, '$.category') as type
+    FROM cryptography c, json_each(c.hints)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    INNER JOIN inventories i ON i.cvid = cv.id
+    WHERE json_valid(c.hints)
+    ),
+    hints_count AS (
+    SELECT type, COUNT(*) count
+    FROM hints_types
+    GROUP BY type
+    ),
+    algorithms_types AS (
+    SELECT 'algorithm' as type
+    FROM cryptography c, json_each(c.algorithms)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    INNER JOIN inventories i ON i.cvid = cv.id
+    WHERE json_valid(c.algorithms)
+    ),
+    algorithms_count AS (
+    SELECT type, COUNT(*) count
+    FROM algorithms_types
+    GROUP BY type
+    )
+    SELECT type, count FROM algorithms_count
+    UNION
+    SELECT type, count FROM hints_count;`;
 
-  SQL_GET_ALL_LOCAL_ALGORITHMS = "SELECT '[' || GROUP_CONCAT(SUBSTR(lc.algorithms, 2, LENGTH(lc.algorithms) - 2), ', ') || ']' AS  algorithms  FROM local_cryptography lc;";
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_CRYPTO_SUMMARY = `
+  WITH crypto_hints AS (
+    SELECT json_extract(value, '$.id') as crypto
+    FROM  cryptography c, json_each(c.hints)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    WHERE json_valid(c.hints)
+    AND cv.id IN (SELECT cvid FROM inventories)
+  ),
+ hints_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM crypto_hints
+    GROUP BY crypto
+  ),
+ crypto_algorithms AS (
+    SELECT json_extract(value, '$.algorithm') as crypto
+    FROM cryptography c, json_each(c.algorithms)
+    INNER JOIN component_versions cv ON cv.purl = c.purl AND cv.version = c.version
+    WHERE json_valid(c.algorithms)
+    AND cv.id IN (SELECT cvid FROM inventories)
+  ),
+ algorithms_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM crypto_algorithms
+    GROUP BY crypto
+  )
+  SELECT crypto, count FROM algorithms_count
+  UNION
+  SELECT crypto, count FROM hints_count;`;
+
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_TYPE_COUNT = `WITH algorithm_data AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm
+      FROM  cryptography c, json_each(c.algorithms)
+      INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.version
+      WHERE json_valid(c.algorithms) AND json_extract(value, '$.algorithm') IS NOT NULL
+      AND cv.id IN (SELECT cvid FROM inventories)
+  ),
+  hint_data AS (
+      SELECT json_extract(value, '$.category') as type
+      FROM cryptography c , json_each(c.hints)
+      INNER JOIN component_versions cv ON c.purl = cv.purl AND c.version = cv.version
+      WHERE json_valid(c.hints) AND json_extract(value, '$.category') IS NOT NULL
+      AND cv.id IN (SELECT cvid FROM inventories)
+  )
+  SELECT
+      (SELECT COUNT(algorithm) FROM algorithm_data) +
+      (SELECT COUNT(type) FROM hint_data) as count;`;
+
+  SQL_GET_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE = `
+  WITH hints_types AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+      FROM cryptography  c, json_each(c.hints)
+      INNER JOIN component_versions cv ON cv.purl = c.purl and cv.version = c.version
+      INNER JOIN inventories i ON i.cvid = cv.id
+      WHERE json_valid(c.hints)
+    ),
+    hints_detection AS (
+      SELECT DISTINCT type, detected
+      FROM hints_types
+      GROUP BY type
+    ),
+    algorithms_detection AS (
+      SELECT DISTINCT  'algorithm' as type,   json_extract(value, '$.algorithm') as detected
+      FROM  cryptography  c, json_each(c.algorithms)
+      INNER JOIN component_versions cv ON cv.purl = c.purl and cv.version = c.version
+      INNER JOIN inventories i ON i.cvid = cv.id
+      WHERE json_valid(c.algorithms)
+    )
+    SELECT type, json_group_array(detected)  as detection  FROM algorithms_detection
+    GROUP BY type
+    UNION
+    SELECT type ,json_group_array(detected) as detection  FROM hints_detection
+    GROUP BY type;`;
+
+  /** ************** Local Cryptography Queries **************** */
+  SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_GROUPED_BY_TYPE = `
+   WITH
+    extracted_algorithms AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm, f.path
+      FROM local_cryptography lc, json_each(lc.algorithms)
+      INNER JOIN files f ON lc.file_Id = f.fileId
+      WHERE json_valid(lc.algorithms)
+    ),
+    algorithm_results AS (
+    SELECT path as name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+      FROM extracted_algorithms
+      WHERE algorithm IS NOT NULL
+      GROUP BY name
+    ),
+    extracted_hints AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, f.path
+      FROM local_cryptography lc, json_each(lc.hints)
+      INNER JOIN files f ON f.fileId = lc.file_id
+      WHERE json_valid(lc.hints)
+    ),
+    hint_results AS (
+      SELECT path AS name, type, json_group_array(hintId) as 'values'
+      FROM extracted_hints
+      GROUP BY name, type
+    )
+    SELECT * FROM algorithm_results
+    UNION
+    SELECT * FROM hint_results;`;
+
+  SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_CRYPTO_SUMMARY = `WITH crypto_hints AS (
+    SELECT json_extract(value, '$.id') as crypto
+    FROM local_cryptography lc, json_each(lc.hints)
+    INNER JOIN files f ON lc.file_Id = f.fileId
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+    WHERE json_valid(lc.hints)
+    ),
+    hints_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM crypto_hints
+    GROUP BY crypto
+    ),
+    crypto_algorithms AS (
+    SELECT json_extract(value, '$.algorithm') as crypto
+    FROM local_cryptography lc, json_each(lc.algorithms)
+    INNER JOIN files f ON lc.file_Id = f.fileId
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+    WHERE json_valid(lc.algorithms)
+    ),
+    algorithms_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM crypto_algorithms
+    GROUP BY crypto
+    )
+    SELECT crypto, count FROM algorithms_count
+    UNION
+    SELECT crypto, count FROM hints_count;`;
+
+  SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_IDENTIFIED_GROUPED_BY_TYPE = `WITH
+    extracted_algorithms AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm, f.path
+      FROM local_cryptography lc, json_each(lc.algorithms)
+      INNER JOIN files f ON lc.file_Id = f.fileId
+      INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+      WHERE json_valid(lc.algorithms)
+    ),
+    algorithm_results AS (
+     SELECT path as name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+     FROM extracted_algorithms
+     WHERE algorithm IS NOT NULL
+     GROUP BY name
+    ),
+    extracted_hints AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, f.path
+      FROM local_cryptography lc, json_each(lc.hints)
+      INNER JOIN files f ON f.fileId = lc.file_id
+      INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+      WHERE json_valid(lc.hints)
+    ),
+    hint_results AS (
+      SELECT path AS name, type, json_group_array(hintId) as 'values'
+      FROM extracted_hints
+      GROUP BY name, type
+    )
+    SELECT * FROM algorithm_results
+    UNION
+    SELECT * FROM hint_results;`;
+
+  SQL_DELETE_LOCAL_CRYPTOGRAPHY_ALL = 'DELETE FROM local_cryptography';
+
+  SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_TYPE_SUMMARY = `
+    WITH hints_types AS (
+    SELECT json_extract(value, '$.category') as type
+    FROM local_cryptography lc, json_each(lc.hints)
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+    WHERE json_valid(lc.hints)
+    ),
+    hints_count AS (
+    SELECT type, COUNT(*) count
+    FROM hints_types
+    GROUP BY type
+    ),
+    algorithms_types AS (
+    SELECT 'algorithm' as type
+    FROM local_cryptography lc, json_each(lc.algorithms)
+    INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
+    WHERE json_valid(lc.algorithms)
+    ),
+    algorithms_count AS (
+    SELECT type, COUNT(*) count
+    FROM algorithms_types
+    HAVING count > 0
+    )
+    SELECT type, count FROM algorithms_count
+    UNION
+    SELECT type, count FROM hints_count;`;
+
+  SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_TYPE_COUNT = `
+    WITH algorithm_data AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm
+      FROM  local_cryptography c, json_each(c.algorithms)
+      INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+      WHERE json_valid(c.algorithms) AND json_extract(value, '$.algorithm') IS NOT NULL
+    ),
+    hint_data AS (
+        SELECT json_extract(value, '$.category') as type
+        FROM local_cryptography c , json_each(c.hints)
+        INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+        WHERE json_valid(c.hints) AND json_extract(value, '$.category') IS NOT NULL
+    )
+    SELECT
+        (SELECT COUNT(algorithm) FROM algorithm_data) +
+        (SELECT COUNT(type) FROM hint_data) as count;`;
+
+  SQL_GET_LOCAL_CRYPTOGRAPHY_IDENTIFIED_DETECTION_GROUP_BY_TYPE = `
+    WITH algorithms_detection AS (
+      SELECT DISTINCT 'algorithm' as type, json_extract(value, '$.algorithm') as detected
+      FROM local_cryptography c, json_each(c.algorithms)
+      INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+      WHERE json_valid(c.algorithms)
+    ),
+    hints_detection AS (
+        SELECT DISTINCT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+        FROM local_cryptography c, json_each(c.hints)
+        INNER JOIN file_inventories fi ON fi.fileId = c.file_id
+        WHERE json_valid(c.hints)
+    )
+    SELECT type, json_group_array(detected) as detection FROM hints_detection
+    GROUP BY type
+    UNION
+    SELECT type, json_group_array(detected) as detection FROM algorithms_detection
+    GROUP BY type;`;
+
+  /** *************** END Local Cryptography Queries ************* */
+
+  /** ************** Cryptography Shared Queries **************** */
+
+  SQL_GET_DETECTED_CRYPTO_TYPE_SUMMARY = `
+    WITH hints_types AS (
+    SELECT json_extract(value, '$.category') as type
+    FROM #TABLE c, json_each(c.hints)
+    WHERE json_valid(c.hints)
+    ),
+    hints_count AS (
+    SELECT type, COUNT(*) count
+    FROM hints_types
+    GROUP BY type
+    ),
+    algorithms_types AS (
+    SELECT 'algorithm' as type
+    FROM #TABLE c, json_each(c.algorithms)
+    WHERE json_valid(c.algorithms)
+    ),
+    algorithms_count AS (
+    SELECT type, COUNT(*) count
+    FROM algorithms_types
+    )
+    SELECT type, count FROM algorithms_count
+    UNION
+    SELECT type, count FROM hints_count;`;
+
+  SQL_GET_DETECTED_CRYPTO_SUMMARY = `
+    WITH crypto_hints AS (
+    SELECT json_extract(value, '$.id') as crypto
+    FROM #TABLE c, json_each(c.hints)
+    WHERE json_valid(c.hints)
+    ),
+    hints_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM crypto_hints
+    GROUP BY crypto
+    ),
+    crypto_algorithms AS (
+    SELECT json_extract(value, '$.algorithm') as crypto
+    FROM #TABLE c, json_each(c.algorithms)
+    WHERE json_valid(c.algorithms)
+    ),
+    algorithms_count AS (
+    SELECT crypto, COUNT(*) count
+    FROM   crypto_algorithms
+    GROUP BY crypto
+    )
+    SELECT crypto, count FROM algorithms_count
+    UNION
+    SELECT crypto, count FROM hints_count;`;
+
+  SQL_GET_CRYPTO_DETECTED_TYPE_COUNT = `
+    WITH algorithm_data AS (
+      SELECT json_extract(value, '$.algorithm') as algorithm
+      FROM #TABLE c, json_each(c.algorithms)
+      WHERE json_valid(c.algorithms) AND json_extract(value, '$.algorithm') IS NOT NULL
+  ),
+  hint_data AS (
+      SELECT json_extract(value, '$.category') as type
+      FROM #TABLE c, json_each(c.hints)
+      WHERE json_valid(c.hints) AND json_extract(value, '$.category') IS NOT NULL
+  )
+  SELECT
+      (SELECT COUNT(algorithm) FROM algorithm_data) +
+      (SELECT COUNT(type) FROM hint_data) as count;`;
+
+  SQL_GET_DETECTED_DETECTION_GROUP_BY_TYPE = `
+   WITH hints_types AS (
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as detected
+      FROM #TABLE c, json_each(c.hints)
+      WHERE json_valid(c.hints)
+    ),
+    hints_detection AS (
+      SELECT DISTINCT type, detected
+      FROM hints_types
+    ),
+    algorithms_detection AS (
+      SELECT DISTINCT 'algorithm' as type,   json_extract(value, '$.algorithm') as detected
+      FROM #TABLE c, json_each(c.algorithms)
+      WHERE json_valid(c.algorithms)
+    )
+    SELECT type, json_group_array(detected)  as detection  FROM algorithms_detection
+    GROUP BY type
+    UNION
+    SELECT type ,json_group_array(detected) as detection  FROM hints_detection
+    GROUP BY type;`;
+
+    /** ************** END Cryptography Shared Queries **************** */
+
+  /** ******************************************************************
+   *               END CRYPTOGRAPHY QUERIES                            *
+   ******************************************************************* */
 
   SQL_DETECTED_REPORT_LICENSE_COMPONENT_SUMMARY = `SELECT spdxid, SUM(detectedLicenseComponentCount) as componentLicenseCount, SUM(declaredLicenseDependencyCount) as dependencyLicenseCount , SUM(detectedLicenseComponentCount + declaredLicenseDependencyCount) as total FROM (
     -- First part: Count component license

@@ -3,77 +3,21 @@ import {
   Dialog,
   DialogActions,
   Button,
-  DialogContentText,
   DialogContent,
-  DialogTitle,
   TextField,
   FormControl,
   FormLabel,
-  Grid,
   Typography,
   Box,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
 import { useTranslation } from 'react-i18next';
-import { setScanPath } from '@store/workspace-store/workspaceSlice';
 import { dialogController } from '../../controllers/dialog-controller';
+import { useTheme } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 400,
-  },
-  closeButton: {
-    color: theme.palette.grey[500],
-  },
-  deleteButton: {
-    backgroundColor: theme.palette.error.main,
-    color: 'white',
-    '&:hover': {
-      backgroundColor: theme.palette.error.dark,
-    },
-  },
-  content: {
-    backgroundColor: 'white !important',
-    paddingTop: '5px',
-  },
-  actions: {
-    padding: theme.spacing(2),
-    borderTop: '1px solid #D4D4D8',
-    backgroundColor: '#f4f4f5',
-  },
-  formControl: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-    width: '100%',
-  },
-  inputContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: theme.spacing(0.5),
-  },
-  input: {
-    flex: 1,
-    border: 'solid 1px #80808033',
-    borderRadius: '3px',
-  },
-  browseButton: {
-    marginLeft: theme.spacing(3),
-    height: '40px',
-  },
-  errorText: {
-    color: theme.palette.error.main,
-    fontSize: '0.75rem',
-    marginTop: theme.spacing(0.5),
-    marginLeft: theme.spacing(1.5),
-  },
-  title: {
-    padding: '12px 15px 12px 15px',
-  },
-}));
 
 interface ImportProjectSourceDialogProps {
   open: boolean;
@@ -82,8 +26,8 @@ interface ImportProjectSourceDialogProps {
 }
 
 export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
+  const theme = useTheme();
   const [projectPath, setProjectPath] = useState<string>('');
   const [sourcePath, setSourcePath] = useState<string>(null);
   const [projectPathError, setProjectPathError] = useState<string>('');
@@ -172,19 +116,43 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
         <label>{t('Import Project and Source')}</label>
         <IconButton
           aria-label="close"
-          className={classes.closeButton}
+          sx={{
+            color: theme.palette.grey[500],
+          }}
           onClick={handleCancel}
           size="large"
         >
           <CloseIcon />
         </IconButton>
       </header>
-      <DialogContent className={classes.content}>
-        <FormControl component="fieldset" className={classes.formControl}>
+      <DialogContent
+        sx={{
+          backgroundColor: 'white !important',
+          paddingTop: '5px',
+        }}
+      >
+        <FormControl
+          component="fieldset"
+          sx={{
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(1),
+            width: '100%',
+          }}
+        >
           <FormLabel component="legend">{t('Project')}</FormLabel>
-          <div className={classes.inputContainer}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: theme.spacing(0.5),
+            }}
+          >
             <TextField
-              className={classes.input}
+              sx={{
+                flex: 1,
+                border: 'solid 1px #80808033',
+                borderRadius: '3px',
+              }}
               value={projectPath}
               onChange={handleProjectPathChange}
               onClick={handleProjectBrowse}
@@ -199,7 +167,10 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
             />
             <Button
               variant="contained"
-              className={classes.browseButton}
+              sx={{
+                marginLeft: theme.spacing(3),
+                height: '40px',
+              }}
               onClick={handleProjectBrowse}
               startIcon={<FolderOpenIcon />}
               size="small"
@@ -214,17 +185,40 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               ref={projectFileInputRef}
               onChange={handleProjectFileSelected}
             />
-          </div>
+          </Box>
           {projectPathError && (
-          <Typography className={classes.errorText}>{projectPathError}</Typography>
+          <Typography
+            sx={{
+              color: theme.palette.error.main,
+              fontSize: '0.75rem',
+              marginTop: theme.spacing(0.5),
+              marginLeft: theme.spacing(1.5),
+            }}
+          >{projectPathError}</Typography>
           )}
         </FormControl>
 
-        <FormControl component="fieldset" className={classes.formControl}>
+        <FormControl
+          component="fieldset"
+          sx={{
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(1),
+            width: '100%',
+          }}
+        >
           <FormLabel component="legend">{t('Source Code')}</FormLabel>
-          <div className={classes.inputContainer}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: theme.spacing(0.5),
+            }}>
             <TextField
-              className={classes.input}
+              sx={{
+                flex: 1,
+                border: 'solid 1px #80808033',
+                borderRadius: '3px',
+              }}
               value={sourcePath}
               onChange={handleSourcePathChange}
               onClick={handleSourceBrowse}
@@ -238,7 +232,10 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
             />
             <Button
               variant="outlined"
-              className={classes.browseButton}
+              sx={{
+                marginLeft: theme.spacing(3),
+                height: '40px',
+              }}
               onClick={handleSourceBrowse}
               startIcon={<FolderOpenIcon />}
               size="small"
@@ -252,10 +249,16 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               ref={sourceFileInputRef}
               onChange={handleSourceFileSelected}
             />
-          </div>
+          </Box>
         </FormControl>
       </DialogContent>
-      <DialogActions className={classes.actions}>
+      <DialogActions
+        sx={{
+          padding: theme.spacing(2),
+          borderTop: '1px solid #D4D4D8',
+          backgroundColor: '#f4f4f5',
+        }}
+      >
         <Button
           onClick={handleCancel}
           color="inherit"

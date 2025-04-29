@@ -8,13 +8,14 @@ import { modelProvider } from '../../../services/ModelProvider';
 import { AddCryptographyTask } from '../../cryptography/AddCryptographyTask';
 import { componentHelper } from '../../../helpers/ComponentHelper';
 
-
-
 export class CryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
 
-  constructor(project: Project) {
+  private force: boolean;
+
+  constructor(project: Project, force: boolean = false) {
     this.project = project;
+    this.force = force;
   }
 
   public getStageProperties():Scanner.StageProperties {
@@ -40,7 +41,8 @@ export class CryptographyTask implements Scanner.IPipelineTask {
 
     const token = this.project.getApiKey();
     const addCryptographyTask = new AddCryptographyTask();
-    await addCryptographyTask.run({ components, token });
+    await addCryptographyTask.run({ components, token, force: this.force });
+
     this.project.save();
 
     return true;

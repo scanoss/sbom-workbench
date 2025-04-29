@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { FileUsageType } from '@api/types';
+import { undefined } from 'zod';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
@@ -7,6 +8,8 @@ import { ExportRepository } from './ExportRepository';
 import { DecisionData } from '../../../model/interfaces/report/DecisionData';
 import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
 import { LicenseDTO } from '../../../../api/dto';
+import { CryptographicItem } from '../../../model/entity/Cryptography';
+import { ExportCryptographyData } from '../../../model/interfaces/report/ExportCryptographyData';
 
 export interface ExportData {
   inventoryId: number;
@@ -61,5 +64,23 @@ export class ExportRepositorySqliteImp implements ExportRepository {
 
   public async getAllLicensesWithFullText(): Promise<Array<LicenseDTO>> {
     return modelProvider.model.license.getAllWithFullText();
+  }
+
+  public async getCBOMDetectedData(): Promise<ExportCryptographyData> {
+    const localCrypto = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
+    const componentCrypto = await modelProvider.model.cryptography.findAllDetectedGroupByType();
+    return {
+      localCryptography: localCrypto,
+      componentCryptography: componentCrypto,
+    };
+  }
+
+  public async getCBOMIdentifiedData(): Promise<ExportCryptographyData> {
+    const localCrypto = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
+    const componentCrypto = await modelProvider.model.cryptography.findAllIdentifiedGroupByType();
+    return {
+      localCryptography: localCrypto,
+      componentCryptography: componentCrypto,
+    };
   }
 }

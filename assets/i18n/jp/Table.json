@@ -16,7 +16,10 @@
     "IncompatibleLicenses": "互換性のないライセンス",
     "PURL": "PURL",
     "URL": "URL",
-    "LocalFile": "ローカルファイル"
+    "LocalFile": "ローカルファイル",
+    "Algorithm": "Algorithm",
+    "Type": "Type",
+    "Detected": "Detected"
   },
   "Version": "バージョン",
   "License": "ライセンス"

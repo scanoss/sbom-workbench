@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogActions, Button, DialogContentText, Card, DialogContent, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,26 +7,8 @@ import InfoIcon from '@mui/icons-material/Info';
 import { Inventory } from '../../../../../api/types';
 import Label from '../Label/Label';
 import { DIALOG_ACTIONS, InventorySelectorResponse } from '../../../../context/types';
+import { useTheme } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 400,
-  },
-  paper: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-  md: {
-    maxWidth: 300,
-  },
-}));
 
 interface InventorySelectorDialogProps {
   open: boolean;
@@ -36,9 +17,8 @@ interface InventorySelectorDialogProps {
 }
 
 export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const { open, inventories, onClose } = props;
-
   const [selected, setSelected] = useState<Inventory | null>(null);
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
@@ -67,7 +47,12 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
         <span>Existing groups</span>
         <IconButton
           aria-label="close"
-          className={classes.closeButton}
+          sx={{
+            position: 'absolute',
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+            color: theme.palette.grey[500],
+          }}
           onClick={handleCancel}
           size="large">
           <CloseIcon />
@@ -88,7 +73,11 @@ export const InventorySelectorDialog = (props: InventorySelectorDialogProps) => 
               elevation={1}
             >
               <div className="usage-card-content">{inventory.usage}</div>
-              <Tooltip title={inventory.notes} classes={{ tooltip: classes.md }} arrow>
+              <Tooltip title={inventory.notes}
+                       sx={{
+                         maxWidth: 300,
+                       }}
+                       arrow>
                 <InfoIcon className="icon" />
               </Tooltip>
             </Card>

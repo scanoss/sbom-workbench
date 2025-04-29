@@ -21,6 +21,9 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
     const { metadata } = project;
 
+    // Flag used by crypto, export control to delete all data and re-mine it again
+    const forceDataReset = metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN;
+
     // decompress
     if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP)) this.queue.push(new DecompressTask(project));
 
@@ -52,7 +55,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
 
     // Cryptography
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
-      this.queue.push(new CryptographyTask(project));
+      this.queue.push(new CryptographyTask(project, forceDataReset));
       this.queue.push(new LocalCryptographyTask(project));
     }
 

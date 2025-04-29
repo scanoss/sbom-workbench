@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { makeStyles } from '@mui/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,23 +10,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTranslation } from 'react-i18next';
 import { Alert } from '@mui/material';
 
-const useStyles = makeStyles({
-  table: {
-    minWidth: 400,
-
-    '& .MuiTableHead-root .MuiTableCell-root': {
-      backgroundColor: 'transparent !important',
-      padding: 8,
-    },
-  },
-  tableCell: {
-    padding: '0px 35px',
-    fontSize: 10,
-  },
-});
-
 const LicensesObligations = ({ data }) => {
-  const classes = useStyles();
   const { t } = useTranslation();
   const [licenseHash, setLicenseHash] = useState({});
 
@@ -44,7 +27,14 @@ const LicensesObligations = ({ data }) => {
 
   return (
     <TableContainer>
-      <Table className={classes.table}>
+      <Table
+        sx={{
+          minWidth: 400,
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            backgroundColor: 'transparent !important',
+          },
+        }}
+      >
         <TableHead>
           <TableRow>
             <TableCell align="left">{t('Table:Header:License')}</TableCell>

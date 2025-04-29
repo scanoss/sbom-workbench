@@ -6,6 +6,7 @@ import { ExportComponentData } from '../../main/model/interfaces/report/ExportCo
 import { DecisionData } from '../../main/model/interfaces/report/DecisionData';
 import { ComponentVulnerability } from '../../main/model/entity/ComponentVulnerability';
 import { detectedVulnerabilityData, identifiedVulnerabilityData } from './mocks/vulnerability.model.mock';
+import { ExportCryptographyData } from '../../main/model/interfaces/report/ExportCryptographyData';
 
 export class ExportRepositoryMock implements ExportRepository {
   private mockDecisionData: Array<DecisionData>;
@@ -115,5 +116,52 @@ export class ExportRepositoryMock implements ExportRepository {
 
   getAllLicensesWithFullText(): Promise<Array<LicenseDTO>> {
     return Promise.resolve(licenses as unknown as LicenseDTO[]);
+  }
+
+  getCBOMDetectedData(): Promise<ExportCryptographyData> {
+    return Promise.resolve({
+      localCryptography: [
+        {
+          name: '/external/src/winnowing.c',
+          type: 'algorithm',
+          values: ['md5', 'crc32'],
+        },
+        {
+          name: '/external/src/winnowing.c',
+          type: 'library',
+          values: ['library/openssl', 'library/webcrypto'],
+        },
+      ],
+      componentCryptography: [
+        {
+          name: 'pkg:github/scanoss/engine@4.0.4',
+          type: 'algorithm',
+          values: ['md5'],
+        },
+        {
+          name: 'pkg:github/scanoss/engine@4.0.4',
+          type: 'library',
+          values: ['library/openssl'],
+        },
+      ],
+    });
+  }
+
+  getCBOMIdentifiedData(): Promise<ExportCryptographyData> {
+    return Promise.resolve({
+      localCryptography: [
+        {
+          name: '/external/src/winnowing.c',
+          type: 'algorithm',
+          values: ['md5', 'crc32'],
+        },
+        {
+          name: '/external/src/winnowing.c',
+          type: 'library',
+          values: ['library/openssl', 'library/webcrypto'],
+        },
+      ],
+      componentCryptography: [],
+    });
   }
 }

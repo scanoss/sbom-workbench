@@ -1,11 +1,12 @@
+import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 import { NodeStatus } from '../main/workspace/tree/Node';
 import { Scanner } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
-import { Cryptography } from '../main/model/entity/Cryptography';
-import { LocalCryptography } from '../main/model/entity/LocalCryptography';
-import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
+import { CryptographicItem } from '../main/model/entity/Cryptography';
+
+
 
 export enum ScanState {
   CREATED = 'CREATED',
@@ -334,6 +335,7 @@ export enum ScannerStage {
   VULNERABILITY,
   CRYPTOGRAPHY,
   LOCAL_CRYPTOGRAPHY,
+  EXPORT_CONTROL,
   SEARCH_INDEX,
 }
 
@@ -404,8 +406,20 @@ export interface LOCK {
 }
 
 export interface CryptographyResponseDTO {
-  files: Array<LocalCryptography>;
-  components: Array<Cryptography>;
+  files: Array<CryptographicItem>,
+  components: Array<CryptographicItem>
+  summary: {
+    files: {
+      type: Record<string, number>;
+      crypto: Record<string, number>;
+      typeDetection: Record<string, Array<string>>;
+    },
+    components:{
+      type: Record<string, number>;
+      crypto: Record<string, number>;
+      typeDetection: Record<string, Array<string>>;
+    }
+  },
 }
 
 /* Report Handler */

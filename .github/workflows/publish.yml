@@ -9,31 +9,34 @@ on:
 
 env:
   ARTIFACT_NAME_PREFIX: "sbom-workbench"    ##This is the build.artifactName on package.json prefix
+  CRYPTO_RULES_SOURCE_DIR: scanoss/platform-deployment
+  TARGET_DIR: assets/data
+  CRYPTO_RULES_PATH: platform-deployment/datasets/cryptography
+  CRYPTO_LIBRARIES_SOURCE: scanoss-crypto-libraries.json
+  CRYPTO_LIBRARIES_TARGET: scanoss-crypto-library-rules.json
+  CRYPTO_ALGORITHMS_SOURCE: scanoss-crypto-algorithms.json
+  CRYPTO_ALGORITHMS_TARGET: scanoss-crypto-algorithm-rules.json
 
 jobs:
   build_w:
     name: "Build for Windows"
     runs-on: windows-latest
+    permissions:
+      contents: read
 
     steps:
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          node-version: 16
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
 
       - name: Build binaries for Windows
         run: |
-          npm exec -- electron-builder build --win --publish never
+          npm exec -- electron-builder build --win
 
       - uses: actions/upload-artifact@v4
         with:
@@ -92,20 +95,13 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout git repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          node-version: 16
-          cache: npm
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
 
       - name: Build Binaries for MacOs & Windows
         env:
@@ -115,7 +111,7 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
-          npm exec -- electron-builder build --mac --publish never
+          npm exec -- electron-builder build --mac
 
 
       - uses: actions/upload-artifact@v4
@@ -132,24 +128,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout git repo
         uses: actions/checkout@v3
 
-      - name: Install Node and NPM
-        uses: actions/setup-node@v3
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
         with:
-          node-version: 16
-          cache: npm
-
-      - name: Install and build
-        run: |
-          npm install --legacy-peer-deps
-          npm run postinstall
-          npm run build
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
 
       - name: Build binaries for linux
         run: |
-          npm exec -- electron-builder build --linux --publish never
+          npm exec -- electron-builder build --linux
 
       - uses: actions/upload-artifact@v4
         with:

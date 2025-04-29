@@ -1,42 +1,9 @@
 import React from 'react';
 import { Dialog, DialogActions, Button, DialogContentText, DialogContent } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { DIALOG_ACTIONS, DialogResponse } from '@context/types';
-
-const useStyles = makeStyles((theme) => ({
-  dialog: {
-    width: 400,
-  },
-  closeButton: {
-    position: 'absolute',
-    right: theme.spacing(1),
-    top: theme.spacing(1),
-    color: theme.palette.grey[500],
-  },
-  deleteButton: {
-    backgroundColor: theme.palette.error.main,
-    color: 'white',
-    '&:hover': {
-      backgroundColor: theme.palette.error.dark,
-    },
-  },
-  content: {
-    backgroundColor: 'white !important',
-  },
-  text: {
-    width: '90%',
-    fontSize: '20px',
-    color: '#27272A !important',
-    whiteSpace: 'pre-line',
-  },
-  actions: {
-    padding: theme.spacing(2),
-    borderTop: '1px solid #D4D4D8',
-    backgroundColor: '#f4f4f5',
-  },
-}));
+import { useTheme } from '@mui/material';
 
 interface AlertDialogProps {
   open: boolean;
@@ -47,7 +14,7 @@ interface AlertDialogProps {
 }
 
 export const AlertDialog = (props: AlertDialogProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const { open, message, buttons, onClose, slots } = props;
 
   const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
@@ -63,23 +30,52 @@ export const AlertDialog = (props: AlertDialogProps) => {
       open={open}
       onClose={handleCancel}
       {...slots}
+      sx={{
+        '& .MuiDialog-paper': {
+          width: 400,
+        },
+      }}
     >
-      <DialogContent className={classes.content}>
+      <DialogContent sx={{ backgroundColor: 'white !important' }}>
         <IconButton
           aria-label="close"
-          className={classes.closeButton}
           onClick={handleCancel}
-          size="large">
+          size="large"
+          sx={{
+            position: 'absolute',
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+            color: theme.palette.grey[500],
+          }}
+        >
           <CloseIcon />
         </IconButton>
-        <DialogContentText className={classes.text}>
+        <DialogContentText
+          sx={{
+            width: '90%',
+            fontSize: '20px',
+            color: '#27272A !important',
+            whiteSpace: 'pre-line',
+          }}
+        >
           <span dangerouslySetInnerHTML={{ __html: message }} />
         </DialogContentText>
       </DialogContent>
-      <DialogActions className={classes.actions}>
+      <DialogActions
+        sx={{
+          padding: theme.spacing(2),
+          borderTop: '1px solid #D4D4D8',
+          backgroundColor: '#f4f4f5',
+        }}
+      >
         {buttons.map((button: any, index: number) =>
           button.role === 'cancel' ? (
-            <Button key={button.label} onClick={handleCancel} className={button.class} color="inherit">
+            <Button
+              key={button.label}
+              onClick={handleCancel}
+              sx={button.class ? { [button.class]: true } : {}}
+              color="inherit"
+            >
               {button.label}
             </Button>
           ) : button.role === 'action' ? (
@@ -94,7 +90,17 @@ export const AlertDialog = (props: AlertDialogProps) => {
             <Button
               key={button.label}
               autoFocus={index === buttons.length - 1}
-              className={button?.role === 'delete' ? classes.deleteButton : ''}
+              sx={
+                button?.role === 'delete'
+                  ? {
+                    backgroundColor: theme.palette.error.main,
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: theme.palette.error.dark,
+                    },
+                  }
+                  : {}
+              }
               color="secondary"
               variant="contained"
               onClick={() => handleAccept(button.action)}

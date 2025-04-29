@@ -13,7 +13,6 @@ import {
   Tooltip,
   Chip,
 } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 
 import { IProject, ProjectAccessMode, ScanState } from '@api/types';
 import { Trans, useTranslation } from 'react-i18next';
@@ -47,12 +46,6 @@ const format = (date) => {
   });
 };
 
-const useStyles = makeStyles((theme) => ({
-  md: {
-    maxWidth: 130,
-    textAlign: 'center',
-  },
-}));
 
 const isProjectFinished = (project: IProject): boolean => project.scannerState === ScanState.FINISHED;
 const isProjectDeprecated = (project: IProject): boolean => project.appVersion < AppConfig.MIN_VERSION_SUPPORTED;
@@ -71,7 +64,6 @@ interface ProjectListProps {
 }
 
 const ProjectList = (props: ProjectListProps) => {
-  const classes = useStyles();
   const { t } = useTranslation();
 
   const { projects, searchQuery } = props;
@@ -106,7 +98,10 @@ const ProjectList = (props: ProjectListProps) => {
                       <div className="project-name">
                         {isProjectDeprecated(project) && (
                           <Tooltip
-                            classes={{ tooltip: classes.md }}
+                            sx={{
+                              maxWidth: 130,
+                              textAlign: 'center',
+                            }}
                             title={t('Tooltip:ProjectDeprecated')}
                           >
                             <WarningOutlinedIcon fontSize="inherit" className="icon mr-1" />
@@ -115,7 +110,10 @@ const ProjectList = (props: ProjectListProps) => {
                         <span>{project.name}</span>
                         {isProjectImported(project) && (
                           <Tooltip
-                            classes={{ tooltip: classes.md }}
+                            sx={{
+                              maxWidth: 130,
+                              textAlign: 'center',
+                            }}
                             title={t('Tooltip:ProjectImported')}
                           >
                             <Chip label={t('Common:IMPORTED')} size="small" variant="outlined" className="ml-1" />

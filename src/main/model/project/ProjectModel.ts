@@ -15,6 +15,7 @@ import { modelProvider } from '../../services/ModelProvider';
 import { LocalCryptographyModel } from './models/LocalCryptographyModel';
 import { ReportModel } from './models/ReportModel';
 
+
 export class ProjectModel {
   private connection: Connection;
 
