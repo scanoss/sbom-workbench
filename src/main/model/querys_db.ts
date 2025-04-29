@@ -22,7 +22,7 @@ export class Queries {
   RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));';
 
   VULNERABILITY_TABLE = `CREATE TABLE IF NOT EXISTS vulnerability (
-    external_id NOT NULL,
+    external_id text NOT NULL,
     cve text NOT NULL,
     source text NOT NULL,
     severity text NOT NULL,
