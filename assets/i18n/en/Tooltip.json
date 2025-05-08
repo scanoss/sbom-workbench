@@ -53,5 +53,6 @@
   "OpenInReadMode": "Open in read-only mode",
   "ExportHintCSVSBOM": "Export SBOM report",
   "ExportHintCSVCryptography": "Export Cryptography report",
-  "ExportHintSettings": "Export a settings file"
+  "ExportHintSettings": "Export a settings file",
+  "ExportCSVVulnerability": "Export Vulnerability Report"
 }

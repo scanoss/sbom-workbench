@@ -1,11 +1,11 @@
-import { Format } from '../Format';
-import { ExportSource, ExportStatusCode } from '../../../../api/types';
-import { modelProvider } from '../../../services/ModelProvider';
-import { DataRecord } from '../../../model/interfaces/report/DataRecord';
-import { isValidPurl } from '../helpers/exportHelper';
-import { ReportData } from '../ReportData';
+import { Format } from '../../Format';
+import { ExportSource, ExportStatusCode } from '../../../../../api/types';
+import { modelProvider } from '../../../../services/ModelProvider';
+import { DataRecord } from '../../../../model/interfaces/report/DataRecord';
+import { isValidPurl } from '../../helpers/exportHelper';
+import { ReportData } from '../../ReportData';
 
-export class Csv extends Format {
+export class SBOMCsv extends Format {
   private source: string;
 
   constructor(source: string) {

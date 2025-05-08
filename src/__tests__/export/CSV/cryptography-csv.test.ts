@@ -1,4 +1,4 @@
-import { Crypto } from '../../../main/modules/export/format/Crypto';
+import { CryptographyCsv } from '../../../main/modules/export/format/CSV/Cryptography-csv';
 import { ExportSource, ExportStatusCode } from '../../../api/types';
 import { ExportRepositoryMock } from '../ExportRepositoryMock';
 
@@ -33,7 +33,7 @@ describe('Crypto export tests', () => {
   });
 
   it('Crypto identified export test', async () => {
-    const cryptoExport = new Crypto(ExportSource.IDENTIFIED, exportRepositoryMock);
+    const cryptoExport = new CryptographyCsv(ExportSource.IDENTIFIED, exportRepositoryMock);
     const { report, status } = await cryptoExport.generate();
     expect(status.code).toEqual(ExportStatusCode.SUCCESS);
 
@@ -61,7 +61,7 @@ describe('Crypto export tests', () => {
   });
 
   it('Crypto detected export test', async () => {
-    const cryptoExport = new Crypto(ExportSource.DETECTED, exportRepositoryMock);
+    const cryptoExport = new CryptographyCsv(ExportSource.DETECTED, exportRepositoryMock);
     const { report, status } = await cryptoExport.generate();
     expect(status.code).toEqual(ExportStatusCode.SUCCESS);
     // Parse the CSV string manually

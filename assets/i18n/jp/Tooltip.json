@@ -48,5 +48,6 @@
   "NotDetected": "未検出",
   "Ignored": "無視された",
   "Progress": "進行中",
-  "ExportHintSettings": "Export a Settings file"
+  "ExportHintSettings": "Export a Settings file",
+  "ExportCSVVulnerability": "Export Vulnerability Report"
 }

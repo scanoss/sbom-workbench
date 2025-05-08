@@ -22,22 +22,26 @@ export class Queries {
   RESULT_LICENSE = 'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));';
 
   VULNERABILITY_TABLE = `CREATE TABLE IF NOT EXISTS vulnerability (
-    cve varchar(30) NOT NULL CONSTRAINT PK_VULNERABILTY PRIMARY KEY,
-    source varchar(35) NOT NULL,
-    severity varchar(30) NOT NULL,
-    published varchar(35) NOT NULL,
-    modified varchar(35) NOT NULL,
-    summary varchar(500) NOT NULL
-    );`;
+    external_id text NOT NULL,
+    cve text NOT NULL,
+    source text NOT NULL,
+    severity text NOT NULL,
+    published text NOT NULL,
+    modified text NOT NULL,
+    summary text NOT NULL,
+    CONSTRAINT vulnerability_pk PRIMARY KEY (external_id, source)
+  );`;
 
   COMPONENT_VULNERABILITY = `CREATE TABLE IF NOT EXISTS component_vulnerability (
-    purl varchar(45) NOT NULL,
-    version varchar(45) NOT NULL,
-    cve varchar(30) NOT NULL,
+    purl text NOT NULL,
+    version text NOT NULL,
+    vulnerability_external_id text NOT NULL,
+    vulnerability_source text NOT NULL,
     rejectAt datetime,
-    CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl,version,cve),
-    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (cve) REFERENCES vulnerability (cve) ON DELETE CASCADE
-);`;
+    CONSTRAINT component_vulnerability_pk PRIMARY KEY (purl, version, vulnerability_source, vulnerability_external_id),
+    CONSTRAINT component_vulnerability_vulnerability FOREIGN KEY (vulnerability_external_id, vulnerability_source)
+    REFERENCES vulnerability (external_id, source) ON DELETE CASCADE
+  );`;
 
   CRYPTOGRAPHY_TABLE = `CREATE TABLE IF NOT EXISTS cryptography (
     purl varchar(45) NOT NULL,
@@ -278,13 +282,13 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   // VULNERABILITIES
 
-  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT v.cve, v.source as vsource, v.published, v.modified, v.severity, v.summary, compv.purl, compv.version, compv.rejectAt, cv.name, cv.description, cv.source, cv.reliableLicense, cv.id FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT v.external_id, v.cve, v.source as vsource, v.published, v.modified, v.severity, v.summary, compv.purl, compv.version, compv.rejectAt, cv.name, cv.description, cv.source, cv.reliableLicense, cv.id FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
   WHERE cv.id IN (SELECT cvid FROM inventories);`;
 
-  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT v.cve, v.source as vsource , v.severity, v.published, v.modified, v.summary, compv.purl, compv.version, compv.rejectAt FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT v.external_id, v.cve, v.source as vsource , v.severity, v.published, v.modified, v.summary, compv.purl, compv.version, compv.rejectAt FROM vulnerability v
+  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
 
@@ -298,13 +302,13 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     WHERE purl ||'@'|| version IN (#COMPONENTS);`;
 
   SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
   WHERE cv.id IN (SELECT cvid FROM inventories)
   GROUP BY v.severity;`;
 
   SQL_GET_VULNERABILITIES_DETECTED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.cve = compv.cve
+  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)
   GROUP BY v.severity;`;

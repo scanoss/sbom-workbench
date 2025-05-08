@@ -171,6 +171,7 @@ const VulnerabilitiesReport = () => {
             <Table stickyHeader aria-label="vulnerabilities table">
               <TableHead>
                 <TableRow>
+                  <TableCell>id</TableCell>
                   <TableCell>{t('Table:Header:Component')}</TableCell>
                   <TableCell>{t('Table:Header:Severity')}</TableCell>
                   <TableCell>{t('Table:Header:CVE')}</TableCell>
@@ -183,6 +184,9 @@ const VulnerabilitiesReport = () => {
               <TableBody>
                 {items?.map((item) => (
                   <TableRow key={item.purl + item.version + item.vulnerability.cve}>
+                    <TableCell>
+                      {item.vulnerability.external_id}
+                    </TableCell>
                     <TableCell className="pb-0 pt-0">
                       <ListItemText
                         primary={item.componentVersion.name}

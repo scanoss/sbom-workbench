@@ -1,14 +1,14 @@
 /* eslint-disable no-async-promise-executor */
 import { NewExportDTO } from 'api/dto';
 import { Format } from '../../modules/export/Format';
-import { Csv } from '../../modules/export/format/Csv';
+import { SBOMCsv } from '../../modules/export/format/CSV/SBOM-csv';
 import { Raw } from '../../modules/export/format/Raw';
 import { Wfp } from '../../modules/export/format/Wfp';
 import { HtmlSummary } from '../../modules/export/format/HtmlSummary';
 import { ITask } from '../Task';
 import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, ExportSource, InventoryType } from '../../../api/types';
-import { Crypto } from '../../modules/export/format/Crypto';
+import { CryptographyCsv } from '../../modules/export/format/CSV/Cryptography-csv';
 import { workspace } from '../../workspace/Workspace';
 import { ExportRepositorySqliteImp } from '../../modules/export/Repository/ExportRepositorySqliteImp';
 import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
@@ -16,6 +16,7 @@ import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/Cyclo
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
 import { Settings } from '../../modules/export/format/Settings/Settings';
+import { VulnerabilityCsv } from '../../modules/export/format/CSV/Vulnerability-csv';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -33,11 +34,18 @@ export class Export implements ITask<string, IExportResult> {
   public setFormat(exportDTO: NewExportDTO) {
     switch (exportDTO.format as ExportFormat) {
       case ExportFormat.CSV:
-        if (exportDTO.inventoryType === InventoryType.SBOM) {
-          this.format = new Csv(exportDTO.source);
-        }
-        if (exportDTO.inventoryType === InventoryType.CRYPTOGRAPHY) {
-          this.format = new Crypto(exportDTO.source, new ExportRepositorySqliteImp());
+        switch (exportDTO.inventoryType) {
+          case InventoryType.SBOM:
+            this.format = new SBOMCsv(exportDTO.source);
+            break;
+          case InventoryType.CRYPTOGRAPHY:
+            this.format = new CryptographyCsv(exportDTO.source, new ExportRepositorySqliteImp());
+            break;
+          case InventoryType.VULNERABILITY:
+            this.format = new VulnerabilityCsv(exportDTO.source, new ExportRepositorySqliteImp());
+            break;
+          default:
+            throw new Error(`Unsupported report type: ${exportDTO.inventoryType} for CSV format`);
         }
         break;
       case ExportFormat.RAW:

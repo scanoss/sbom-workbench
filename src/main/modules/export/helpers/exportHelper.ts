@@ -93,3 +93,7 @@ export function isValidPurl(purl: string): boolean {
     return false;
   }
 }
+
+export function resolveVulnerabilityURL(source: string, cve:string): string {
+  return source.toUpperCase() === 'NVD' ? `https://nvd.nist.gov/vuln/detail/${cve}` : `https://osv.dev/vulnerability/${cve}`;
+}
