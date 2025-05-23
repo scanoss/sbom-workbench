@@ -46,22 +46,21 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
         return null;
       }
     });
+
     const results = await Promise.all(promises);
-    return results.flat().map(c => c);
+    return results.flat().filter(Boolean).map((c)=> c);
   }
 
   public async run(params: ICryptographyTask): Promise<void> {
     try {
       const { GRPC_PROXY } = userSettingService.get();
       const cryptography = await this.getCryptography(params.components, params.token, GRPC_PROXY);
-
       // Delete all cryptography if force flag is set
       if (params.force) await modelProvider.model.cryptography.deleteAll();
       // Import Crypto into Database
       await modelProvider.model.cryptography.createBatch(cryptography);
     } catch (e: any) {
       log.error(e);
-      throw new Error(e.message);
     }
   }
 }
