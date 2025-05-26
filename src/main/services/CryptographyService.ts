@@ -9,12 +9,16 @@ import { LocalCryptographyTask } from '../task/scanner/cryptography/LocalCryptog
 
 class CryptographyService {
   public async importFromComponents(components: Array<NewComponentDTO>) {
-    const p = workspace.getOpenProject();
-    if (p.getApiKey()) {
-      log.info('%c[ Crypto ]: Importing cryptography into database', 'color: green');
-      const cryptoTask = new AddCryptographyTask();
-      const comp = this.adaptToCryptographyTask(components);
-      await cryptoTask.run({ components: comp, token: p.getApiKey() });
+    try {
+      const p = workspace.getOpenProject();
+      if (p.getApiKey()) {
+        log.info('%c[ Crypto ]: Importing cryptography into database', 'color: green');
+        const cryptoTask = new AddCryptographyTask();
+        const comp = this.adaptToCryptographyTask(components);
+        await cryptoTask.run({ components: comp, token: p.getApiKey() });
+      }
+    }catch (e){
+      log.error("[Cryptography Service]: ", e);
     }
   }
 

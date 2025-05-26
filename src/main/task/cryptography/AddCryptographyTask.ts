@@ -61,6 +61,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
       await modelProvider.model.cryptography.createBatch(cryptography);
     } catch (e: any) {
       log.error(e);
+      throw e;
     }
   }
 }
