@@ -19,7 +19,7 @@ export const AppConfigDefault: IAppConfig = {
   DEFAULT_IP_gRPC: 'api.scanoss.com',
   DEFAULT_PORT_gRPC: 443,
   DEFAULT_MULTIUSER_LOCK_TIMEOUT: 30,
-  DEFAULT_SERVICE_CHUNK_LIMIT: 10,
+  DEFAULT_SERVICE_CHUNK_LIMIT: 1,
 
   // feature flags
   FF_ENABLE_COMPONENT_LOGO: true,
