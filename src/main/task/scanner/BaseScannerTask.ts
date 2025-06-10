@@ -175,7 +175,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     // Allows Scanoss SDK to write into project.log
     logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
 
-    await scannerCfg.validate();
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;
     this.scanner.setWorkDirectory(this.project.getMyPath());

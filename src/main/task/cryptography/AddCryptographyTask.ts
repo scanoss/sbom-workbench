@@ -41,8 +41,8 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
       try {
         const r = await cryptoScanner.scanComponents(req);
         return r;
-      } catch (err) {
-        log.error('Error:', err);
+      } catch (err: any) {
+        log.warn('Warning:', err.message, req);
         return null;
       }
     });
