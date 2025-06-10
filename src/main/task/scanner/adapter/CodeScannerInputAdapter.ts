@@ -54,12 +54,18 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
 
     const scanossSettingsPath = await getScanossSettingsFilePath(rootPath);
     if (scanossSettingsPath) {
-      log.info('[ SCAN ] - Loading scanoss.json file');
-      const scanossSettings = JSON.parse(await fs.promises.readFile(path.join(rootPath, scanossSettingsPath), 'utf8'));
-      result.forEach((_, index, arr) => {
-        arr[index].settings = scanossSettings;
-      });
-      return result;
+      try {
+        log.info('[ SCAN ] - Loading scanoss.json file');
+        const absoluteScanossSettingsPath = path.join(rootPath, scanossSettingsPath);
+        const scanossSettings = JSON.parse(await fs.promises.readFile(absoluteScanossSettingsPath, 'utf8'));
+        result.forEach((_, index, arr) => {
+          arr[index].settings = scanossSettings;
+        });
+        return result;
+      }catch (e) {
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile ${path.join(rootPath, scanossSettingsPath)}`, e);
+        throw new Error(`Invalid contextFile ${path.join(rootPath, scanossSettingsPath)}`);
+      }
     }
 
     // Legacy
@@ -69,13 +75,26 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
     const contextFiles = await getContextFiles(rootPath);
 
     if (contextFiles.ignoreFile) {
-      sbom = fs.readFileSync(`${rootPath}/${contextFiles.identifyFile}`, 'utf-8');
-      sbomMode = SbomMode.SBOM_IGNORE;
+      try {
+        sbom = fs.readFileSync(path.join(rootPath,contextFiles.ignoreFile), 'utf-8');
+        JSON.parse(sbom);
+        log.error(`Invalid contextFile ${contextFiles.ignoreFile}`);
+        sbomMode = SbomMode.SBOM_IGNORE;
+      } catch (e) {
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile '${path.join(rootPath,contextFiles.ignoreFile)}'`, e);
+        throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.ignoreFile)}'`);
+      }
     }
 
     if (contextFiles.identifyFile) {
-      sbom = fs.readFileSync(`${rootPath}/${contextFiles.identifyFile}`, 'utf-8');
-      sbomMode = SbomMode.SBOM_IDENTIFY;
+      try {
+        sbom = fs.readFileSync(path.join(rootPath,contextFiles.identifyFile), 'utf-8');
+        JSON.parse(sbom);
+        sbomMode = SbomMode.SBOM_IDENTIFY;
+      }catch (e) {
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile ${path.join(rootPath,contextFiles.identifyFile)}'`, e);
+        throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.identifyFile)}'`);
+      }
     }
 
     if (sbom.length) {
