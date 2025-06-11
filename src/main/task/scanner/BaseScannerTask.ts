@@ -166,7 +166,8 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     scannerCfg.NO_PROXY = NO_PROXY ? NO_PROXY.join(',') : null;
 
     scannerCfg.IGNORE_CERT_ERRORS = IGNORE_CERT_ERRORS || false;
-    scannerCfg.CA_CERT = CA_CERT || null;
+    scannerCfg.CA_CERT = CA_CERT ? CA_CERT : null;
+
 
     // Obfuscation
     scannerCfg.WFP_OBFUSCATION = this.project.getDto().scannerConfig.obfuscate;
@@ -175,7 +176,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     // Allows Scanoss SDK to write into project.log
     logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
 
-    await scannerCfg.validate();
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;
     this.scanner.setWorkDirectory(this.project.getMyPath());

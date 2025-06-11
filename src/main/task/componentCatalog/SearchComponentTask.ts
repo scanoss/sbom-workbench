@@ -10,7 +10,7 @@ import { ComponentsClient } from "../grpc/scanoss/api/components/v2/scanoss-comp
 
 export class SearchComponentTask implements ITask<ISearchComponent, Array<IComponentResult>> {
   public async run(params: ISearchComponent): Promise<Array<IComponentResult>> {
-    const client = gRPCConnections.getComponentCatalogStub() as ComponentsClient;
+    const client = await gRPCConnections.getComponentCatalogStub() as ComponentsClient;
     const req = CompSearchRequestBuilder.build(params);
 
     const pSearchComponents = new Promise((resolve, reject) => {

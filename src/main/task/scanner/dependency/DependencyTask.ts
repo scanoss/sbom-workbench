@@ -48,7 +48,6 @@ export class DependencyTask implements Scanner.IPipelineTask {
       const cfg = new DependencyScannerCfg();
       const { GRPC_PROXY } = userSettingService.get();
       cfg.GRPC_PROXY = GRPC_PROXY || '';
-      await cfg.validate();
 
       const chunks = [];
       for (let i = 0; i < allFiles.length; i += AppConfigModule.DEFAULT_SERVICE_CHUNK_LIMIT) {
@@ -59,7 +58,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
         try {
           return await depScanner.scan(chunk);
         } catch (err: any) {
-          log.error('[ DependencyTask ] Request failed for purls:', chunk.map((file: any) => file));
+          log.error('[ DependencyTask ] Request failed for files:', chunk.map((file: any) => file));
           log.error('Error:', err);
           return null;
         }
