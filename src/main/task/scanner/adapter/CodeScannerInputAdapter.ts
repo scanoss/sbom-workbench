@@ -63,7 +63,7 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
         });
         return result;
       }catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile ${path.join(rootPath, scanossSettingsPath)}`, e);
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: ${path.join(rootPath, scanossSettingsPath)}`, e);
         throw new Error(`Invalid contextFile ${path.join(rootPath, scanossSettingsPath)}`);
       }
     }
@@ -81,7 +81,7 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
         log.error(`Invalid contextFile ${contextFiles.ignoreFile}`);
         sbomMode = SbomMode.SBOM_IGNORE;
       } catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile '${path.join(rootPath,contextFiles.ignoreFile)}'`, e);
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: '${path.join(rootPath,contextFiles.ignoreFile)}'`, e);
         throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.ignoreFile)}'`);
       }
     }
@@ -92,7 +92,7 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
         JSON.parse(sbom);
         sbomMode = SbomMode.SBOM_IDENTIFY;
       }catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid contextFile ${path.join(rootPath,contextFiles.identifyFile)}'`, e);
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: ${path.join(rootPath,contextFiles.identifyFile)}'`, e);
         throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.identifyFile)}'`);
       }
     }
