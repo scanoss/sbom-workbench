@@ -254,7 +254,11 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     INNER JOIN files f ON d.fileId = f.fileId
     GROUP BY f.path;`;
 
-  SQL_DEPENDENCY_TOTAL_DETECTED = 'SELECT count(*) as total FROM dependencies;';
+  SQL_DEPENDENCY_TOTAL_DETECTED = `WITH grouped_deps AS (
+    SELECT purl, version    FROM dependencies
+    GROUP BY purl, version
+    )
+    SELECT COUNT(*) as total FROM grouped_deps;`;
 
   SQL_DEPENDENCIES_BY_IDS = 'SELECT * FROM dependencies WHERE dependencyId IN (#IDS);';
 
