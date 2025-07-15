@@ -1,8 +1,8 @@
-import fs from "fs";
-import { IndexTreeTask } from "./IndexTreeTask";
-import { Tree } from "../../workspace/tree/Tree";
+import { IndexTreeTask } from './IndexTreeTask';
+import fs from 'fs';
+import { Tree } from '../../workspace/tree/Tree';
 
-export class WFPIndexTreeTask extends IndexTreeTask {
+export class ResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
 
@@ -15,22 +15,16 @@ export class WFPIndexTreeTask extends IndexTreeTask {
   }
 
   private getFiles(): Array<string> {
-    const wfp = this.getWFPContent();
-    const regex = new RegExp(/file=.*,.*,(?<path>.*)/g);
-    const files = [];
-    let result = regex.exec(wfp);
-    while (result !== null) {
-      files.push(result.groups.path);
-      result = regex.exec(wfp);
-    }
-    return files;
+    const results = this.getFileResultJsonContent();
+    return Array.from(Object.keys(results));
   }
 
-  private getWFPContent():string {
-   const wfp = fs.readFileSync(this.project.getScanRoot(),
+  private getFileResultJsonContent():Record<string, any>{
+    const resultJson = fs.readFileSync(this.project.getScanRoot(),
       {encoding:'utf8'});
-    return wfp;
+    return JSON.parse(resultJson);
   }
+
 
   /**
    * @brief build tree from array of paths
@@ -42,7 +36,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
     tree.build(files);
     tree.orderTree();
     return tree;
- }
+  }
 
   public setTreeSummary(tree: Tree):void {
     this.project.filesToScan = this.filesToScan.reduce((acc,curr)=> { if(!acc[curr])acc[curr]=null; return acc; },{});
