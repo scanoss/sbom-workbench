@@ -16,6 +16,7 @@ import ScannerType = Scanner.ScannerType;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
 import { ReScanDependencyTask } from '../dependency/ReScanDependencyTask';
+import { ComponentImportTask } from '../../ComponentImportation/ComponentImportTask';
 
 export class CodeScannerPipelineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -43,6 +44,9 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
       this.queue.push(scanTask);
     }
+
+    // Import component task
+    this.queue.push(new ComponentImportTask(project));
 
     // dependencies
     const dependencyTask: DependencyTask = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN

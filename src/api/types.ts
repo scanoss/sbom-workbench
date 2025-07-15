@@ -338,6 +338,7 @@ export enum ScannerStage {
   LOCAL_CRYPTOGRAPHY,
   EXPORT_CONTROL,
   SEARCH_INDEX,
+  IMPORT_COMPONENT,
 }
 
 export interface InventoryExtraction {

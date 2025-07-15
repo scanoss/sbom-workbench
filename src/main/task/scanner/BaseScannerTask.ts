@@ -108,15 +108,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     }
     await fs.promises.writeFile(resultPath, JSON.stringify(result, null, 2));
 
-    await fileService.insert(this.project.getTree().getRootFolder().getFiles());
-    const files = await fileHelper.getPathFileId();
-    await resultService.insertFromFile(resultPath, files);
-    await componentService.importComponents();
-
-    this.project.metadata.setScannerState(ScanState.FINISHED);
-    this.project.metadata.save();
-    this.project.getTree().updateFlags();
-
     if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
       const autoAccept = new AutoAccept();
       await autoAccept.run();

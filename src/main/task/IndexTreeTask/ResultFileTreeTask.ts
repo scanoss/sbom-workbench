@@ -1,17 +1,16 @@
 import { IndexTreeTask } from './IndexTreeTask';
 import fs from 'fs';
 import { Tree } from '../../workspace/tree/Tree';
+import path from 'path';
 
 export class ResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
 
-  public async run(): Promise<boolean> {
-    const files = this.getFiles();
-    this.filesToScan = files;
-    const tree =  await this.buildTree(this.filesToScan);
-    await this.setTreeSummary(tree);
-    return true;
+  private async saveResults(){
+    const resultPath = path.join(this.project.getMyPath(),'result.json');
+    const results = await fs.promises.readFile(this.project.getScanRoot(),'utf-8');
+    await fs.promises.writeFile(resultPath, JSON.stringify(JSON.parse(results), null, 2));
   }
 
   private getFiles(): Array<string> {
@@ -20,11 +19,19 @@ export class ResultFileTreeTask extends IndexTreeTask {
   }
 
   private getFileResultJsonContent():Record<string, any>{
-    const resultJson = fs.readFileSync(this.project.getScanRoot(),
-      {encoding:'utf8'});
+    const resultPath = path.join(this.project.getMyPath(), 'result.json');
+    const resultJson = fs.readFileSync(resultPath, {encoding:'utf8'});
     return JSON.parse(resultJson);
   }
 
+  public async run(): Promise<boolean> {
+    await this.saveResults();
+    const files = this.getFiles();
+    this.filesToScan = files;
+    const tree =  await this.buildTree(this.filesToScan);
+    await this.setTreeSummary(tree);
+    return true;
+  }
 
   /**
    * @brief build tree from array of paths
