@@ -41,5 +41,6 @@
   "RestartLater": "Restart later",
   "RestartNow": "Restart now",
   "NewFromWFPFile": "New from WFP",
-  "AddNewWorkspace": "Add new workspace"
+  "AddNewWorkspace": "Add new workspace",
+  "ImportFromResultFile": "Import from raw result file"
 }

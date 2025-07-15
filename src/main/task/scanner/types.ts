@@ -21,6 +21,7 @@ export namespace Scanner {
     CODE,
     WFP,
     IMPORTED,
+    IMPORTED_RESULTS_RAW
   }
 
   export interface ScannerConfig {

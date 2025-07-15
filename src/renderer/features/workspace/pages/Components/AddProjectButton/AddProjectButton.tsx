@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 
-const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, onNewProjectWithSource }) => {
+const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, onNewProjectWithSource, importFromResultFile }) => {
   const { t } = useTranslation();
 
   const [open, setOpen] = React.useState(false);
@@ -74,6 +74,14 @@ const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, 
                     }}
                   >
                     {t('Button:ImportProjectWithSource')}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(event) => {
+                      setOpen(false);
+                      importFromResultFile();
+                    }}
+                  >
+                    {t('Button:ImportFromResultFile')}
                   </MenuItem>
                 </MenuList>
               </ClickAwayListener>

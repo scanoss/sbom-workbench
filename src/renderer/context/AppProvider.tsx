@@ -20,6 +20,7 @@ export interface IAppContext {
   exportProject: (project: IProject) => void;
   importProject: () => void;
   importProjectWithSource: () => void;
+  importFromResultFile: () => void;
 }
 
 export const AppContext = React.createContext<IAppContext | null>(null);
@@ -49,6 +50,18 @@ const AppProvider = ({ children }) => {
 
     if (paths && paths.length > 0) {
       dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.WFP }));
+      navigate('/workspace/new/settings');
+    }
+  };
+
+  const importFromResultFile = async () => {
+    const paths = await dialogController.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'result', extensions: ['json'] }],
+    });
+
+    if (paths && paths.length > 0) {
+      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.IMPORTED_RESULTS_RAW }));
       navigate('/workspace/new/settings');
     }
   };
@@ -198,6 +211,7 @@ const AppProvider = ({ children }) => {
         exportProject,
         importProject,
         importProjectWithSource,
+        importFromResultFile,
       }}
     >
       {children}

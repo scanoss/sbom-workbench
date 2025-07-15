@@ -26,7 +26,7 @@ const Workspace = () => {
   const { settings } = useSelector(selectWorkspaceState);
   const { projects } = useSelector(selectWorkspaceState);
 
-  const { newProject, exportProject, importProject, newProjectFromWFP, importProjectWithSource } = useContext(AppContext) as IAppContext;
+  const { newProject, exportProject, importProject, newProjectFromWFP, importProjectWithSource, importFromResultFile } = useContext(AppContext) as IAppContext;
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
   const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -81,6 +81,11 @@ const Workspace = () => {
   const onNewProjectFromWFPHandler = () => {
     newProjectFromWFP();
   };
+
+  const onImportFromResultFile = () => {
+    importFromResultFile();
+  };
+
 
   const onWorkspaceSelectedHandler = async (workspace: WorkspaceData) => {
     await workspaceService.setCurrent(workspace.PATH);
@@ -164,6 +169,7 @@ const Workspace = () => {
             onImportProject={onImportProjectHandler}
             onNewProjectFromWFP={onNewProjectFromWFPHandler}
             onNewProjectWithSource={onImportProjectWithSourceHandler}
+            importFromResultFile={onImportFromResultFile}
           />
         </section>
       </header>
