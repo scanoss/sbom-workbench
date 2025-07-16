@@ -1,17 +1,13 @@
-import { IndexTreeTask } from './IndexTreeTask';
+import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
 import fs from 'fs';
 import { Tree } from '../../workspace/tree/Tree';
 import path from 'path';
+import log from 'electron-log';
 
 export class ResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
 
-  private async saveResults(){
-    const resultPath = path.join(this.project.getMyPath(),'result.json');
-    const results = await fs.promises.readFile(this.project.getScanRoot(),'utf-8');
-    await fs.promises.writeFile(resultPath, JSON.stringify(JSON.parse(results), null, 2));
-  }
 
   private getFiles(): Array<string> {
     const results = this.getFileResultJsonContent();
@@ -25,7 +21,6 @@ export class ResultFileTreeTask extends IndexTreeTask {
   }
 
   public async run(): Promise<boolean> {
-    await this.saveResults();
     const files = this.getFiles();
     this.filesToScan = files;
     const tree =  await this.buildTree(this.filesToScan);
