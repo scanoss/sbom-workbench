@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react';
 
 import { exportService } from '@api/services/export.service';
-import { ExportFormat, ExportSource, ExportStatusCode, InventoryType } from '@api/types';
+import { ExportFormat, ExportSource, ExportStatusCode, InventoryType, ProjectSource } from '@api/types';
 import AppConfig from '@config/AppConfigModule';
 import { getFormatFilesAttributes } from '@shared/utils/file-utils';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
@@ -18,7 +18,8 @@ import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
 export const ExportButton = ({ empty }) => {
   const { pathname } = useLocation();
-  const { path: projectPath, name } = useSelector(selectWorkbench);
+  const { path: projectPath, name, projectSource } = useSelector(selectWorkbench);
+
   const { t } = useTranslation();
 
   const source: ExportSource = pathname.startsWith('/workbench/report/scan/detected')
@@ -30,34 +31,40 @@ export const ExportButton = ({ empty }) => {
       label: 'WFP',
       hint: t('Tooltip:ExportHintWFP'),
       sources: [ExportSource.DETECTED],
+      disable: projectSource === ProjectSource.IMPORT_SCAN_RESULTS,
     },
     RAW: {
       label: 'RAW',
       hint: t('Tooltip:ExportHintRAW'),
       sources: [ExportSource.DETECTED],
+      disable: false,
     },
     CSV: {
       label: 'CSV',
       hint: t('Tooltip:ExportHintCSV'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      disable: false,
       childrens: [
         {
           label: 'SBOM',
           hint: t('Tooltip:ExportHintCSVSBOM'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           type: InventoryType.SBOM,
+          disable: false,
         },
         {
           label: 'Cryptography',
           hint: t('Tooltip:ExportHintCSVCryptography'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           type: InventoryType.CRYPTOGRAPHY,
+          disable: false,
         },
         {
           label: 'Vulnerability',
           hint: t('Tooltip:ExportCSVVulnerability'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           type: InventoryType.VULNERABILITY,
+          disable: false,
         },
       ],
     },
@@ -65,22 +72,26 @@ export const ExportButton = ({ empty }) => {
       label: 'Cyclone DX',
       hint: t('Tooltip:ExportHintCycloneDX'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      disable: false,
     },
     SPDXLITEJSON: {
       label: 'SPDX Lite',
       hint: t('Tooltip:ExportHintSPDXLite'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      disable: false,
     },
     HTMLSUMMARY: {
       label: 'HTML Summary',
       hint: t('Tooltip:ExportHintHTML'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      disable: false,
     },
     SETTINGS: {
       label: 'Settings',
       hint: t('Tooltip:ExportHintSettings'),
       sources: [ExportSource.IDENTIFIED],
       fileName: 'settings',
+      disable: false,
     },
   };
 
@@ -199,6 +210,7 @@ export const ExportButton = ({ empty }) => {
             {AppConfig.FF_EXPORT_FORMAT_OPTIONS.map(
               (format) =>
                 exportLabels[format] &&
+                !exportLabels[format].disable &&
                 exportLabels[format].sources.includes(source) && (
                   <CustomMenuItem format={format} item={exportLabels[format]} />
                 )

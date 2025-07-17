@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   collapseAll, convertTreeToNode, expandAll, expandToMatches,
 } from '@shared/utils/filetree-utils';
-import { ProjectAccessMode } from '@api/types';
+import { ProjectAccessMode, ProjectSource } from '@api/types';
 import { status } from '@grpc/grpc-js';
 import { loadProject, loadProjectSettings, setTree } from './workbenchThunks';
 import { RootState } from '../rootReducer';
@@ -19,6 +19,7 @@ export interface WorkbenchState {
   progress: number;
   projectScannerConfig: Scanner.ScannerConfig;
   dependencies: string[]; // TODO: move to dependency store
+  projectSource: ProjectSource;
   file: string | null;
   history: {
     section: number;
@@ -47,6 +48,7 @@ const initialState: WorkbenchState = {
   file: null,
   loading: false,
   loaded: false,
+  projectSource: null,
   history: {
     section: null,
   },
@@ -95,7 +97,7 @@ export const workbenchSlice = createSlice({
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
       const {
-        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy,
+        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, projectSource
       } = action.payload;
 
       state.path = scanRoot;
@@ -108,6 +110,7 @@ export const workbenchSlice = createSlice({
       state.dependencies = dependencies;
       state.projectScannerConfig = config;
       state.mode = mode;
+      state.projectSource = projectSource;
       state.lockedBy = lockedBy;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {

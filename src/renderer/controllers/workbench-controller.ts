@@ -1,6 +1,14 @@
 import { projectService } from '@api/services/project.service';
 import { componentService } from '@api/services/component.service';
-import { ComponentGroup, ComponentSource, IProject, IWorkbenchFilterParams, ProjectAccessMode, ProjectOpenResponse } from '@api/types';
+import {
+  ComponentGroup,
+  ComponentSource,
+  IProject,
+  IWorkbenchFilterParams,
+  ProjectAccessMode,
+  ProjectOpenResponse,
+  ProjectSource
+} from '@api/types';
 import { sortComponents } from '@shared/utils/scan-util';
 import { IpcChannels } from '@api/ipc-channels';
 import { Scanner } from '../../main/task/scanner/types';
@@ -17,6 +25,7 @@ export interface ScanResult {
   config: Scanner.ScannerConfig;
   mode: ProjectAccessMode
   lockedBy: string;
+  projectSource: ProjectSource;
 }
 
 export interface ProjectSettings {
@@ -110,6 +119,7 @@ class WorkbenchController {
       config: data.metadata.scannerConfig,
       mode: data.mode,
       lockedBy: data.lockedBy,
+      projectSource: data.metadata.source as ProjectSource || ProjectSource.SCAN
     };
   }
 }
