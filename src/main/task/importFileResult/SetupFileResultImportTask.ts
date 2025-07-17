@@ -3,10 +3,11 @@ import log from 'electron-log';
 import path from 'path';
 import fs from 'fs';
 import { Project } from 'main/workspace/Project';
-import { ScannerStage } from '../../../api/types';
+import { ProjectSource, ScannerStage } from '../../../api/types';
 import i18next from 'i18next';
 import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
+import { Metadata } from '../../workspace/Metadata';
 
 export class SetupFileResultImportTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -28,6 +29,11 @@ export class SetupFileResultImportTask implements Scanner.IPipelineTask {
     await fs.promises.writeFile(resultPath, JSON.stringify(parsedResults,null,2));
   }
 
+  private async setProjectSource(){
+    // Set project source
+    this.project.metadata.setSource(ProjectSource.IMPORT_SCAN_RESULTS);
+  }
+
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.INDEX,
@@ -40,6 +46,8 @@ export class SetupFileResultImportTask implements Scanner.IPipelineTask {
     await modelProvider.init(this.project.getMyPath());
     await licenseService.import();
     await this.saveResults();
+    await this.setProjectSource();
+    await this.project.save();
     return true;
   }
 }

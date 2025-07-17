@@ -14,7 +14,7 @@ import {
   Chip,
 } from '@mui/material';
 
-import { IProject, ProjectAccessMode, ScanState } from '@api/types';
+import { IProject, ProjectAccessMode, ProjectSource, ScanState } from '@api/types';
 import { Trans, useTranslation } from 'react-i18next';
 import AppConfig from '../../../../../config/AppConfigModule';
 
@@ -161,6 +161,7 @@ const ProjectList = (props: ProjectListProps) => {
                               <IconButton
                                 aria-label="export"
                                 className="btn-export"
+                                disabled={ project.source === ProjectSource.IMPORT_SCAN_RESULTS }
                                 onClick={(event) => {
                                   event.stopPropagation();
                                   props.onProjectExport(project);
@@ -175,7 +176,10 @@ const ProjectList = (props: ProjectListProps) => {
                               <IconButton
                                 aria-label="rescan"
                                 className="btn-rescan"
-                                disabled={project.source === 'IMPORTED'}
+                                disabled={
+                                  project.source === ProjectSource.IMPORTED ||
+                                  project.source === ProjectSource.IMPORT_SCAN_RESULTS
+                                }
                                 onClick={(event) => {
                                   event.stopPropagation();
                                   props.onProjectRescan(project);

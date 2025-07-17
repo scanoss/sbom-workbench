@@ -1,7 +1,7 @@
 import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
-import { IProject, ScanState } from '../../api/types';
+import { IProject, ProjectSource, ScanState } from '../../api/types';
 import { SemVerCompareVersion } from '../helpers/SemVer';
 import { Metadata } from './Metadata';
 import { Project } from './Project';
@@ -144,7 +144,7 @@ export class ProjectZipper {
     this.zip.extractAllTo(workspace.getMyPath(), true);
     const projectPath = path.join(workspace.getMyPath(), this.projectName);
     const projectMetadata = await Metadata.readFromPath(projectPath);
-    projectMetadata.setSource('IMPORTED');
+    projectMetadata.setSource(ProjectSource.IMPORTED);
     projectMetadata.setMyPath(this.projectName);
     projectMetadata.save();
   }

@@ -474,3 +474,15 @@ export enum ExportStatusCode {
 export interface ExportResultsInfo {
   invalidPurls: Array<string>;
 }
+
+
+
+
+export enum ProjectSource {
+  /** Project created from imported files */
+  IMPORTED = 'IMPORTED',
+  /** Project created from direct scanning */
+  SCAN = 'SCAN',
+  /** Project created from imported scan results. result.json */
+  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS'
+}
