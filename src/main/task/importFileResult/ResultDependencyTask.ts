@@ -75,7 +75,6 @@ export class ResultDependencyTask implements Scanner.IPipelineTask {
       fileData.forEach((fd: any) => {
           if(fd.id === "dependency"){
             const fileList = this.processFileDependencies(file,fd.dependencies);
-            console.log(fileList);
             dependencies.filesList.push(fileList)
           }
       });
