@@ -7,7 +7,7 @@ import { ProjectSource, ScannerStage } from '../../../api/types';
 import i18next from 'i18next';
 import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
-import { Metadata } from '../../workspace/Metadata';
+import { ScanossResultValidator } from '../../modules/validator/ScanossResultValidator';
 
 export class SetupFileResultImportTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -15,17 +15,29 @@ export class SetupFileResultImportTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  private async saveResults(){
+  private validateResults(results: any){
+    const scanossResultValidator = new ScanossResultValidator();
+    const r = scanossResultValidator.validate(results);
+    if (!r.isValid){
+      log.error('[ ResultFileTreeTask validateResults ]', r.getDetailedErrors());
+      throw new Error(`Invalid SCANOSS scan result: ${r.getDetailedErrors()[0].field} - ${r.getDetailedErrors()[0].message}`);
+    }
+  }
+
+  private async processScanResults(){
     log.info('[ ResultFileTreeTask saveResults ]');
-    const resultPath = path.join(this.project.getMyPath(),'result.json');
     const results = await fs.promises.readFile(this.project.getScanRoot(),'utf-8');
-    const parsedResults =  JSON.parse(results)
+    const parsedResults =  JSON.parse(results);
     for (const [key, value] of Object.entries(parsedResults)) {
       if (!key.startsWith('/')) {
         parsedResults[`/${key}`] = value;
         delete parsedResults[key];
       }
     }
+    // validate file
+    this.validateResults(parsedResults);
+    // Save result.json file
+    const resultPath = path.join(this.project.getMyPath(),'result.json');
     await fs.promises.writeFile(resultPath, JSON.stringify(parsedResults,null,2));
   }
 
@@ -45,7 +57,7 @@ export class SetupFileResultImportTask implements Scanner.IPipelineTask {
   public async run(): Promise<boolean> {
     await modelProvider.init(this.project.getMyPath());
     await licenseService.import();
-    await this.saveResults();
+    await this.processScanResults();
     await this.setProjectSource();
     await this.project.save();
     return true;
