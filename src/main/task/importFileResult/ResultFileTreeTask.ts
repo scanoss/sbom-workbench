@@ -20,11 +20,19 @@ export class ResultFileTreeTask extends IndexTreeTask {
     return JSON.parse(resultJson);
   }
 
+  private loadScanResultsOnFileTree(){
+    log.info('[ Loading scan results on file tree... ]');
+    const results = this.getFileResultJsonContent();
+    this.project.tree.attachResults(results);
+    this.project.tree.updateFlags();
+  }
+
   public async run(): Promise<boolean> {
     const files = this.getFiles();
     this.filesToScan = files;
     const tree =  await this.buildTree(this.filesToScan);
-    await this.setTreeSummary(tree);
+    this.setTreeSummary(tree);
+    this.loadScanResultsOnFileTree();
     return true;
   }
 
