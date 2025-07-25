@@ -7,7 +7,6 @@ import { ResultDependencyTask } from '../../importFileResult/ResultDependencyTas
 import { SetupFileResultImportTask } from '../../importFileResult/SetupFileResultImportTask';
 import { VulnerabilitiesTask } from '../vulnerability/VulnerabilitiesTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
-import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
 import { Scanner } from '../types';
 import ScannerType = Scanner.ScannerType;
 
