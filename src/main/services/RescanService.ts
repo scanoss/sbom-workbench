@@ -1,4 +1,3 @@
-import { IDependencyResponse } from 'scanoss';
 import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/tree/Node';
 import { componentService } from './ComponentService';
@@ -31,123 +30,38 @@ class RescanService {
   }
 
   public async reScan(
-    files: Array<any>,
+    files: Array<{path: string, [key: string]: any}>,
     resultPath: string,
     projectPath: string,
   ): Promise<void> {
     try {
-      const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
+      await this.executeRescanProcess(files, resultPath);
 
-      // UPDATING FILES
-      await modelProvider.model.file.setDirty(1);
-      await modelProvider.model.file.setDirty(0, aux);
-      const filesDb = await modelProvider.model.file.getAll(null);
-
-      // Insert new files
-      const newFilesDb = [];
-      files.forEach((f) => {
-        const aux = filesDb.find((o) => o.path === f.path);
-        if (aux === undefined) newFilesDb.push(f);
-      });
-
-      // Insert new files
-      if (newFilesDb.length > 0) {
-        await modelProvider.model.file.insertFiles(newFilesDb);
-      }
-
-      await modelProvider.model.result.updateDirty(1);
-
-      const cleanFiles = await modelProvider.model.file.getClean();
-
-      const filesToUpdate = cleanFiles.reduce((previousValue: any, currentValue: any) => {
-        previousValue[currentValue.path] = currentValue.fileId;
-        return previousValue;
-      }, []);
-
-      // Delete empty inventories
-      await this.deleteEmptyInventories();
-
-      const resultLicenses: IInsertResult = await modelProvider.model.result.insertFromFileReScan(
-        resultPath,
-        filesToUpdate,
-      );
-      if (resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
-
-      await modelProvider.model.result.deleteDirty();
-      await modelProvider.model.file.deleteDirty();
-      await modelProvider.model.component.updateOrphanToManual();
-      await componentService.importComponents();
-      // Updates most reliable license for each component
-      const mostReliableLicensePerComponent = await modelProvider.model.component.getMostReliableLicensePerComponent();
-      await modelProvider.model.component.updateMostReliableLicense(
-        mostReliableLicensePerComponent,
-      );
-    } catch (err: any) {
-      console.error('[ Rescan Service ]', err);
-      throw err;
+      // Delete unused components (specific to reScan)
+      await this.deleteUnusedComponents();
+    } catch (error: any) {
+      console.error('[ Rescan Service ]', error);
+      throw new Error(`Rescan failed: ${error.message}`);
     }
   }
 
   public async reScanWFP(
-    files: Array<any>,
+    files: Array<{path: string, [key: string]: any}>,
     resultPath: string,
   ): Promise<void> {
     try {
-      const aux = utilHelper.convertsArrayOfStringToString(files, 'path');
-      // UPDATING FILES
-      await modelProvider.model.file.setDirty(1);
-      await modelProvider.model.file.setDirty(0, aux);
-      const filesDb = await modelProvider.model.file.getAll(null);
+      await this.executeRescanProcess(files, resultPath);
 
-      const newFilesDb = [];
-      files.forEach((f) => {
-        const aux = filesDb.find((o) => o.path === f.path);
-        if (aux === undefined) newFilesDb.push(f);
-      });
-      if (filesDb.length > 0) {
-        await modelProvider.model.file.insertFiles(newFilesDb);
-      }
-
-      await modelProvider.model.result.updateDirty(1);
-
-      const cleanFiles = await modelProvider.model.file.getClean();
-      const filesToUpdate = cleanFiles.reduce((previousValue, currentValue) => {
-        previousValue[currentValue.path] = currentValue.fileId;
-        return previousValue;
-      }, []);
-
-      // Delete empty inventories
-      await this.deleteEmptyInventories();
-
-      const resultLicenses: IInsertResult = await modelProvider.model.result.insertFromFileReScan(
-        resultPath,
-        filesToUpdate,
-      );
-      if (resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
-
-      await modelProvider.model.result.deleteDirty();
-      await modelProvider.model.file.deleteDirty();
-
-      await modelProvider.model.component.updateOrphanToManual();
-      await componentService.importComponents();
-
-      // Delete unused components
+      // Delete unused components (specific to reScanWFP)
       await this.deleteUnusedComponents();
-
-      // Updates most reliable license for each component
-      const mostReliableLicensePerComponent = await modelProvider.model.component.getMostReliableLicensePerComponent();
-      await modelProvider.model.component.updateMostReliableLicense(
-        mostReliableLicensePerComponent,
-      );
-    } catch (err: any) {
-      throw new Error('[ RESCAN DB ] Unable to insert new results');
+    } catch (error: any) {
+      throw new Error(`WFP Rescan failed: ${error.message}`);
     }
   }
 
   public async getNewResults(): Promise<Array<any>> {
     const results: Array<any> = await modelProvider.model.file.getFilesRescan();
     results.forEach((result) => {
-      console.log(result);
       if (result.original === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
@@ -185,33 +99,57 @@ class RescanService {
     return results;
   }
 
-  private dirtyModelDependencyAdapter(
-    dep: IDependencyResponse,
-  ): Record<string, string> {
-    const dependencies = {
-      paths: [],
-      purls: [],
-      versions: [],
-      licenses: [],
-    };
-    dep.filesList.forEach((d) => {
-      d.dependenciesList.forEach((e) => {
-        dependencies.paths.push(d.file);
-        dependencies.purls.push(e.purl);
-        dependencies.versions.push(e.version);
-        const spdxIds = e.licensesList.map((l) => l.spdxId);
-        const joinedIds = spdxIds.join(',');
-        dependencies.licenses.push(joinedIds);
-      });
-    });
-    const aux = {
-      purls: `'${dependencies.purls.join("','")}'`,
-      versions: `'${dependencies.versions.join("','")}'`,
-      licenses: `'${dependencies.licenses.join("','")}'`,
-      paths: `'${dependencies.paths.join("','")}'`,
-    };
+  private async executeRescanProcess(
+    files: Array<{path: string, [key: string]: any}>,
+    resultPath: string,
+  ): Promise<void> {
+    const filePaths = utilHelper.convertsArrayOfStringToString(files, 'path');
 
-    return aux;
+    // UPDATING FILES
+    await modelProvider.model.file.setDirty(1);
+    await modelProvider.model.file.setDirty(0, filePaths);
+    const filesDb = await modelProvider.model.file.getAll(null);
+
+    // Insert new files
+    const newFilesDb = [];
+    files.forEach((file) => {
+      const existingFile = filesDb.find((dbFile) => dbFile.path === file.path);
+      if (existingFile === undefined) newFilesDb.push(file);
+    });
+
+    if (newFilesDb.length > 0) {
+      await modelProvider.model.file.insertFiles(newFilesDb);
+    }
+
+    await modelProvider.model.result.updateDirty(1);
+
+    const cleanFiles = await modelProvider.model.file.getClean();
+
+    // Fix: Initialize with empty object {} instead of array []
+    const filesToUpdate = cleanFiles.reduce((previousValue: any, currentValue: any) => {
+      previousValue[currentValue.path] = currentValue.fileId;
+      return previousValue;
+    }, {});
+
+    // Delete empty inventories
+    await this.deleteEmptyInventories();
+
+    const resultLicenses: IInsertResult = await modelProvider.model.result.insertFromFileReScan(
+      resultPath,
+      filesToUpdate,
+    );
+    if (resultLicenses) await modelProvider.model.result.insertResultLicense(resultLicenses);
+
+    await modelProvider.model.result.deleteDirty();
+    await modelProvider.model.file.deleteDirty();
+    await modelProvider.model.component.updateOrphanToManual();
+    await componentService.importComponents();
+
+    // Updates most reliable license for each component
+    const mostReliableLicensePerComponent = await modelProvider.model.component.getMostReliableLicensePerComponent();
+    await modelProvider.model.component.updateMostReliableLicense(
+      mostReliableLicensePerComponent,
+    );
   }
 }
 export const rescanService = new RescanService();

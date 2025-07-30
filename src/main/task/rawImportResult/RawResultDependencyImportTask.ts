@@ -24,7 +24,7 @@ interface ResultDependency{
   "version": string;
 }
 
-export class ResultDependencyTask implements Scanner.IPipelineTask {
+export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
 
   private project: Project;
 

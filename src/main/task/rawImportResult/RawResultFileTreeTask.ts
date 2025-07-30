@@ -4,7 +4,7 @@ import { Tree } from '../../workspace/tree/Tree';
 import path from 'path';
 import log from 'electron-log';
 
-export class ResultFileTreeTask extends IndexTreeTask {
+export class RawResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
 

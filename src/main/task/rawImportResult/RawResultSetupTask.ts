@@ -9,7 +9,7 @@ import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
 import { ScanossResultValidator } from '../../modules/validator/ScanossResultValidator';
 
-export class SetupFileResultImportTask implements Scanner.IPipelineTask {
+export class RawResultSetupTask implements Scanner.IPipelineTask {
   private project: Project;
   constructor(project: Project) {
     this.project = project;
