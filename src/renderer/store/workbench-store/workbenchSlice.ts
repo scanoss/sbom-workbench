@@ -99,7 +99,6 @@ export const workbenchSlice = createSlice({
       const {
         name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, projectSource
       } = action.payload;
-
       state.path = scanRoot;
       state.name = name;
       state.loading = false;

@@ -38,7 +38,7 @@ const ProjectSettings = () => {
   const { t } = useTranslation();
 
   const { projects, scanPath, settings } = useSelector(selectWorkspaceState);
-  const showConfigurationOptions = scanPath?.source === Scanner.ScannerSource.CODE || scanPath?.source === Scanner.ScannerSource.WFP
+  const showConfigurationOptions = scanPath?.source === Scanner.ScannerSource.CODE || scanPath?.source === Scanner.ScannerSource.WFP;
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 

@@ -37,7 +37,7 @@ const AppProvider = ({ children }) => {
     });
 
     if (paths && paths.length > 0) {
-      dispatch(setScanPath({ path: paths[0], action: 'scan' }));
+      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.CODE }));
       navigate('/workspace/new/settings');
     }
   };
