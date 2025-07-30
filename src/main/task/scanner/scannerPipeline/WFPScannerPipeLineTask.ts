@@ -11,8 +11,7 @@ import { IDispatch } from '../dispatcher/IDispatch';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { WFPResumeTask } from '../resume/WFPResumeTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
-import { userSettingService } from '../../../services/UserSettingService';
-import { ComponentImportTask } from '../../ComponentImportation/ComponentImportTask';
+
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {
@@ -32,9 +31,6 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
         : new WFPRescanTask(project);
 
     this.queue.push(scanTask);
-
-    // Import component task
-    this.queue.push(new ComponentImportTask(project));
 
     // vulnerabilities
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));

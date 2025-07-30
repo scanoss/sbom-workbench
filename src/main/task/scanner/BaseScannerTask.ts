@@ -10,10 +10,6 @@ import fs from 'fs';
 import { ProjectSource, ScanState } from '../../../api/types';
 import { Project } from '../../workspace/Project';
 import { IpcChannels } from '../../../api/ipc-channels';
-import { fileService } from '../../services/FileService';
-import { fileHelper } from '../../helpers/FileHelper';
-import { resultService } from '../../services/ResultService';
-import { componentService } from '../../services/ComponentService';
 import { userSettingService } from '../../services/UserSettingService';
 import AppConfig from '../../../config/AppConfigModule';
 import { AutoAccept } from '../inventory/AutoAccept';
@@ -22,7 +18,8 @@ import { Scanner as ScannerModule } from './types';
 import { IDispatch } from './dispatcher/IDispatch';
 import { IScannerInputAdapter } from './adapter/IScannerInputAdapter';
 import { utilModel } from '../../model/UtilModel';
-import { Metadata } from '../../workspace/Metadata';
+import { ImportTask } from '../import/ImportTask';
+
 
 export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> implements ScannerModule.IPipelineTask {
   protected scanner: Scanner;
@@ -111,6 +108,10 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       }
     }
     await fs.promises.writeFile(resultPath, JSON.stringify(result, null, 2));
+
+    // Import task
+    const componentImportTask = new ImportTask(this.project);
+    await componentImportTask.run();
 
     if (AppConfig.FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN) {
       const autoAccept = new AutoAccept();

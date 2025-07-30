@@ -51,7 +51,7 @@ class RescanService {
       });
 
       // Insert new files
-      if (filesDb.length > 0) {
+      if (newFilesDb.length > 0) {
         await modelProvider.model.file.insertFiles(newFilesDb);
       }
 
@@ -147,12 +147,16 @@ class RescanService {
   public async getNewResults(): Promise<Array<any>> {
     const results: Array<any> = await modelProvider.model.file.getFilesRescan();
     results.forEach((result) => {
+      console.log(result);
       if (result.original === NodeStatus.NOMATCH && result.identified === 1) {
         result[result.path] = NodeStatus.IDENTIFIED;
         result.status = NodeStatus.IDENTIFIED;
       } else if (result.original === NodeStatus.NOMATCH) {
         result[result.path] = NodeStatus.NOMATCH;
         result.status = NodeStatus.NOMATCH;
+      } else if (result.original === NodeStatus.NOMATCH && result.pending === 1) {
+        result[result.path] = NodeStatus.PENDING;
+        result.status = NodeStatus.PENDING;
       } else if (
         result.original === NodeStatus.FILTERED
         && result.identified === 1

@@ -2,13 +2,13 @@ import { ScannerPipeline } from './ScannerPipeline';
 import { Project } from '../../../workspace/Project';
 import log from 'electron-log';
 import { ResultFileTreeTask } from '../../importFileResult/ResultFileTreeTask';
-import { ComponentImportTask } from '../../ComponentImportation/ComponentImportTask';
 import { ResultDependencyTask } from '../../importFileResult/ResultDependencyTask';
 import { SetupFileResultImportTask } from '../../importFileResult/SetupFileResultImportTask';
 import { VulnerabilitiesTask } from '../vulnerability/VulnerabilitiesTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { Scanner } from '../types';
 import ScannerType = Scanner.ScannerType;
+import { ImportTask } from '../../import/ImportTask';
 
 export class ResultFilePipelineTask extends ScannerPipeline {
 
@@ -21,8 +21,8 @@ export class ResultFilePipelineTask extends ScannerPipeline {
     // Index
     this.queue.push(new ResultFileTreeTask(project));
 
-    // Import component task
-    this.queue.push(new ComponentImportTask(project));
+    // Import task
+    this.queue.push(new ImportTask(project));
 
     // Dependency
     this.queue.push(new ResultDependencyTask(project));

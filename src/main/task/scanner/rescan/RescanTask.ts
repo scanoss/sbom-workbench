@@ -9,6 +9,7 @@ import { rescanService } from '../../../services/RescanService';
 import { IDispatch } from '../dispatcher/IDispatch';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { fileExists } from '../../../utils/utils';
+import { utilModel } from '../../../model/UtilModel';
 
 export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher, TInputScannerAdapter> {
   public getStageProperties(): Scanner.StageProperties {
@@ -19,7 +20,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     };
   }
 
-  public abstract reScan(): Promise<void>;
+  public abstract reScan(resultsPath: string): Promise<void>;
 
   public async init(): Promise<void> {
     if (await fileExists(`${this.project.getMyPath()}/result.json`)) await fs.promises.unlink(`${this.project.getMyPath()}/result.json`);
@@ -36,11 +37,32 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     this.project.save();
   }
 
+  private async updateResultFile(){
+    const resultPath = `${this.project.getMyPath()}/result.json`;
+    const result: Record<any, any> = await utilModel.readFile(resultPath);
+    for (const [key, value] of Object.entries(result)) {
+      if(!key.startsWith("/")) {
+        result[`/${key}`] = value;
+        delete result[key];
+      }
+    }
+    await fs.promises.writeFile(resultPath,JSON.stringify(result,null,2));
+    return result;
+  }
+
+  protected async updateStatusFlagsOnFileTree(results: Record<string, any>){
+    this.project.tree.attachResults(results);
+    this.project.tree.updateFlags();
+  }
+
   public async done() {
     await this.project.open();
-    await this.reScan();
-    const results = await rescanService.getNewResults();
-    this.project.getTree().sync(results);
+    const results = await this.updateResultFile();
+    await this.updateStatusFlagsOnFileTree(results);
+    await this.reScan(`${this.project.getMyPath()}/result.json`);
+    this.project.getTree().updateFlags();
+    const newFileStatusResults = await rescanService.getNewResults();
+    this.project.getTree().sync(newFileStatusResults);
     this.project.metadata.setScannerState(ScanState.FINISHED);
     log.info('%c[ SCANNER ]: Re-scan finished ', 'color: green');
     this.project.save();
