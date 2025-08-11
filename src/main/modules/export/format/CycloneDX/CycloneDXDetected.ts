@@ -8,8 +8,9 @@ export class CycloneDXDetected extends CycloneDX {
     const uniqueComponents = new Map<string, ExportComponentData>();
     const invalidPurls: Array<string> = [];
     data.forEach((comp) => {
+      const version = comp.version ? comp.version : 'unknown';
       if (isValidPurl(comp.purl)) {
-        const key = `${comp.purl}@${comp.version}`;
+        const key = `${comp.purl}@${version}`;
         uniqueComponents.set(key, {
           ...comp,
           unique_detected_licenses: comp.detected_licenses ? comp.detected_licenses?.split(' AND ') : [],

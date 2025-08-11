@@ -61,6 +61,7 @@ export abstract class CycloneDX extends Format {
       : await this.export.getDetectedVulnerability();
 
     const { components, invalidPurls } = this.getUniqueComponents(data);
+
     const vulnerabilityExportData = toVulnerabilityExportData(vulnerabilityData);
 
     // Add components to CycloneDX with each respective license
@@ -100,7 +101,8 @@ export abstract class CycloneDX extends Format {
 
     vulnerabilityExportData.forEach((v) => {
       const ratingRepository = new CDX.Models.Vulnerability.RatingRepository();
-      ratingRepository.add(new CDX.Models.Vulnerability.Rating({ severity: v.severity.toLowerCase() as any }));
+      if(v.severity)
+        ratingRepository.add(new CDX.Models.Vulnerability.Rating({ severity: v.severity.toLowerCase() as any }));
       const affectedRepository = new CDX.Models.Vulnerability.AffectRepository();
       v.affectedComponents.forEach((c:any) => {
         const bomRef = new CDX.Models.BomRef(c.purl);

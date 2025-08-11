@@ -9,11 +9,16 @@ export function toVulnerabilityExportData(componentVulnerabilities: Array<Compon
     components: Map<string, AffectedComponent>
   }>();
   componentVulnerabilities.forEach((cv) => {
-    const { cve, source, summary, published, severity, modified } = cv.vulnerability;
+    let { cve, source, summary, published, severity, modified } = cv.vulnerability;
     const { purl, version, rejectAt } = cv;
     if (!vulnerabilityMapper.has(cve)) {
       const componentMapper = new Map<string, { purl: string, versions: Array<string> }>();
       componentMapper.set(purl, { purl, versions: [version] });
+
+      // WORKAROUND: OSV has a bug in the severity mapping
+      if (severity && severity === 'MODERATE')
+        severity = 'MEDIUM';
+
       vulnerabilityMapper.set(cve, {
         cve,
         source,

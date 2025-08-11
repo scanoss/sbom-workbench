@@ -9,7 +9,8 @@ export class CycloneDXIdentified extends CycloneDX {
     const invalidPurls: Array<string> = [];
     data.forEach((comp) => {
       if (isValidPurl(comp.purl)) {
-        const key = `${comp.purl}@${comp.version}`;
+        const version = comp.version ? comp.version : 'unknown';
+        const key = `${comp.purl}@${version}`;
         if (uniqueComponents.has(key)) {
           uniqueComponents.get(key).unique_concluded_licenses.push(comp.concluded_licenses);
         } else {
