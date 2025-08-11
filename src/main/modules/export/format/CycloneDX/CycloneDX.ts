@@ -1,31 +1,33 @@
 import * as CDX from '@cyclonedx/cyclonedx-library';
 import { PackageURL } from 'packageurl-js';
 import AppConfig from '../../../../../config/AppConfigModule';
-import { ExportSource, ExportStatusCode } from '../../../../../api/types';
+import { ExportStatusCode } from '../../../../../api/types';
 import { ExportResult, Format } from '../../Format';
 import { Project } from '../../../../workspace/Project';
 import { ExportComponentData } from '../../../../model/interfaces/report/ExportComponentData';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { getSupplier, resolveVulnerabilityURL, toVulnerabilityExportData } from '../../helpers/exportHelper';
 import { ReportData } from '../../ReportData';
+import { ComponentVulnerability } from 'main/model/entity/ComponentVulnerability';
+import { VulnerabilityExportData } from '../../../../model/interfaces/report/VulnerabilityExportData';
 
 export abstract class CycloneDX extends Format {
-  private source: string;
 
   private project: Project;
+  private includeVulnerabilities: boolean;
 
-  constructor(source: string, project: Project, exportModel: ExportRepository) {
+  constructor(project: Project, exportModel: ExportRepository, includeVulnerabilities: boolean = false) {
     super(exportModel);
-    this.source = source;
     this.extension = '.bom';
     this.project = project;
+    this.includeVulnerabilities = includeVulnerabilities;
   }
 
   protected abstract getUniqueComponents(data: Array<ExportComponentData>): ReportData<ExportComponentData[]>;
+  protected abstract getComponents(): Promise<Array<ExportComponentData>>;
+  protected abstract getVulnerabilities(): Promise<Array<ComponentVulnerability>>;
 
-  // See CycloneDX 1.6 https://cyclonedx.org/docs/1.6/json
-  // See CycloneDX Example w/ Crypto & Dependencies https://raw.githubusercontent.com/CycloneDX/bom-examples/master/CBOM/Example-With-Dependencies/bom.json
-  public async generate(): Promise<ExportResult> {
+  protected async buildBOM(components:ExportComponentData[], vulnerabilities:VulnerabilityExportData[]){
     // Create CycloneDX Header
     const bom = new CDX.Models.Bom();
     bom.metadata = new CDX.Models.Metadata({
@@ -51,18 +53,6 @@ export abstract class CycloneDX extends Format {
         ),
       );
     }
-
-    const data = this.source === ExportSource.IDENTIFIED
-      ? await this.export.getIdentifiedData()
-      : await this.export.getDetectedData();
-
-    const vulnerabilityData = this.source === ExportSource.IDENTIFIED
-      ? await this.export.getIdentifiedVulnerability()
-      : await this.export.getDetectedVulnerability();
-
-    const { components, invalidPurls } = this.getUniqueComponents(data);
-
-    const vulnerabilityExportData = toVulnerabilityExportData(vulnerabilityData);
 
     // Add components to CycloneDX with each respective license
     components.forEach((c) => {
@@ -99,7 +89,7 @@ export abstract class CycloneDX extends Format {
       bom.components.add(cdxComponent);
     });
 
-    vulnerabilityExportData.forEach((v) => {
+    vulnerabilities.forEach((v) => {
       const ratingRepository = new CDX.Models.Vulnerability.RatingRepository();
       if(v.severity)
         ratingRepository.add(new CDX.Models.Vulnerability.Rating({ severity: v.severity.toLowerCase() as any }));
@@ -131,13 +121,27 @@ export abstract class CycloneDX extends Format {
       });
       bom.vulnerabilities.add(vulnerability);
     });
+    return bom;
+  }
+
+  // See CycloneDX 1.6 https://cyclonedx.org/docs/1.6/json
+  // See CycloneDX Example w/ Crypto & Dependencies https://raw.githubusercontent.com/CycloneDX/bom-examples/master/CBOM/Example-With-Dependencies/bom.json
+  public async generate(): Promise<ExportResult> {
 
     const jsonSerializer = new CDX.Serialize.JsonSerializer(
       new CDX.Serialize.JSON.Normalize.Factory(CDX.Spec.Spec1dot6),
     );
 
+    // Component Data
+    const comp = await this.getComponents();
+    const { components, invalidPurls } = this.getUniqueComponents(comp);
+
+    // Vulnerability data
+    const vulnerabilityData = this.includeVulnerabilities ? await this.getVulnerabilities() : [];
+    const vulnerabilityExportData = toVulnerabilityExportData(vulnerabilityData);
+
     return {
-      report: jsonSerializer.serialize(bom, { sortLists: true, space: 2 }),
+      report: jsonSerializer.serialize(await this.buildBOM(components, vulnerabilityExportData), { sortLists: true, space: 2 }),
       status: {
         code: invalidPurls.length > 0 ? ExportStatusCode.SUCCESS_WITH_WARNINGS : ExportStatusCode.SUCCESS,
         info: {

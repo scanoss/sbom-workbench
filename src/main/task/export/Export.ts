@@ -31,22 +31,13 @@ export class Export implements ITask<string, IExportResult> {
     return data;
   }
 
-  public setFormat(exportDTO: NewExportDTO) {
+  public setFormat(exportDTO: NewExportDTO): void {
+    const repository = new ExportRepositorySqliteImp();
+    const project = workspace.getOpenedProjects()[0];
+
     switch (exportDTO.format as ExportFormat) {
       case ExportFormat.CSV:
-        switch (exportDTO.inventoryType) {
-          case InventoryType.SBOM:
-            this.format = new SBOMCsv(exportDTO.source);
-            break;
-          case InventoryType.CRYPTOGRAPHY:
-            this.format = new CryptographyCsv(exportDTO.source, new ExportRepositorySqliteImp());
-            break;
-          case InventoryType.VULNERABILITY:
-            this.format = new VulnerabilityCsv(exportDTO.source, new ExportRepositorySqliteImp());
-            break;
-          default:
-            throw new Error(`Unsupported report type: ${exportDTO.inventoryType} for CSV format`);
-        }
+        this.setCsvFormat(exportDTO, repository);
         break;
       case ExportFormat.RAW:
         this.format = new Raw();
@@ -56,25 +47,11 @@ export class Export implements ITask<string, IExportResult> {
         break;
       case ExportFormat.SPDXLITEJSON:
         this.format = exportDTO.source === ExportSource.DETECTED
-          ? new SpdxLiteDetected(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp())
-          : new SpdxLiteIdentified(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
+          ? new SpdxLiteDetected(project, repository)
+          : new SpdxLiteIdentified(project, repository);
         break;
       case ExportFormat.BOM:
-        const project = workspace.getOpenedProjects()[0];
-        switch (exportDTO.inventoryType) {
-          case InventoryType.CYLONEDX:
-            this.format = exportDTO.source === 'IDENTIFIED'
-              ? new CycloneDXIdentified(exportDTO.source, project ,new ExportRepositorySqliteImp())
-              : new CycloneDXDetected(exportDTO.source, project ,new ExportRepositorySqliteImp());
-            break;
-          case InventoryType.CYCLONEDX_WITH_VULNERAVILITIES:
-            this.format = exportDTO.source === 'IDENTIFIED'
-              ? new CycloneDXIdentified(exportDTO.source, project ,new ExportRepositorySqliteImp())
-              : new CycloneDXDetected(exportDTO.source, project ,new ExportRepositorySqliteImp());
-            break;
-          default:
-            throw new Error(`Unsupported report type: ${exportDTO.inventoryType} for BOM format`);
-        }
+        this.setBomFormat(exportDTO, project, repository);
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);
@@ -83,6 +60,42 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new Settings(exportDTO.source);
         break;
       default:
+        throw new Error(`Unsupported export format: ${exportDTO.format}`);
+    }
+  }
+
+  private setCsvFormat(exportDTO: NewExportDTO, repository: ExportRepositorySqliteImp): void {
+    switch (exportDTO.inventoryType) {
+      case InventoryType.SBOM:
+        this.format = new SBOMCsv(exportDTO.source);
+        break;
+      case InventoryType.CRYPTOGRAPHY:
+        this.format = new CryptographyCsv(exportDTO.source, repository);
+        break;
+      case InventoryType.VULNERABILITY:
+        this.format = new VulnerabilityCsv(exportDTO.source, repository);
+        break;
+      default:
+        throw new Error(`Unsupported inventory type: ${exportDTO.inventoryType} for CSV format`);
+    }
+  }
+
+  private setBomFormat(exportDTO: NewExportDTO, project: any, repository: ExportRepositorySqliteImp): void {
+    const isIdentified = exportDTO.source === ExportSource.IDENTIFIED;
+
+    switch (exportDTO.inventoryType) {
+      case InventoryType.CYLONEDX:
+        this.format = isIdentified
+          ? new CycloneDXIdentified(project, repository)
+          : new CycloneDXDetected(project, repository);
+        break;
+      case InventoryType.CYCLONEDX_WITH_VULNERABILITIES:
+        this.format = isIdentified
+          ? new CycloneDXIdentified(project, repository, true)
+          : new CycloneDXDetected(project, repository, true);
+        break;
+      default:
+        throw new Error(`Unsupported inventory type: ${exportDTO.inventoryType} for BOM format`);
     }
   }
 }

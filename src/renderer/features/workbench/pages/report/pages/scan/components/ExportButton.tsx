@@ -81,11 +81,11 @@ export const ExportButton = ({ empty }) => {
           type: InventoryType.CYLONEDX,
         },
         {
-          label: 'CycloneDXwith vulnerabilities',
+          label: 'CycloneDX with vulnerabilities',
           hint: 'CycloneDX with vulnerabilities',
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           disable: false,
-          type: InventoryType.CYCLONEDX_WITH_VULNERAVILITIES,
+          type: InventoryType.CYCLONEDX_WITH_VULNERABILITIES,
         },
       ],
     },
@@ -129,6 +129,7 @@ export const ExportButton = ({ empty }) => {
   };
 
   const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
+    console.log('exportFile', format, inventoryType);
     const dirname = localStorage.getItem('last-path-used') || projectPath;
     const attributes = getFormatFilesAttributes(format);
 
