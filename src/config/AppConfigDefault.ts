@@ -29,7 +29,7 @@ export const AppConfigDefault: IAppConfig = {
     ExportFormat.WFP,
     ExportFormat.CSV,
     ExportFormat.SPDXLITEJSON,
-    ExportFormat.CYCLONEDX,
+    ExportFormat.BOM,
     ExportFormat.HTMLSUMMARY,
     ExportFormat.SETTINGS,
   ],

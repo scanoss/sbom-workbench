@@ -59,8 +59,22 @@ export class Export implements ITask<string, IExportResult> {
           ? new SpdxLiteDetected(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp())
           : new SpdxLiteIdentified(workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
         break;
-      case ExportFormat.CYCLONEDX:
-        this.format = exportDTO.source === ExportSource.DETECTED ? new CycloneDXDetected(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp()) : new CycloneDXIdentified(exportDTO.source, workspace.getOpenedProjects()[0], new ExportRepositorySqliteImp());
+      case ExportFormat.BOM:
+        const project = workspace.getOpenedProjects()[0];
+        switch (exportDTO.inventoryType) {
+          case InventoryType.CYLONEDX:
+            this.format = exportDTO.source === 'IDENTIFIED'
+              ? new CycloneDXIdentified(exportDTO.source, project ,new ExportRepositorySqliteImp())
+              : new CycloneDXDetected(exportDTO.source, project ,new ExportRepositorySqliteImp());
+            break;
+          case InventoryType.CYCLONEDX_WITH_VULNERAVILITIES:
+            this.format = exportDTO.source === 'IDENTIFIED'
+              ? new CycloneDXIdentified(exportDTO.source, project ,new ExportRepositorySqliteImp())
+              : new CycloneDXDetected(exportDTO.source, project ,new ExportRepositorySqliteImp());
+            break;
+          default:
+            throw new Error(`Unsupported report type: ${exportDTO.inventoryType} for BOM format`);
+        }
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);

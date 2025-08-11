@@ -15,7 +15,6 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 
-
 export const ExportButton = ({ empty }) => {
   const { pathname } = useLocation();
   const { path: projectPath, name, projectSource } = useSelector(selectWorkbench);
@@ -68,11 +67,27 @@ export const ExportButton = ({ empty }) => {
         },
       ],
     },
-    CYCLONEDX: {
-      label: 'Cyclone DX',
+    BOM: {
+      label: 'BOM',
       hint: t('Tooltip:ExportHintCycloneDX'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
       disable: false,
+      childrens: [
+        {
+          label: 'CycloneDX',
+          hint: 'CycloneDX',
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          disable: false,
+          type: InventoryType.CYLONEDX,
+        },
+        {
+          label: 'CycloneDXwith vulnerabilities',
+          hint: 'CycloneDX with vulnerabilities',
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          disable: false,
+          type: InventoryType.CYCLONEDX_WITH_VULNERAVILITIES,
+        },
+      ],
     },
     SPDXLITEJSON: {
       label: 'SPDX Lite',

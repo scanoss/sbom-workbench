@@ -190,7 +190,7 @@ export enum ExportFormat {
   RAW = 'RAW',
   WFP = 'WFP',
   SPDXLITEJSON = 'SPDXLITEJSON',
-  CYCLONEDX = 'CYCLONEDX',
+  BOM = 'BOM',
   HTMLSUMMARY = 'HTMLSUMMARY',
   SETTINGS = 'SETTINGS',
 }
@@ -204,6 +204,8 @@ export enum InventoryType {
   SBOM = 'SBOM',
   CRYPTOGRAPHY = 'CRYPTOGRAPHY',
   VULNERABILITY = 'VULNERABILITY',
+  CYLONEDX = 'CYCLONEDX',
+  CYCLONEDX_WITH_VULNERAVILITIES = 'CYLONEDX_WITH_VULNERABILITIES',
 }
 
 export type IParams = Record<PropertyKey, any> & {
