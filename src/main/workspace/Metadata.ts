@@ -36,6 +36,8 @@ export class Metadata {
 
   private scannerConfig: Scanner.ScannerConfig;
 
+  private sourceCodePath: string;
+
   constructor(name: string) {
     this.name = name;
     this.appVersion = app.isPackaged === true ? app.getVersion() : packageJson.version;
@@ -169,6 +171,14 @@ export class Metadata {
     this.scannerConfig = value;
   }
 
+  public setSourceCodePath(sourceCodePath: string) {
+    this.sourceCodePath = sourceCodePath;
+  }
+
+  public getSourceCodePath() {
+    return this.sourceCodePath;
+  }
+
   public getDto(): IProject {
     const Ip: IProject = {
       appVersion: this.appVersion,
@@ -185,6 +195,7 @@ export class Metadata {
       api_key: this.apiKey,
       source: this.source,
       scannerConfig: this.scannerConfig,
+      sourceCodePath: this.sourceCodePath,
     };
     return Ip;
   }

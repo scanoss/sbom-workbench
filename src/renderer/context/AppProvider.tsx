@@ -43,27 +43,30 @@ const AppProvider = ({ children }) => {
   };
 
   const newProjectFromWFP = async () => {
-    const paths = await dialogController.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'WFP files', extensions: ['wfp'] }],
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: 'Import project from WFP file',
+      openDialogProperties: {
+        filters: [{ name: 'WFP files', extensions: ['wfp'] }],
+      },
+      placeHolder: 'WFP file path',
     });
-
-    if (paths && paths.length > 0) {
-      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.WFP }));
-      navigate('/workspace/new/settings');
-    }
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
+    dispatch(setScanPath({ path: r.data.projectPath , action: 'scan', source: Scanner.ScannerSource.WFP, sourceCodePath: r.data.sourcePath }));
+    navigate('/workspace/new/settings');
   };
 
   const importFromResultFile = async () => {
-    const paths = await dialogController.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'result', extensions: ['json'] }],
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: 'Import project from SCANOSS RAW result file',
+      openDialogProperties: {
+        filters: [{ name: 'SCANOSS RAW results', extensions: ['json'] }],
+      },
+      placeHolder: 'RAW result file path',
     });
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
 
-    if (paths && paths.length > 0) {
-      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.IMPORTED_RESULTS_RAW }));
-      navigate('/workspace/new/settings');
-    }
+    dispatch(setScanPath({ path: r.data.projectPath, action: 'scan', source: Scanner.ScannerSource.IMPORTED_RESULTS_RAW, sourceCodePath: r.data.sourcePath }));
+    navigate('/workspace/new/settings');
   };
 
   const importProject = async () => {
@@ -162,7 +165,13 @@ const AppProvider = ({ children }) => {
   };
 
   const importProjectWithSource = async () => {
-    const r = await dialogCtrl.openImportProjectSourceDialog();
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: 'Import project with source',
+      openDialogProperties: {
+        filters: [{ name: 'Zip files', extensions: ['zip'] }],
+      },
+      placeHolder: 'Project zip file path',
+    });
     if (r.action === DIALOG_ACTIONS.CANCEL) return;
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
     dialog.present();

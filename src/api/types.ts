@@ -130,6 +130,7 @@ export interface ItemInclude {
 export interface INewProject {
   name: string;
   scan_root: string;
+  sourceCodePath: string;
   default_license: string;
   default_components?: string;
   api?: string;
@@ -389,6 +390,7 @@ export interface ProjectOpenResponse {
   logical_tree: Folder;
   work_root: string;
   scan_root: string;
+  sourceCodePath: string;
   dependencies: string[];
   uuid: string;
   source: string;

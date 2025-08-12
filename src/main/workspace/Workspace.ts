@@ -188,6 +188,7 @@ export class Workspace {
     const newProject: Project = new Project(projectDTO.name);
     newProject.setScannerConfig(projectDTO.scannerConfig);
     newProject.setScanPath(projectDTO.scan_root);
+    newProject.setSourceCodePath(projectDTO.sourceCodePath);
     newProject.setLicense(projectDTO.default_license);
     if (projectDTO.api) {
       newProject.setApi(projectDTO.api);

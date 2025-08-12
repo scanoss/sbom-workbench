@@ -196,6 +196,14 @@ export class Project {
     this.metadata.setApiKey(apiKey);
   }
 
+  public setSourceCodePath(sourceCodePath: string) {
+    this.metadata.setSourceCodePath(sourceCodePath);
+  }
+
+  public getSourceCodePath() {
+    return this.metadata.getSourceCodePath();
+  }
+
   private getProjectAPIKey() {
     return this.metadata.getApiKey();
   }
