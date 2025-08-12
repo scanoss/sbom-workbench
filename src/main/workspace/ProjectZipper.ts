@@ -78,6 +78,7 @@ export class ProjectZipper {
       const projectPath = path.join(workspace.getMyPath(), this.projectName);
       const projectMetadata = await Metadata.readFromPath(projectPath);
       projectMetadata.setScanRoot(sourceCodePath);
+      projectMetadata.setSourceCodePath(sourceCodePath ? sourceCodePath : '');
       projectMetadata.save();
     }
     const project = await Project.readFromPath(workspace.getMyPath() + path.sep + this.projectName);
