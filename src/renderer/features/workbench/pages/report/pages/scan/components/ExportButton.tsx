@@ -69,31 +69,32 @@ export const ExportButton = ({ empty }) => {
     },
     BOM: {
       label: 'BOM',
-      hint: t('Tooltip:ExportHintCycloneDX'),
+      hint: t('Tooltip:ExportHintBOM'),
       sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
       disable: false,
       childrens: [
         {
           label: 'CycloneDX',
-          hint: 'CycloneDX',
+          hint: t('Tooltip:ExportHintCycloneDX'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           disable: false,
           type: InventoryType.CYLONEDX,
         },
         {
           label: 'CycloneDX with vulnerabilities',
-          hint: 'CycloneDX with vulnerabilities',
+          hint: t('Tooltip:ExportHintCycloneDXVulnerabilities'),
           sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
           disable: false,
           type: InventoryType.CYCLONEDX_WITH_VULNERABILITIES,
         },
+        {
+          label: 'SPDX Lite',
+          hint: t('Tooltip:ExportHintSPDXLite'),
+          sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+          disable: false,
+          type: InventoryType.SPDXLITE,
+        },
       ],
-    },
-    SPDXLITEJSON: {
-      label: 'SPDX Lite',
-      hint: t('Tooltip:ExportHintSPDXLite'),
-      sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
-      disable: false,
     },
     HTMLSUMMARY: {
       label: 'HTML Summary',
@@ -128,15 +129,19 @@ export const ExportButton = ({ empty }) => {
     handleClose();
   };
 
-  const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
-    console.log('exportFile', format, inventoryType);
+  const getDefaultPath = (attributes: Record<string,any>, inventoryType: InventoryType ) => {
     const dirname = localStorage.getItem('last-path-used') || projectPath;
-    const attributes = getFormatFilesAttributes(format);
+    const prefix = attributes.prefix ? `-${attributes.prefix}-` : '-';
+    const defaultFileName = attributes.defaultFileName ? `-${attributes.defaultFileName}-` : '';
+    const inventoryTypeStr = inventoryType ? `${inventoryType.toLowerCase()}-` : '';
 
+    return `${dirname}/${name}${prefix}${defaultFileName}${inventoryTypeStr}${source.toLowerCase()}`;
+  }
+
+  const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
+    const attributes = getFormatFilesAttributes(format);
     const path = await dialogController.showSaveDialog({
-      defaultPath: `${dirname}/${name}${attributes.prefix ? `-${attributes.prefix}` : ''}${
-        attributes.defaultFileName ? `-${attributes.defaultFileName}` : ''
-      }${inventoryType ? `-${inventoryType.toLowerCase()}` : ''}-${source.toLowerCase()}.${attributes.extension}`,
+      defaultPath: getDefaultPath(attributes,inventoryType),
       filters: [{ name: attributes.description, extensions: [attributes.extension] }],
     });
 

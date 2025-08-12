@@ -184,12 +184,9 @@ export enum HashType {
 }
 
 export enum ExportFormat {
-  SPDX20 = 'SPDX20',
-  SPDXLITE = 'SPDXLITE',
   CSV = 'CSV',
   RAW = 'RAW',
   WFP = 'WFP',
-  SPDXLITEJSON = 'SPDXLITEJSON',
   BOM = 'BOM',
   HTMLSUMMARY = 'HTMLSUMMARY',
   SETTINGS = 'SETTINGS',
@@ -206,6 +203,7 @@ export enum InventoryType {
   VULNERABILITY = 'VULNERABILITY',
   CYLONEDX = 'CYCLONEDX',
   CYCLONEDX_WITH_VULNERABILITIES = 'CYLONEDX-WITH-VULNERABILITIES',
+  SPDXLITE = 'SPDXLITE',
 }
 
 export type IParams = Record<PropertyKey, any> & {

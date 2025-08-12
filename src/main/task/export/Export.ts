@@ -45,11 +45,6 @@ export class Export implements ITask<string, IExportResult> {
       case ExportFormat.WFP:
         this.format = new Wfp();
         break;
-      case ExportFormat.SPDXLITEJSON:
-        this.format = exportDTO.source === ExportSource.DETECTED
-          ? new SpdxLiteDetected(project, repository)
-          : new SpdxLiteIdentified(project, repository);
-        break;
       case ExportFormat.BOM:
         this.setBomFormat(exportDTO, project, repository);
         break;
@@ -93,6 +88,11 @@ export class Export implements ITask<string, IExportResult> {
         this.format = isIdentified
           ? new CycloneDXIdentified(project, repository, true)
           : new CycloneDXDetected(project, repository, true);
+        break;
+      case InventoryType.SPDXLITE:
+        this.format = exportDTO.source === ExportSource.DETECTED
+          ? new SpdxLiteDetected(project, repository)
+          : new SpdxLiteIdentified(project, repository);
         break;
       default:
         throw new Error(`Unsupported inventory type: ${exportDTO.inventoryType} for BOM format`);

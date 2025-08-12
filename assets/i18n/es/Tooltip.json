@@ -50,5 +50,7 @@
   "Progress": "Progreso",
   "OpenInReadMode": "Abrir en modo lectura",
   "ExportHintSettings": "Exportar archivo de configuracion",
-  "ExportCSVVulnerability": "Exportar reporte de vulnerabilidades"
+  "ExportCSVVulnerability": "Exportar reporte de vulnerabilidades",
+  "ExportHintCycloneDXVulnerabilities": "Exportar informe en formato CycloneDX con vulnerabilities",
+  "ExportHintBOM": "Exportar la lista de materiales (BOM)"
 }

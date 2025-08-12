@@ -49,5 +49,7 @@
   "Ignored": "無視された",
   "Progress": "進行中",
   "ExportHintSettings": "Export a Settings file",
-  "ExportCSVVulnerability": "Export Vulnerability Report"
+  "ExportCSVVulnerability": "Export Vulnerability Report",
+  "ExportHintCycloneDXVulnerabilities": "Export a CycloneDX compliant SBOM JSON with vulnerabilities",
+  "ExportHintBOM": "Export Bill of Materials (BOM)"
 }
