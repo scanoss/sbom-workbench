@@ -35,6 +35,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
     logical_tree: p.getTree().getRootFolder(),
     work_root: p.getWorkRoot(),
     scan_root: p.getScanRoot(),
+    sourceCodePath: p.getSourceCodePath(),
     dependencies: Array.from(await dependencyService.getDependenciesFiles()),
     uuid: p.getUUID(),
     source: p.getDto().source,

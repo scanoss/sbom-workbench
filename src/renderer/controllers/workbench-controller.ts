@@ -26,6 +26,7 @@ export interface ScanResult {
   mode: ProjectAccessMode
   lockedBy: string;
   projectSource: ProjectSource;
+  sourceCodePath: string;
 }
 
 export interface ProjectSettings {
@@ -113,6 +114,7 @@ class WorkbenchController {
       name: data.metadata.name,
       imported,
       scanRoot: data.scan_root,
+      sourceCodePath: data.sourceCodePath,
       projectRoot: work,
       fileTree: tree,
       dependencies,

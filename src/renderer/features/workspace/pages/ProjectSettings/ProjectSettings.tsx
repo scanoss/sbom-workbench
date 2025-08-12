@@ -55,6 +55,7 @@ const ProjectSettings = () => {
     api: null,
     token: null,
     source: null,
+    sourceCodePath: '',
     scannerConfig: {
       mode: Scanner.ScannerMode.SCAN,
       source: scanPath?.source || ScannerSource.CODE,
@@ -92,6 +93,7 @@ const ProjectSettings = () => {
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
+      sourceCodePath: scanPath?.source === ScannerSource.CODE ? path : scanPath.sourceCodePath,
       name: projectName,
     });
   };
@@ -144,6 +146,7 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
+    console.log("SCAN PATH:", scanPath);
     dispatch(setScanPath({ ...scanPath, projectName: projectSettings.name }));
     dispatch(setNewProject(projectSettings));
     navigate('/workspace/new/scan');

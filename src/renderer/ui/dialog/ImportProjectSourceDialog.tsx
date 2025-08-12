@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogActions,
@@ -7,7 +7,6 @@ import {
   TextField,
   FormControl,
   FormLabel,
-  Typography,
   Box,
 } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
@@ -21,25 +20,26 @@ import { useTheme } from '@mui/material';
 
 interface ImportProjectSourceDialogProps {
   open: boolean;
-  button: any;
   onClose: (response: DialogResponse) => void;
+  dialogTitle: string;
+  projectPathPlaceHolder: string;
+  openDialogProperties: Electron.OpenDialogOptions;
 }
 
 export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const [projectPath, setProjectPath] = useState<string>('');
-  const [sourcePath, setSourcePath] = useState<string>(null);
+  const [sourcePath, setSourcePath] = useState<string>('');
   const [projectPathError, setProjectPathError] = useState<string>('');
+  const [sourcePathError, setSourcePathError] = useState<string>('');
 
-  const projectFileInputRef = useRef<HTMLInputElement>(null);
-  const sourceFileInputRef = useRef<HTMLInputElement>(null);
 
   const { open, onClose } = props;
 
-  const handleCancel = () => onClose({ action: DIALOG_ACTIONS.CANCEL });
+  const handleCancel = useCallback(() => onClose({ action: DIALOG_ACTIONS.CANCEL }), [onClose]);
 
-  const handleAccept = () => {
+  const handleAccept = useCallback(() => {
     if (!projectPath.trim()) {
       setProjectPathError(t('Project path cannot be empty'));
       return;
@@ -52,55 +52,56 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
         sourcePath,
       },
     });
-  };
+  }, [projectPath, sourcePath, onClose, t]);
 
-  const handleProjectPathChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProjectPathChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setProjectPath(event.target.value);
     if (event.target.value.trim()) {
       setProjectPathError('');
     }
-  };
+  }, []);
 
-  const handleSourcePathChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSourcePathChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     setSourcePath(event.target.value);
-  };
+  }, []);
 
-  const handleProjectBrowse = () => {
-    if (projectFileInputRef.current) {
-      projectFileInputRef.current.click();
-    }
-  };
-
-  const handleSourceBrowse = async () => {
-    await handleSourceFileSelected();
-  };
-
-  const handleProjectFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { files } = event.target;
-
-    if (files && files.length > 0) {
-        setProjectPath(files[0].path || files[0].name);
+  const handleProjectBrowse = useCallback(async () => {
+    try {
+      const paths = await dialogController.showOpenDialog(props.openDialogProperties || {});
+      if (paths && paths.length > 0) {
+        setProjectPath(paths[0]);
         setProjectPathError('');
+      }
+    } catch (error) {
+      console.error('Error selecting project file:', error);
+      setProjectPathError(t('Error selecting project file'));
     }
-  };
+  }, [props.openDialogProperties, t]);
 
-  const handleSourceFileSelected = async () => {
+  const handleSourceBrowse = useCallback(async () => {
+    await handleSourceFileSelected();
+  }, []);
+
+
+  const handleSourceFileSelected = useCallback(async () => {
     try {
       const paths = await dialogController.showOpenDialog({
         properties: ['openDirectory'],
       });
       if (paths && paths.length > 0) {
         setSourcePath(paths[0]);
+        setSourcePathError('');
       }
     } catch (error) {
       console.error('Error selecting folder:', error);
+      setSourcePathError(t('Error selecting source folder'));
     }
-  };
+  }, [t]);
 
 
-  const isValid = () => {
-    return projectPath && projectPath !== '';
-  };
+  const isValid = useCallback(() => {
+    return projectPath.trim() !== '';
+  }, [projectPath]);
 
   return (
     <Dialog
@@ -113,7 +114,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
       onClose={handleCancel}
     >
       <header className="dialog-title">
-        <label>{t('Import Project and Source')}</label>
+        <label>{props.dialogTitle}</label>
         <IconButton
           aria-label="close"
           sx={{
@@ -127,8 +128,8 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
       </header>
       <DialogContent
         sx={{
-          backgroundColor: 'white !important',
-          paddingTop: '5px',
+          backgroundColor: theme.palette.background.paper,
+          paddingTop: theme.spacing(0.5),
         }}
       >
         <FormControl
@@ -156,13 +157,17 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               value={projectPath}
               onChange={handleProjectPathChange}
               onClick={handleProjectBrowse}
-              placeholder={t('Select project path')}
+              placeholder={props.projectPathPlaceHolder || t('Select project path')}
               fullWidth
               error={!!projectPathError}
+              helperText={projectPathError}
               size="small"
               variant="outlined"
-              InputProps={{
-                readOnly: true,
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  'aria-label': t('Project file path'),
+                },
               }}
             />
             <Button
@@ -174,28 +179,11 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               onClick={handleProjectBrowse}
               startIcon={<FolderOpenIcon />}
               size="small"
+              aria-label={t('Browse for project file')}
             >
               {t('Browse')}
             </Button>
-            <input
-              type="file"
-              accept=".zip,application/zip,application/x-zip-compressed"
-              hidden
-              required
-              ref={projectFileInputRef}
-              onChange={handleProjectFileSelected}
-            />
           </Box>
-          {projectPathError && (
-          <Typography
-            sx={{
-              color: theme.palette.error.main,
-              fontSize: '0.75rem',
-              marginTop: theme.spacing(0.5),
-              marginLeft: theme.spacing(1.5),
-            }}
-          >{projectPathError}</Typography>
-          )}
         </FormControl>
 
         <FormControl
@@ -224,10 +212,15 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               onClick={handleSourceBrowse}
               placeholder={t('Select source code path (optional)')}
               fullWidth
+              error={!!sourcePathError}
+              helperText={sourcePathError}
               size="small"
               variant="outlined"
-              InputProps={{
-                readOnly: true,
+              slotProps={{
+                input: {
+                  readOnly: true,
+                  'aria-label': t('Source code path'),
+                },
               }}
             />
             <Button
@@ -239,24 +232,18 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               onClick={handleSourceBrowse}
               startIcon={<FolderOpenIcon />}
               size="small"
+              aria-label={t('Browse for source code folder')}
             >
               {t('Browse')}
             </Button>
-            <input
-              type="file"
-              hidden
-              {...({ webkitdirectory: '', directory: '' } as any)}
-              ref={sourceFileInputRef}
-              onChange={handleSourceFileSelected}
-            />
           </Box>
         </FormControl>
       </DialogContent>
       <DialogActions
         sx={{
           padding: theme.spacing(2),
-          borderTop: '1px solid #D4D4D8',
-          backgroundColor: '#f4f4f5',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.grey[50],
         }}
       >
         <Button
@@ -279,4 +266,3 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
   );
 };
 
-export default ImportProjectSourceDialog;

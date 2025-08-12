@@ -11,6 +11,7 @@ import { Scanner } from '../../../main/task/scanner/types';
 
 export interface WorkbenchState {
   path: string;
+  sourceCodePath: string;
   name: string;
   imported: boolean;
   wfp: boolean;
@@ -37,6 +38,7 @@ export interface WorkbenchState {
 
 const initialState: WorkbenchState = {
   path: null,
+  sourceCodePath: null,
   name: null,
   imported: false,
   wfp: false,
@@ -97,9 +99,10 @@ export const workbenchSlice = createSlice({
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
       const {
-        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, projectSource
+        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, projectSource, sourceCodePath
       } = action.payload;
       state.path = scanRoot;
+      state.sourceCodePath = sourceCodePath
       state.name = name;
       state.loading = false;
       state.loaded = true;

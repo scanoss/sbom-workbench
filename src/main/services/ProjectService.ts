@@ -89,6 +89,7 @@ class ProjectService {
   }
 
   public async createProject(projectDTO: INewProject) {
+    console.log("PROJECT SERVICE:", projectDTO);
     const p = await this.create(projectDTO);
     // Add crypto scanner config depending on API Key token
     this.setCryptographyScanType(p);
