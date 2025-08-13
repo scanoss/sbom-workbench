@@ -5,7 +5,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import AddIcon from '@mui/icons-material/Add';
 import { useTranslation } from 'react-i18next';
 
-const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, onNewProjectWithSource, importFromResultFile }) => {
+const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, importFromResultFile }) => {
   const { t } = useTranslation();
 
   const [open, setOpen] = React.useState(false);
@@ -52,12 +52,12 @@ const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, 
               <ClickAwayListener onClickAway={(e) => handleClose(e)}>
                 <MenuList id="split-button-menu">
                   <MenuItem
-                      onClick={(event) => {
-                        setOpen(false);
-                        onNewProjectFromWFP();
-                      }}
-                    >
-                    {t('Button:NewFromWFPFile')}
+                    onClick={(event) => {
+                      setOpen(false);
+                      onNewProject();
+                    }}
+                  >
+                    {t('Button:NewProject')}
                   </MenuItem>
                   <MenuItem
                     onClick={(event) => {
@@ -68,12 +68,12 @@ const AddProjectButton = ({ onNewProject, onImportProject, onNewProjectFromWFP, 
                     {t('Button:ImportProject')}
                   </MenuItem>
                   <MenuItem
-                    onClick={(event) => {
-                      setOpen(false);
-                      onNewProjectWithSource();
-                    }}
-                  >
-                    {t('Button:ImportProjectWithSource')}
+                      onClick={(event) => {
+                        setOpen(false);
+                        onNewProjectFromWFP();
+                      }}
+                    >
+                    {t('Button:ImportFromWFPFile')}
                   </MenuItem>
                   <MenuItem
                     onClick={(event) => {

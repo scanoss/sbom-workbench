@@ -163,12 +163,6 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               helperText={projectPathError}
               size="small"
               variant="outlined"
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  'aria-label': t('Project file path'),
-                },
-              }}
             />
             <Button
               variant="contained"
@@ -181,7 +175,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               size="small"
               aria-label={t('Browse for project file')}
             >
-              {t('Browse')}
+              {t('Button:Browse')}
             </Button>
           </Box>
         </FormControl>
@@ -210,18 +204,12 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               value={sourcePath}
               onChange={handleSourcePathChange}
               onClick={handleSourceBrowse}
-              placeholder={t('Select source code path (optional)')}
+              placeholder={t('Dialog:SelectSourceCodePath')}
               fullWidth
               error={!!sourcePathError}
               helperText={sourcePathError}
               size="small"
               variant="outlined"
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  'aria-label': t('Source code path'),
-                },
-              }}
             />
             <Button
               variant="outlined"
@@ -232,9 +220,9 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
               onClick={handleSourceBrowse}
               startIcon={<FolderOpenIcon />}
               size="small"
-              aria-label={t('Browse for source code folder')}
+              aria-label={t('Dialog:SelectSourceCodePath')}
             >
-              {t('Browse')}
+              {t('Button:Browse')}
             </Button>
           </Box>
         </FormControl>
@@ -250,7 +238,7 @@ export const ImportProjectSourceDialog = (props: ImportProjectSourceDialogProps)
           onClick={handleCancel}
           color="inherit"
         >
-          {t('Cancel')}
+          {t('Button:Cancel')}
         </Button>
         <Button
           autoFocus
