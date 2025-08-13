@@ -42,5 +42,7 @@
   "RestartNow": "Restart now",
   "NewFromWFPFile": "New from WFP",
   "AddNewWorkspace": "Add new workspace",
-  "ImportFromResultFile": "Import from raw result file"
+  "ImportFromResultFile": "Import from raw result file",
+  "ImportFromWFPFile": "Import from WFP",
+  "Browse": "Browse"
 }

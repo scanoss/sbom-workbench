@@ -19,7 +19,6 @@ export interface IAppContext {
   newProjectFromWFP: () => void;
   exportProject: (project: IProject) => void;
   importProject: () => void;
-  importProjectWithSource: () => void;
   importFromResultFile: () => void;
 }
 
@@ -44,11 +43,11 @@ const AppProvider = ({ children }) => {
 
   const newProjectFromWFP = async () => {
     const r = await dialogCtrl.openImportProjectSourceDialog({
-      title: 'Import project from WFP file',
+      title: t('Dialog:ImportProjectFromWFPTitle'),
       openDialogProperties: {
         filters: [{ name: 'WFP files', extensions: ['wfp'] }],
       },
-      placeHolder: 'WFP file path',
+      placeHolder: t('Dialog:ImportProjectFromWFPPlaceHolder'),
     });
     if (r.action === DIALOG_ACTIONS.CANCEL) return;
     dispatch(setScanPath({ path: r.data.projectPath , action: 'scan', source: Scanner.ScannerSource.WFP, sourceCodePath: r.data.sourcePath }));
@@ -57,11 +56,11 @@ const AppProvider = ({ children }) => {
 
   const importFromResultFile = async () => {
     const r = await dialogCtrl.openImportProjectSourceDialog({
-      title: 'Import project from SCANOSS RAW result file',
+      title: t('Dialog:ImportProjectFromRawTitle'),
       openDialogProperties: {
         filters: [{ name: 'SCANOSS RAW results', extensions: ['json'] }],
       },
-      placeHolder: 'RAW result file path',
+      placeHolder:t('Dialog:ImportProjectFromRawPlaceHolder'),
     });
     if (r.action === DIALOG_ACTIONS.CANCEL) return;
 
@@ -70,19 +69,20 @@ const AppProvider = ({ children }) => {
   };
 
   const importProject = async () => {
-    const paths = await dialogController.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Zip files', extensions: ['zip'] }],
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: t('Dialog:ImportWorkbenchProjectTitle'),
+      openDialogProperties: {
+        filters: [{ name: 'Zip files', extensions: ['zip'] }],
+      },
+      placeHolder: t('Dialog:ImportWorkbenchProjectPlaceHolder'),
     });
-
-    if (!paths || paths.length === 0) return;
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
     dialog.present();
-
     try {
-      await workspaceService.importProject(paths[0]);
+      await workspaceService.importProject(r.data.projectPath, r.data.sourcePath);
       setTimeout(async () => {
-        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
+        dialog.finish({ message: t('Dialog:SuccessfulImport').toUpperCase() });
         dialog.dismiss({ delay: 1500 });
         dispatch(fetchProjects());
       }, 2000);
@@ -164,45 +164,11 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  const importProjectWithSource = async () => {
-    const r = await dialogCtrl.openImportProjectSourceDialog({
-      title: 'Import project with source',
-      openDialogProperties: {
-        filters: [{ name: 'Zip files', extensions: ['zip'] }],
-      },
-      placeHolder: 'Project zip file path',
-    });
-    if (r.action === DIALOG_ACTIONS.CANCEL) return;
-    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
-    dialog.present();
-    try {
-      await workspaceService.importProject(r.data.projectPath, r.data.sourcePath);
-      setTimeout(async () => {
-        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
-        dialog.dismiss({ delay: 1500 });
-        dispatch(fetchProjects());
-      }, 2000);
-    } catch (err: any) {
-      dialog.dismiss();
-
-      const errorMessage = `<strong>Importing Error</strong>
-        <span style="font-style: italic;">${err.message || ''}</span>`;
-      await dialogCtrl.openConfirmDialog(
-        `${errorMessage}`,
-        {
-          label: 'OK',
-          role: 'accept',
-        },
-        true,
-      );
-    }
-  };
 
   const setupAppMenuListeners = (): () => void => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject));
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject));
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT_WITH_SOURCE, importProjectWithSource));
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
@@ -219,7 +185,6 @@ const AppProvider = ({ children }) => {
         newProjectFromWFP,
         exportProject,
         importProject,
-        importProjectWithSource,
         importFromResultFile,
       }}
     >

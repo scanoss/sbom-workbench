@@ -587,7 +587,6 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         <ImportProjectSourceDialog
           open={importProjectSourceSelectorDialog.open}
           onClose={(response) => importProjectSourceSelectorDialog.onClose && importProjectSourceSelectorDialog.onClose(response)}
-          button={confirmDialog.button}
           openDialogProperties={importProjectSourceSelectorDialog.dialogProperties}
           dialogTitle={importProjectSourceSelectorDialog.dialogTitle}
           projectPathPlaceHolder={importProjectSourceSelectorDialog.placeHolder}
