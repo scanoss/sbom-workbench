@@ -27,9 +27,14 @@ export class WFPIndexTreeTask extends IndexTreeTask {
   }
 
   private getWFPContent():string {
-   const wfp = fs.readFileSync(this.project.getScanRoot(),
-      {encoding:'utf8'});
-    return wfp;
+    try {
+      const wfp = fs.readFileSync(this.project.getScanRoot(),
+        { encoding: 'utf8' });
+      return wfp;
+    }
+    catch(e){
+      throw new Error(`WFP file does not exists in: ${this.project.getScanRoot()}`);
+    }
   }
 
   /**

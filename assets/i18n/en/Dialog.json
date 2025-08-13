@@ -22,7 +22,7 @@
   "RescanQuestion": "Are you sure you want to rescan this project?",
   "YouNeedRestartQuestionLanguage": "You need restart the application to change the language. Do you?",
   "ExportingProject": "Exporting Project",
-  "SuccesfulImport": "Successful Import",
+  "SuccessfulImport": "Successful Import",
   "ImportingProject": "Importing Project",
   "UpdatingReport": "Updating Report",
   "UpdateFinished": "Update Finished",
