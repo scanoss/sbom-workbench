@@ -1,40 +1,39 @@
-import fs from "fs";
-import { IndexTreeTask } from "./IndexTreeTask";
-import { Tree } from "../../workspace/tree/Tree";
+import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
+import fs from 'fs';
+import { Tree } from '../../workspace/tree/Tree';
+import path from 'path';
+import log from 'electron-log';
 
-export class WFPIndexTreeTask extends IndexTreeTask {
+export class RawResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
+
+
+  private getFiles(): Array<string> {
+    const results = this.getFileResultJsonContent();
+    return Array.from(Object.keys(results));
+  }
+
+  private getFileResultJsonContent():Record<string, any>{
+    const resultPath = path.join(this.project.getMyPath(), 'result.json');
+    const resultJson = fs.readFileSync(resultPath, {encoding:'utf8'});
+    return JSON.parse(resultJson);
+  }
+
+  private loadScanResultsOnFileTree(){
+    log.info('[ Loading scan results on file tree... ]');
+    const results = this.getFileResultJsonContent();
+    this.project.tree.attachResults(results);
+    this.project.tree.updateFlags();
+  }
 
   public async run(): Promise<boolean> {
     const files = this.getFiles();
     this.filesToScan = files;
     const tree =  await this.buildTree(this.filesToScan);
-    await this.setTreeSummary(tree);
+    this.setTreeSummary(tree);
+    this.loadScanResultsOnFileTree();
     return true;
-  }
-
-  private getFiles(): Array<string> {
-    const wfp = this.getWFPContent();
-    const regex = new RegExp(/file=.*,.*,(?<path>.*)/g);
-    const files = [];
-    let result = regex.exec(wfp);
-    while (result !== null) {
-      files.push(result.groups.path);
-      result = regex.exec(wfp);
-    }
-    return files;
-  }
-
-  private getWFPContent():string {
-    try {
-      const wfp = fs.readFileSync(this.project.getScanRoot(),
-        { encoding: 'utf8' });
-      return wfp;
-    }
-    catch(e){
-      throw new Error(`WFP file does not exists in: ${this.project.getScanRoot()}`);
-    }
   }
 
   /**
@@ -47,7 +46,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
     tree.build(files);
     tree.orderTree();
     return tree;
- }
+  }
 
   public setTreeSummary(tree: Tree):void {
     this.project.filesToScan = this.filesToScan.reduce((acc,curr)=> { if(!acc[curr])acc[curr]=null; return acc; },{});

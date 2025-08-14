@@ -37,5 +37,12 @@
   "Delete": "删除",
   "Keep": "保留",
   "Overwrite": "覆盖",
-  "Yes": "是"
+  "Yes": "是",
+  "RestartLater": "Restart later",
+  "RestartNow": "Restart now",
+  "NewFromWFPFile": "New from WFP",
+  "AddNewWorkspace": "Add new workspace",
+  "ImportFromResultFile": "Import from raw result file",
+  "ImportFromWFPFile": "Import from WFP",
+  "Browse": "Browse"
 }

@@ -55,11 +55,11 @@ export default class File extends Node {
   }
 
   public someNoMatch(): boolean {
-    return this.original === 'NO-MATCH' && this.getAction() === 'scan';
+    return this.original === 'NO-MATCH';
   }
 
   public someMatch(): boolean {
-    return this.original === 'MATCH' && this.getAction() === 'scan';
+    return this.original === 'MATCH';
   }
 
   public restoreStatus(path: string) {

@@ -48,7 +48,7 @@ const Editor = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const {
-    path: scanBasePath, imported, summary, wfp, settings,
+    path: scanBasePath, imported, summary, wfp, settings, sourceCodePath
   } = useSelector(selectWorkbench);
   const { node } = useSelector(selectNavigationState);
   const { appInfo } = useSelector(selectWorkspaceState);
@@ -87,16 +87,15 @@ const Editor = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false, loading: true });
-
-      if (wfp) throw new Error(t('ProjectWFPCantDisplay'));
-      if (imported) throw new Error(t('ProjectImportedCantDisplay'));
-
-      const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
+      const content = await workbenchController.fetchLocalFile(`${sourceCodePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
 
       setLocalFileContent({ content, error: false, loading: false });
     } catch (error: any) {
-      setLocalFileContent({ content: t('FileNotLoad'), error: true, loading: false });
+      let content = t('FileNotLoad');
+      if(!sourceCodePath && (wfp || imported))
+        content = t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')
+      setLocalFileContent({ content, error: true, loading: false });
     }
   };
 
@@ -200,8 +199,7 @@ const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      // const diff = currentMatch?.type !== 'file' || wfp || imported;
-      const diff = currentMatch?.type !== 'file' && !imported && !wfp;
+      const diff = currentMatch?.type !== 'file' && sourceCodePath;
       setIsDiffView(diff);
 
       if (diff || wfp || imported) loadRemoteFile(currentMatch.md5_file);
@@ -328,7 +326,7 @@ const Editor = () => {
         ${isDiffView ? 'diff-view' : ''}
         `}
       >
-        { (!wfp && !imported) && (
+        {(
           <div className="editor">
             {/* TODO: we need to remove this IF statement. Should we keep editor instance to better performance and UX.
                 Problem: editors not re-layout on changing file */}
@@ -346,18 +344,17 @@ const Editor = () => {
           </div>
         )}
 
-        { (imported || wfp) && !currentMatch && !localFileContent?.loading
+        { !currentMatch && !localFileContent?.loading
           && (
           <div className="editor">
             <div className="file-loader">
               {' '}
-              {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}
               {' '}
             </div>
           </div>
           )}
 
-        { (isDiffView || wfp || imported) && currentMatch && (
+        { (isDiffView) && currentMatch && (
           <div className="editor">
             {!remoteFileContent?.error && remoteFileContent?.content ? (
               <MemoCodeViewer
@@ -369,10 +366,10 @@ const Editor = () => {
               />
             ) : (
               <div className="file-loader">
-                { !remoteFileContent.loading && (remoteFileContent?.error || (localFileContent?.error && (wfp || imported)))
+                { !remoteFileContent.loading && (remoteFileContent?.error || (localFileContent?.error))
                   ? (
                     <>
-                      { localFileContent?.error && (wfp || imported) && (
+                      { localFileContent?.error && (
                       <span>
                         {t(wfp ? 'ProjectWFPCantDisplay' : 'ProjectImportedCantDisplay')}
                         <br />

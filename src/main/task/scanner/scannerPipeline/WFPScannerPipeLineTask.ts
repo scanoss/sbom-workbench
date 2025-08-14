@@ -11,7 +11,7 @@ import { IDispatch } from '../dispatcher/IDispatch';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { WFPResumeTask } from '../resume/WFPResumeTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
-import { userSettingService } from '../../../services/UserSettingService';
+
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
   public async run(project: Project): Promise<boolean> {

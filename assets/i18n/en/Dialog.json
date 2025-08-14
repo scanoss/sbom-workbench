@@ -22,7 +22,7 @@
   "RescanQuestion": "Are you sure you want to rescan this project?",
   "YouNeedRestartQuestionLanguage": "You need restart the application to change the language. Do you?",
   "ExportingProject": "Exporting Project",
-  "SuccesfulImport": "Successful Import",
+  "SuccessfulImport": "Successful Import",
   "ImportingProject": "Importing Project",
   "UpdatingReport": "Updating Report",
   "UpdateFinished": "Update Finished",
@@ -34,5 +34,12 @@
   "GroupNameLabel": "Group name",
   "GroupKeywordLabel": "Keywords",
   "GroupAlreadyExists": "Group already exists!",
-  "CreateComponentPurlError": "Invalid Package URL"
+  "CreateComponentPurlError": "Invalid Package URL",
+  "ImportProjectFromRawTitle": "Import project from raw scan result file",
+  "ImportProjectFromRawPlaceHolder":"RAW result file path",
+  "ImportProjectFromWFPTitle": "Import project from WFP file",
+  "ImportProjectFromWFPPlaceHolder": "WFP file path",
+  "ImportWorkbenchProjectTitle": "Import Workbench project",
+  "ImportWorkbenchProjectPlaceHolder":"Workbench project zip file path",
+  "SelectSourceCodePath": "Select source code path (optional)"
 }

@@ -89,6 +89,7 @@ class ProjectService {
   }
 
   public async createProject(projectDTO: INewProject) {
+    console.log("PROJECT SERVICE:", projectDTO);
     const p = await this.create(projectDTO);
     // Add crypto scanner config depending on API Key token
     this.setCryptographyScanType(p);
@@ -97,16 +98,35 @@ class ProjectService {
     await ScannerPipelineFactory.getScannerPipeline(projectDTO.scannerConfig.source).run(p);
   }
 
+  /**
+   * Rescans an existing project by re-running the scanner pipeline in RESCAN mode.
+   * This method closes all currently open projects, loads the specified project,
+   * configures it for rescanning (including cryptography scanning if API key is available),
+   * and executes the appropriate scanner pipeline. If the scan fails, it ensures
+   * the project remains in a consistent state.
+   * 
+   * @param projectPath - Absolute path to the project directory to rescan
+   * @throws {Error} Re-throws any scanning errors after ensuring project consistency
+   */
   public async reScan(projectPath: string) {
-    await workspace.closeAllProjects();
-    const p = await workspace.getProject(new ProjectFilterPath(projectPath));
-    p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
-
-    // Add crypto scanner config depending on API Key token
-    this.setCryptographyScanType(p);
-    p.save();
-
-    await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
+      await workspace.closeAllProjects();
+      const p = await workspace.getProject(new ProjectFilterPath(projectPath));
+      p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
+      // Add crypto scanner config depending on API Key token
+      this.setCryptographyScanType(p);
+      // Save only metadata to avoid overwriting the filetree with an empty new one
+      // Using p.save() would overwrite the entire project including the filetree
+      p.metadata.save();
+      try {
+        await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
+      } catch (e) {
+        // If scanning fails, ensure the project is properly opened and saved
+        // This maintains project integrity even when the rescan operation fails
+        await p.open()
+        p.save()
+        await p.close();
+        throw e
+      }
   }
 
   public async resume(projectPath: string) {

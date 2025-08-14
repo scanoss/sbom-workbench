@@ -38,6 +38,7 @@ const ProjectSettings = () => {
   const { t } = useTranslation();
 
   const { projects, scanPath, settings } = useSelector(selectWorkspaceState);
+  const showConfigurationOptions = scanPath?.source === Scanner.ScannerSource.CODE || scanPath?.source === Scanner.ScannerSource.WFP;
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -54,6 +55,7 @@ const ProjectSettings = () => {
     api: null,
     token: null,
     source: null,
+    sourceCodePath: '',
     scannerConfig: {
       mode: Scanner.ScannerMode.SCAN,
       source: scanPath?.source || ScannerSource.CODE,
@@ -91,6 +93,7 @@ const ProjectSettings = () => {
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
+      sourceCodePath: scanPath?.source === ScannerSource.CODE ? path : scanPath.sourceCodePath,
       name: projectName,
     });
   };
@@ -143,6 +146,7 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
+    console.log("SCAN PATH:", scanPath);
     dispatch(setScanPath({ ...scanPath, projectName: projectSettings.name }));
     dispatch(setNewProject(projectSettings));
     navigate('/workspace/new/scan');
@@ -280,7 +284,7 @@ const ProjectSettings = () => {
               </div>
               <div className="api-conections-container mt-5">
                 <div className="api-subcontainer">
-                  {AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && (
+                  {(AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && showConfigurationOptions) && (
                     <>
                       <div className="api-conections-label-container mb-3">
                         <label className="input-label">{t('Title:APIConnections')}</label>
@@ -358,51 +362,47 @@ const ProjectSettings = () => {
                   </div>
                 </div>
               </div>
+              { scanPath?.source === Scanner.ScannerSource.CODE && (
+                <div className="mt-5">
+                  <label className="input-label">{t('Title:ScannerSettings')}</label>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={t('DecompressArchivesLabel')}
+                      onChange={(event, checked) => onDecompressHandler(checked)}
+                    />
+                    <FormHelperText className="helper">
+                      {t('DecompressArchivesHint')}
+                    </FormHelperText>
+                  </FormGroup>
 
-              <div className="mt-5">
-                <label className="input-label">{t('Title:ScannerSettings')}</label>
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    disabled={scanPath?.source === Scanner.ScannerSource.WFP}
-                    label={t('DecompressArchivesLabel')}
-                    onChange={(event, checked) => onDecompressHandler(checked)}
-                  />
-                  <FormHelperText className="helper">
-                    {t('DecompressArchivesHint')}
-                  </FormHelperText>
-                </FormGroup>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={t('ObfuscateFilePaths')}
+                      onChange={(event, checked) => onObfuscateHandler(checked)}
+                    />
+                    <FormHelperText className="helper">
+                      {t('ObfuscateFilePathsHint')}
+                    </FormHelperText>
+                  </FormGroup>
 
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    disabled={scanPath?.source === Scanner.ScannerSource.WFP}
-                    label={t('ObfuscateFilePaths')}
-                    onChange={(event, checked) => onObfuscateHandler(checked)}
-                  />
-                  <FormHelperText className="helper">
-                    {t('ObfuscateFilePathsHint')}
-                  </FormHelperText>
-                </FormGroup>
-
-                <FormGroup>
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    disabled={scanPath?.source === Scanner.ScannerSource.WFP}
-                    label={t('EnableHPSM')}
-                    onChange={(event, checked) => onHPSMhandler(checked)}
-                  />
-                  <FormHelperText className="helper">
-                    {t('HPSMHint')}
-                  </FormHelperText>
-                </FormGroup>
-
-              </div>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={t('EnableHPSM')}
+                      onChange={(event, checked) => onHPSMhandler(checked)}
+                    />
+                    <FormHelperText className="helper">
+                      {t('HPSMHint')}
+                    </FormHelperText>
+                  </FormGroup>
+                </div>
+              )}
             </div>
-
             <div className="grid-item">
               <div className="context-files-info">
-                { context && !context.identifyFile && !context.ignoreFile && !scanossSettingFilePath && (
+                { showConfigurationOptions && !context?.identifyFile && !context?.ignoreFile && !scanossSettingFilePath && (
                   <Alert
                     severity="info"
                     action={(

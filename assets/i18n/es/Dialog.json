@@ -22,7 +22,7 @@
   "RescanQuestion": "Seguro que quieres rescanear este proyecto?",
   "YouNeedRestartQuestionLanguage": "Es necesario reiniciar la aplicación para cambiar el idioma. ¿Quieres hacerlo?",
   "ExportingProject": "Exportando proyecto",
-  "SuccesfulImport": "Importación exitosa",
+  "SuccessfulImport": "Importación exitosa",
   "ImportingProject": "Importando proyecto",
   "UpdatingReport": "Actualizando Reporte",
   "UpdateFinished": "Actualizacion Existosa",
@@ -34,5 +34,12 @@
   "GroupNameLabel": "Grupo",
   "GroupKeywordLabel": "Palabras",
   "GroupAlreadyExists": "El grupo ya existe",
-  "CreateComponentPurlError": "PURL invalido"
+  "CreateComponentPurlError": "PURL invalido",
+  "ImportProjectFromRawTitle": "Importar proyecto desde un resultado de escaneo",
+  "ImportProjectFromRawPlaceHolder":"Ruta del archivo de escaneo",
+  "ImportProjectFromWFPTitle": "Importar proyecto desde un archivo WFP",
+  "ImportProjectFromWFPPlaceHolder": "Ruta al archivo WFP",
+  "ImportWorkbenchProjectTitle": "Importar proyecto Workbench",
+  "ImportWorkbenchProjectPlaceHolder":"Ruta al zip del proyecto Workbench",
+  "SelectSourceCodePath": "Seleccionar path del codigo fuente (opcional)"
 }

@@ -40,5 +40,8 @@
   "Yes": "Yes",
   "RestartLater": "後で再起動",
   "RestartNow": "すぐに再起動",
-  "NewFromWFPFile": "WFPから開始"
+  "NewFromWFPFile": "WFPから開始",
+  "ImportFromResultFile": "Import from raw result file",
+  "ImportFromWFPFile": "Import from WFP",
+  "Browse": "Browse"
 }

@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import log from 'electron-log';
 import { app, dialog } from 'electron';
 import { Project } from './Project';
-import { INewProject, IProject, License, ProjectState } from '../../api/types';
+import { INewProject, IProject, License, ProjectSource, ProjectState } from '../../api/types';
 import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
@@ -188,6 +188,7 @@ export class Workspace {
     const newProject: Project = new Project(projectDTO.name);
     newProject.setScannerConfig(projectDTO.scannerConfig);
     newProject.setScanPath(projectDTO.scan_root);
+    newProject.setSourceCodePath(projectDTO.sourceCodePath);
     newProject.setLicense(projectDTO.default_license);
     if (projectDTO.api) {
       newProject.setApi(projectDTO.api);

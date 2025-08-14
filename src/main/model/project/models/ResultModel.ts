@@ -68,7 +68,7 @@ export class ResultModel extends Model {
           for (let i = 0; i < value.length; i += 1) {
             const filePath = key;
             data = value[i];
-            if (data.id !== 'none') {
+            if (data.id !== 'none' && data.id!="dependency") {
               const resultId = await this.insertResultBulk(this.connection, data, files[filePath]);
               resultLicense[resultId] = data.licenses;
             }

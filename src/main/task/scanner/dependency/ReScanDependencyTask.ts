@@ -6,7 +6,14 @@ import { NodeStatus } from '../../../workspace/tree/Node';
 import { modelProvider } from '../../../services/ModelProvider';
 import { DependencyTask } from './DependencyTask';
 
-export class ReScanDependencyTask extends DependencyTask {
+export class
+
+
+
+
+
+
+ReScanDependencyTask extends DependencyTask {
   // @Override
   public async run(params: void): Promise<boolean> {
     await super.run();

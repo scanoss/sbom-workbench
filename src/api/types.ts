@@ -130,6 +130,7 @@ export interface ItemInclude {
 export interface INewProject {
   name: string;
   scan_root: string;
+  sourceCodePath: string;
   default_license: string;
   default_components?: string;
   api?: string;
@@ -184,13 +185,10 @@ export enum HashType {
 }
 
 export enum ExportFormat {
-  SPDX20 = 'SPDX20',
-  SPDXLITE = 'SPDXLITE',
   CSV = 'CSV',
   RAW = 'RAW',
   WFP = 'WFP',
-  SPDXLITEJSON = 'SPDXLITEJSON',
-  CYCLONEDX = 'CYCLONEDX',
+  BOM = 'BOM',
   HTMLSUMMARY = 'HTMLSUMMARY',
   SETTINGS = 'SETTINGS',
 }
@@ -204,6 +202,9 @@ export enum InventoryType {
   SBOM = 'SBOM',
   CRYPTOGRAPHY = 'CRYPTOGRAPHY',
   VULNERABILITY = 'VULNERABILITY',
+  CYLONEDX = 'CYCLONEDX',
+  CYCLONEDX_WITH_VULNERABILITIES = 'CYLONEDX-WITH-VULNERABILITIES',
+  SPDXLITE = 'SPDXLITE',
 }
 
 export type IParams = Record<PropertyKey, any> & {
@@ -338,6 +339,7 @@ export enum ScannerStage {
   LOCAL_CRYPTOGRAPHY,
   EXPORT_CONTROL,
   SEARCH_INDEX,
+  IMPORT_COMPONENT,
 }
 
 export interface InventoryExtraction {
@@ -388,6 +390,7 @@ export interface ProjectOpenResponse {
   logical_tree: Folder;
   work_root: string;
   scan_root: string;
+  sourceCodePath: string;
   dependencies: string[];
   uuid: string;
   source: string;
@@ -472,4 +475,16 @@ export enum ExportStatusCode {
 
 export interface ExportResultsInfo {
   invalidPurls: Array<string>;
+}
+
+
+
+
+export enum ProjectSource {
+  /** Project created from imported files */
+  IMPORTED = 'IMPORTED',
+  /** Project created from direct scanning */
+  SCAN = 'SCAN',
+  /** Project created from imported scan results. result.json */
+  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS'
 }

@@ -2,6 +2,7 @@ import { Scanner } from "../types";
 import { ScannerPipeline } from "../scannerPipeline/ScannerPipeline";
 import { CodeScannerPipelineTask } from "../scannerPipeline/CodeScannerPipelineTask";
 import { WFPScannerPipeLineTask } from "../scannerPipeline/WFPScannerPipeLineTask";
+import { RawResultImportPipelineTask } from '../scannerPipeline/RawResultImportPipelineTask';
 
 export class ScannerPipelineFactory {
 
@@ -12,6 +13,9 @@ export class ScannerPipelineFactory {
         break;
       case Scanner.ScannerSource.WFP:
         return new WFPScannerPipeLineTask();
+        break;
+      case Scanner.ScannerSource.IMPORTED_RESULTS_RAW:
+        return new RawResultImportPipelineTask();
         break;
       default:
         return null;

@@ -19,7 +19,7 @@ export interface IAppContext {
   newProjectFromWFP: () => void;
   exportProject: (project: IProject) => void;
   importProject: () => void;
-  importProjectWithSource: () => void;
+  importFromResultFile: () => void;
 }
 
 export const AppContext = React.createContext<IAppContext | null>(null);
@@ -36,37 +36,53 @@ const AppProvider = ({ children }) => {
     });
 
     if (paths && paths.length > 0) {
-      dispatch(setScanPath({ path: paths[0], action: 'scan' }));
+      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.CODE }));
       navigate('/workspace/new/settings');
     }
   };
 
   const newProjectFromWFP = async () => {
-    const paths = await dialogController.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'WFP files', extensions: ['wfp'] }],
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: t('Dialog:ImportProjectFromWFPTitle'),
+      openDialogProperties: {
+        filters: [{ name: 'WFP files', extensions: ['wfp'] }],
+      },
+      placeHolder: t('Dialog:ImportProjectFromWFPPlaceHolder'),
     });
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
+    dispatch(setScanPath({ path: r.data.projectPath , action: 'scan', source: Scanner.ScannerSource.WFP, sourceCodePath: r.data.sourcePath }));
+    navigate('/workspace/new/settings');
+  };
 
-    if (paths && paths.length > 0) {
-      dispatch(setScanPath({ path: paths[0], action: 'scan', source: Scanner.ScannerSource.WFP }));
-      navigate('/workspace/new/settings');
-    }
+  const importFromResultFile = async () => {
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: t('Dialog:ImportProjectFromRawTitle'),
+      openDialogProperties: {
+        filters: [{ name: 'SCANOSS RAW results', extensions: ['json'] }],
+      },
+      placeHolder:t('Dialog:ImportProjectFromRawPlaceHolder'),
+    });
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
+
+    dispatch(setScanPath({ path: r.data.projectPath, action: 'scan', source: Scanner.ScannerSource.IMPORTED_RESULTS_RAW, sourceCodePath: r.data.sourcePath }));
+    navigate('/workspace/new/settings');
   };
 
   const importProject = async () => {
-    const paths = await dialogController.showOpenDialog({
-      properties: ['openFile'],
-      filters: [{ name: 'Zip files', extensions: ['zip'] }],
+    const r = await dialogCtrl.openImportProjectSourceDialog({
+      title: t('Dialog:ImportWorkbenchProjectTitle'),
+      openDialogProperties: {
+        filters: [{ name: 'Zip files', extensions: ['zip'] }],
+      },
+      placeHolder: t('Dialog:ImportWorkbenchProjectPlaceHolder'),
     });
-
-    if (!paths || paths.length === 0) return;
+    if (r.action === DIALOG_ACTIONS.CANCEL) return;
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
     dialog.present();
-
     try {
-      await workspaceService.importProject(paths[0]);
+      await workspaceService.importProject(r.data.projectPath, r.data.sourcePath);
       setTimeout(async () => {
-        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
+        dialog.finish({ message: t('Dialog:SuccessfulImport').toUpperCase() });
         dialog.dismiss({ delay: 1500 });
         dispatch(fetchProjects());
       }, 2000);
@@ -148,39 +164,11 @@ const AppProvider = ({ children }) => {
     }
   };
 
-  const importProjectWithSource = async () => {
-    const r = await dialogCtrl.openImportProjectSourceDialog();
-    if (r.action === DIALOG_ACTIONS.CANCEL) return;
-    const dialog = await dialogCtrl.createProgressDialog(t('Dialog:ImportingProject').toUpperCase());
-    dialog.present();
-    try {
-      await workspaceService.importProject(r.data.projectPath, r.data.sourcePath);
-      setTimeout(async () => {
-        dialog.finish({ message: t('Dialog:SuccesfulImport').toUpperCase() });
-        dialog.dismiss({ delay: 1500 });
-        dispatch(fetchProjects());
-      }, 2000);
-    } catch (err: any) {
-      dialog.dismiss();
-
-      const errorMessage = `<strong>Importing Error</strong>
-        <span style="font-style: italic;">${err.message || ''}</span>`;
-      await dialogCtrl.openConfirmDialog(
-        `${errorMessage}`,
-        {
-          label: 'OK',
-          role: 'accept',
-        },
-        true,
-      );
-    }
-  };
 
   const setupAppMenuListeners = (): () => void => {
     const subscriptions = [];
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_NEW_PROJECT, newProject));
     subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT, importProject));
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.MENU_IMPORT_PROJECT_WITH_SOURCE, importProjectWithSource));
 
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
   };
@@ -197,7 +185,7 @@ const AppProvider = ({ children }) => {
         newProjectFromWFP,
         exportProject,
         importProject,
-        importProjectWithSource,
+        importFromResultFile,
       }}
     >
       {children}

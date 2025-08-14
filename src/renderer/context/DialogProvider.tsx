@@ -6,7 +6,14 @@ import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
 import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
 import { InventoryDialog } from '../ui/dialog/InventoryDialog';
 import { InventorySelectorDialog } from '../features/workbench/components/InventorySelectorDialog/InventorySelectorDialog';
-import { DIALOG_ACTIONS, DialogResponse, InventoryForm, InventorySelectorResponse, LoaderController } from './types';
+import {
+  DIALOG_ACTIONS,
+  DialogResponse,
+  ImportProjectDialogProps,
+  InventoryForm,
+  InventorySelectorResponse,
+  LoaderController
+} from './types';
 import { ConfirmDialog } from '../ui/dialog/ConfirmDialog';
 import { LicenseDialog } from '../ui/dialog/LicenseDialog';
 import { ComponentDialog } from '../ui/dialog/ComponentDialog';
@@ -35,7 +42,7 @@ export interface IDialogContext {
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string }) => Promise<DialogResponse>;
   openWorkspaceAddDialog: () => Promise<DialogResponse>;
   openReportDialog: (invalidPurls: Array<string>) => Promise<DialogResponse>;
-  openImportProjectSourceDialog: () => Promise<DialogResponse>;
+  openImportProjectSourceDialog: (dialogProperties: ImportProjectDialogProps) => Promise<DialogResponse>;
 }
 
 export interface InventoryDialogOptions {
@@ -385,15 +392,21 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
     };
     onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
-  }>({ open: false, data: { includeSourceCode: false } });
+    dialogProperties: Electron.OpenDialogOptions;
+    dialogTitle: string;
+    placeHolder: string;
+  }>({ open: false, data: { includeSourceCode: false }, dialogProperties: { properties: [], filters: [] }, placeHolder: 'Project path', dialogTitle: 'Import Project' });
 
-  const openImportProjectSourceDialog = (): Promise<DialogResponse> => {
+  const openImportProjectSourceDialog = (dialogProps: ImportProjectDialogProps): Promise<DialogResponse> => {
     return new Promise<DialogResponse>((resolve) => {
       setImportProjectSourceDialog({
         data: {
           includeSourceCode: false,
         },
         open: true,
+        dialogProperties: dialogProps.openDialogProperties,
+        placeHolder: dialogProps.placeHolder,
+        dialogTitle: dialogProps.title,
         onClose: (response) => {
           setImportProjectSourceDialog((dialog) => ({ ...dialog, open: false }));
           resolve(response);
@@ -574,8 +587,9 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         <ImportProjectSourceDialog
           open={importProjectSourceSelectorDialog.open}
           onClose={(response) => importProjectSourceSelectorDialog.onClose && importProjectSourceSelectorDialog.onClose(response)}
-          button={confirmDialog.button}
-
+          openDialogProperties={importProjectSourceSelectorDialog.dialogProperties}
+          dialogTitle={importProjectSourceSelectorDialog.dialogTitle}
+          projectPathPlaceHolder={importProjectSourceSelectorDialog.placeHolder}
         />
       )}
 
