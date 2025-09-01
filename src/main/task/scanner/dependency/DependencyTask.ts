@@ -1,4 +1,4 @@
-import { DependencyScanner, DependencyScannerCfg } from 'scanoss';
+import { DependencyScanner, DependencyScannerCfg, VulnerabilityCfg } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
 import i18next from 'i18next';
@@ -10,12 +10,43 @@ import { ScannerStage } from '../../../../api/types';
 import { userSettingService } from '../../../services/UserSettingService';
 import { modelProvider } from '../../../services/ModelProvider';
 import AppConfigModule from '../../../../config/AppConfigModule';
+import { workspace } from '../../../workspace/Workspace';
+import AppConfig from '../../../../config/AppConfigModule';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   protected project: Project;
 
   constructor(project: Project) {
     this.project = project;
+  }
+
+  private getDependencyScanner(): DependencyScanner{
+    const cfg = new DependencyScannerCfg();
+    const project = workspace.getOpenProject();
+    const {
+      DEFAULT_API_INDEX,
+      APIS,
+      HTTP_PROXY,
+      HTTPS_PROXY,
+      PAC_PROXY,
+      CA_CERT,
+      IGNORE_CERT_ERRORS,
+    } = userSettingService.get();
+
+    if (project.getApi()) {
+      cfg.API_URL = project.getApi();
+      cfg.API_KEY = project.getApiKey();
+    } else {
+      cfg.API_URL = APIS[DEFAULT_API_INDEX].URL + AppConfig.API_SCAN_PATH;
+      cfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
+    }
+    const PAC_URL = PAC_PROXY ? `pac+${PAC_PROXY.trim()}` : null;
+    cfg.HTTP_PROXY = PAC_URL || HTTP_PROXY || '';
+    cfg.HTTPS_PROXY = PAC_URL || HTTPS_PROXY || '';
+
+    cfg.IGNORE_CA_CERT_ERR = IGNORE_CERT_ERRORS || false;
+    cfg.CA_CERT = CA_CERT ? CA_CERT : null;
+    return new DependencyScanner(cfg);
   }
 
   public getStageProperties(): Scanner.StageProperties {
@@ -45,15 +76,11 @@ export class DependencyTask implements Scanner.IPipelineTask {
           allFiles.push(rootPath + f.path);
         });
 
-      const cfg = new DependencyScannerCfg();
-      const { GRPC_PROXY } = userSettingService.get();
-      cfg.GRPC_PROXY = GRPC_PROXY || '';
-
       const chunks = [];
       for (let i = 0; i < allFiles.length; i += AppConfigModule.DEFAULT_SERVICE_CHUNK_LIMIT) {
         chunks.push(allFiles.slice(i, i + 10));
       }
-      const depScanner = new DependencyScanner(cfg);
+      const depScanner = this.getDependencyScanner();
       const promises = chunks.map(async (chunk) => {
         try {
           return await depScanner.scan(chunk);
