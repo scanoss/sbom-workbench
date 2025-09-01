@@ -7,34 +7,35 @@ import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
 import { userSettingService } from '../../services/UserSettingService';
 import { AppConfigDefault } from '../../../config/AppConfigDefault';
+import { workspace } from '../../workspace/Workspace';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
-  private generateRequests(reqData: Array<string>): Array<PurlRequest> {
+  private generateRequests(reqData: Array<string>): Array<any> {
     const chunks = [];
     for (let i = 0; i < reqData.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
       chunks.push(reqData.slice(i, i + AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT));
     }
     const requests = [];
     chunks.forEach((components: Array<string>) => {
-      requests.push({
-        purlsList: components.map((purl) => {
+        const req = components.map((purl) => {
           const splitPurl = purl.split('@');
           return {
             purl: splitPurl[0],
             requirement: splitPurl[1],
           };
-        }),
-      });
+        });
+        requests.push(req);
     });
     return requests;
   }
 
-  private async getCryptography(components: Array<string>, token: string, proxy: string) {
-    const cryptoCfg = new CryptoCfg({
-      apiKey: token,
-      proxy,
-    });
+  private async getCryptography(components: Array<string>) {
+    const p = workspace.getOpenProject();
+    const { GRPC_PROXY, DEFAULT_API_INDEX, APIS } = userSettingService.get();
+    const cryptoCfg = new CryptoCfg();
+    cryptoCfg.API_KEY = p.getApiKey();
+    cryptoCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
     const cryptoScanner = new CryptographyScanner(cryptoCfg);
     const requests = this.generateRequests(components);
     const promises = requests.map(async (req: any) => {
@@ -53,8 +54,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
   public async run(params: ICryptographyTask): Promise<void> {
     try {
-      const { GRPC_PROXY } = userSettingService.get();
-      const cryptography = await this.getCryptography(params.components, params.token, GRPC_PROXY);
+      const cryptography = await this.getCryptography(params.components);
       // Delete all cryptography if force flag is set
       if (params.force) await modelProvider.model.cryptography.deleteAll();
       // Import Crypto into Database
