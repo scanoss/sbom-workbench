@@ -1,13 +1,10 @@
 import log from 'electron-log';
-import {
-  PurlRequest, CryptographyScanner, CryptoCfg,
-} from 'scanoss';
+import { CryptographyScanner, CryptoCfg } from 'scanoss';
+import { ScannerFactory } from '../scanner/ScannerFactory';
 import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
-import { userSettingService } from '../../services/UserSettingService';
 import { AppConfigDefault } from '../../../config/AppConfigDefault';
-import { workspace } from '../../workspace/Workspace';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
@@ -31,12 +28,7 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
   }
 
   private async getCryptography(components: Array<string>) {
-    const p = workspace.getOpenProject();
-    const { GRPC_PROXY, DEFAULT_API_INDEX, APIS } = userSettingService.get();
-    const cryptoCfg = new CryptoCfg();
-    cryptoCfg.API_KEY = p.getApiKey();
-    cryptoCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
-    const cryptoScanner = new CryptographyScanner(cryptoCfg);
+    const cryptoScanner = ScannerFactory.createScanner(CryptoCfg, CryptographyScanner);
     const requests = this.generateRequests(components);
     const promises = requests.map(async (req: any) => {
       try {
