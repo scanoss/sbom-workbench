@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
-import { Chip, IconButton, InputBase, styled, TextField } from '@mui/material';
+import { Chip, IconButton, styled, TextField } from '@mui/material';
 import { IpcChannels } from '@api/ipc-channels';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import * as SearchUtils from '@shared/utils/search-utils';
@@ -15,8 +15,6 @@ import TreeNode from '../TreeNode/TreeNode';
 import { KeywordGroupMenu } from '../KeywordGroupMenu/KeywordGroupMenu';
 import { GroupSearchKeyword } from '@api/types';
 import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
-
-
 
 // For the data grid
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
@@ -78,7 +76,7 @@ const SearchPanel = () => {
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const serverPage = useRef(0);
-  const [localPage, setLocalPage] = React.useState(0);
+  const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 100 });
 
   const [value, setValue] = React.useState<string[]>([]);
   const [results, setResults] = React.useState<any[]>([]);
@@ -108,7 +106,7 @@ const SearchPanel = () => {
 
   const onTagsHandler = (tags: string[]) => {
     serverPage.current = 0;
-    setLocalPage(0);
+    setPaginationModel({ page: 0, pageSize: 100 });
 
     const nTags = tags
     .map((tag) => tag.toLowerCase().trim())
@@ -177,9 +175,9 @@ const SearchPanel = () => {
     window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
   };
 
-  const onPageChangeHandler = (localPageNumber, details) => {
-    setLocalPage(localPageNumber);
-    const nextPageServer = Math.floor((localPageNumber + 1) / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
+  const onPaginationModelChangeHandler = (model: GridPaginationModel) => {
+    setPaginationModel(model);
+    const nextPageServer = Math.floor((model.page + 1) / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
     if (nextPageServer > serverPage.current) {
       serverPage.current = nextPageServer;
       search();
@@ -283,7 +281,7 @@ const SearchPanel = () => {
           </div>
         </div>
       </header>
-      <main className="panel-body">
+      <main className="panel-body" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
         <IconButton
           disabled={selected?.length === 0}
           size="small"
@@ -319,17 +317,18 @@ const SearchPanel = () => {
             },
           }}
           rowHeight={23}
-          page={localPage}
+          paginationModel={paginationModel}
+          onPaginationModelChange={onPaginationModelChangeHandler}
+          pageSizeOptions={[100]}
           disableColumnMenu
-          rowsPerPageOptions={[100]}
           hideFooterSelectedRowCount
           checkboxSelection
-          headerHeight={41}
-          disableSelectionOnClick
-          onPageChange={onPageChangeHandler}
+          columnHeaderHeight={41}
+          disableRowSelectionOnClick
           onRowClick={onRowClickHandler}
           onCellKeyDown={onCellKeyDownHandler}
-          onSelectionModelChange={onSelectionHandler}
+          onRowSelectionModelChange={onSelectionHandler}
+          sx={{ flex: 1, overflow: 'hidden' }}
         />
       </main>
       <footer className="panel-footer" />
