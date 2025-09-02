@@ -1,4 +1,5 @@
-import { DependencyScanner, DependencyScannerCfg } from 'scanoss';
+import { DependencyScanner, DependencyScannerCfg, VulnerabilityCfg } from 'scanoss';
+import { ScannerFactory } from '../ScannerFactory';
 import fs from 'fs';
 import log from 'electron-log';
 import i18next from 'i18next';
@@ -7,7 +8,6 @@ import { Project } from '../../../workspace/Project';
 import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
-import { userSettingService } from '../../../services/UserSettingService';
 import { modelProvider } from '../../../services/ModelProvider';
 import AppConfigModule from '../../../../config/AppConfigModule';
 
@@ -44,16 +44,11 @@ export class DependencyTask implements Scanner.IPipelineTask {
         .forEach((f: File) => {
           allFiles.push(rootPath + f.path);
         });
-
-      const cfg = new DependencyScannerCfg();
-      const { GRPC_PROXY } = userSettingService.get();
-      cfg.GRPC_PROXY = GRPC_PROXY || '';
-
+      const depScanner = ScannerFactory.createScanner(DependencyScannerCfg, DependencyScanner);
       const chunks = [];
       for (let i = 0; i < allFiles.length; i += AppConfigModule.DEFAULT_SERVICE_CHUNK_LIMIT) {
         chunks.push(allFiles.slice(i, i + 10));
       }
-      const depScanner = new DependencyScanner(cfg);
       const promises = chunks.map(async (chunk) => {
         try {
           return await depScanner.scan(chunk);

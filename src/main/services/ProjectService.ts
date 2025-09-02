@@ -89,7 +89,6 @@ class ProjectService {
   }
 
   public async createProject(projectDTO: INewProject) {
-    console.log("PROJECT SERVICE:", projectDTO);
     const p = await this.create(projectDTO);
     // Add crypto scanner config depending on API Key token
     this.setCryptographyScanType(p);
@@ -104,7 +103,7 @@ class ProjectService {
    * configures it for rescanning (including cryptography scanning if API key is available),
    * and executes the appropriate scanner pipeline. If the scan fails, it ensures
    * the project remains in a consistent state.
-   * 
+   *
    * @param projectPath - Absolute path to the project directory to rescan
    * @throws {Error} Re-throws any scanning errors after ensuring project consistency
    */
