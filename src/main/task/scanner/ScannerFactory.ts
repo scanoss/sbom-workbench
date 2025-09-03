@@ -6,7 +6,7 @@ export interface ScannerConfig {
   API_KEY: string;
   HTTP_PROXY: string;
   HTTPS_PROXY: string;
-  IGNORE_CA_CERT_ERR: boolean;
+  IGNORE_CERT_ERRORS: boolean;
   CA_CERT: string | null;
 }
 
@@ -32,17 +32,15 @@ export class ScannerFactory {
       API_KEY: apiKey,
       HTTP_PROXY: PAC_URL || HTTP_PROXY || '',
       HTTPS_PROXY: PAC_URL || HTTPS_PROXY || '',
-      IGNORE_CA_CERT_ERR: IGNORE_CERT_ERRORS || false,
+      IGNORE_CERT_ERRORS: IGNORE_CERT_ERRORS || false,
       CA_CERT: CA_CERT || null,
     };
   }
-
   static createScanner<T, S>(ConfigClass: new () => T, ScannerClass: new (config: T) => S): S {
     const configData = this.buildConfig();
     const cfg = new ConfigClass();
-    
+
     Object.assign(cfg, configData);
-    
     return new ScannerClass(cfg);
   }
 }
