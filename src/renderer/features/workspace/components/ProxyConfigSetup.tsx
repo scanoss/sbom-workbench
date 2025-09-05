@@ -149,12 +149,6 @@ function ProxyConfigSetup() {
           />
         </Grid>
         <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
-          <Stack direction="row" gap={2}>
-            <ControlledInput control={control} label="GRPC Proxy" name="proxyConfig.grpcProxyHost" fullWidth />
-            <ControlledInput control={control} label={t('Title:Port')} name="proxyConfig.grpcProxyPort" fullWidth />
-          </Stack>
-        </Grid>
-        <Grid sx={{ display: 'block', width: '100%', colSpan:12 }}>
           <Stack gap={1}>
             <Stack direction="row" gap={2} alignItems="flex-end" sx={{ width: '100%' }}>
               <ControlledInput control={control} label="CA Certificate" name="proxyConfig.caCertificatePath" />
