@@ -169,7 +169,6 @@
     "@electron/notarize": "^3.0.1",
     "@eslint/config-array": "^0.20.0",
     "@eslint/object-schema": "^2.1.6",
-    "@grpc/grpc-js": "^1.8.7",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.6",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@testing-library/jest-dom": "^5.16.4",
