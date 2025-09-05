@@ -1,23 +1,23 @@
 import * as ComponentMessages from '../../grpc/scanoss/api/components/v2/scanoss-components_pb';
 import { IComponentVersionResult, ILicense, IVersion } from '../iComponentCatalog/IComponentVersionResult';
+import { ComponentVersionResponse } from 'scanoss';
 
 export class CompoVerSearchResponseAdapter {
-  public static convert(response: ComponentMessages.CompVersionResponse): IComponentVersionResult {
-    const comp = response.getComponent();
+  public static convert(response: ComponentVersionResponse): IComponentVersionResult {
     const output: IComponentVersionResult = {
-      component: comp.getComponent(),
-      url: comp.getUrl(),
-      purl: comp.getPurl(),
+      component: response.component.component,
+      url: response.component.url,
+      purl: response.component.purl,
       versions: [],
     };
-    comp.getVersionsList().forEach((v) => {
-      const aux: IVersion = { version: v.getVersion(), licenses: [] };
-      v.getLicensesList().forEach((l) => {
+    response.component.versions.forEach((v) => {
+      const aux: IVersion = { version: v.version, licenses: [] };
+      v.licenses.forEach((l) => {
         const auxLicense: ILicense = {
-          name: l.getName(),
-          spdxId: l.getSpdxId(),
-          isSpdxApproved: l.getIsSpdxApproved(),
-          url: l.getUrl(),
+          name: l.name,
+          spdxId: l.spdxId,
+          isSpdxApproved: l.isSpdxApproved,
+          url: l.url,
         };
         aux.licenses.push(auxLicense);
       });
