@@ -2,7 +2,7 @@ import { ITask } from '../Task';
 import { ISearchComponentVersion } from './iComponentCatalog/ISearchComponentVersion';
 import { IComponentVersionResult } from './iComponentCatalog/IComponentVersionResult';
 import { CompoVerSearchResponseAdapter } from './adapters/CompoVerSearchResponseAdapter';
-import { ClientConfig, ComponentVersionRequest , ComponentsHttpClient } from '../../../../../scanoss.js/src';
+import { ClientConfig, ComponentVersionRequest , ComponentsHttpClient } from 'scanoss';
 import { workspace } from '../../workspace/Workspace';
 import { userSettingService } from '../../services/UserSettingService';
 
