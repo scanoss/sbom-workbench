@@ -10,6 +10,7 @@ export const packages = [
   'drupal',
   'eclipse',
   'gem',
+  'generic',
   'gitee',
   'github',
   'gitlab',
