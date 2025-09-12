@@ -293,7 +293,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                               filtered.push({
                                 inputValue,
                                 new: true,
-                                URL: t('ClickOrEnterToAddValue', { value: inputValue }),
+                                URL: inputValue
                               });
                             }
 
@@ -318,13 +318,17 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                 <ListItem
                                   {...props}
                                   sx={{
-                                    height: '10px',
+                                    height: '40px',
                                     fontSize: '0.9rem',
                                     fontWeight: 600,
-                                    color: theme.palette.primary.light,
+                                    padding: '8px 16px',
+                                    display: 'flex',
+                                    gap: '3px',
+                                    color: theme.palette.primary.light
                                   }}
                                 >
-                                  {option.URL}
+                                  <p style={{ fontWeight: 'bold' }}>{t('ClickOrEnterToAddValue')}:</p>
+                                  <p style={{ color: 'black' }}>'{option.URL}'</p>
                                 </ListItem>
                               );
                             }

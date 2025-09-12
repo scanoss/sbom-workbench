@@ -77,7 +77,7 @@
   "NComponentWillNotIdentified_one": "{{count}} コンポーネントは宣言されたライセンスを特定できませんでした。手動で調査お願いします。",
   "NComponentWillNotIdentified_other": "{{count}}コンポーネントは宣言されたライセンスを特定できませんでした。手動で調査お願いします。.",
   "DependenciesDeclaredIdentifyManual": "パッケージマネージャファイルで宣言された依存物は承認されません。手動で調査してください。",
-  "ClickOrEnterToAddValue": "クリックして入力してください。 \"{{value}}\"",
+  "ClickOrEnterToAddValue": "クリックして入力してください。",
   "SettingsApiKeyHint": "この値は詳細なCANOSSサーバインスタンス用のオプションです. この値が空の時、無料でご利用できます。もし詳細なサーバの利用に興味がある場合salese@scanoss.com. に連絡してください。",
   "WorkspaceIsReduced": "アクティブフィルタノーのために、このワークスペースのコンテクストは削減されています。",
   "DecompressArchivesLabel": "アーカイブを展開し内部のファイルをスキャンする",
