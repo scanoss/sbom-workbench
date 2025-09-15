@@ -78,7 +78,7 @@
   "NComponentWillNotIdentified_one": "{{count}} component will not be identified as they do not have a license declared with the component. Please, identify them manually.",
   "NComponentWillNotIdentified_other": "{{count}} components will not be identified as they do not have a license declared with the component. Please, identify them manually.",
   "DependenciesDeclaredIdentifyManual": "Dependencies declared in packages manager files will not be accepted. Please, identify them manually.",
-  "ClickOrEnterToAddValue": "Click or enter to add \"{{value}}\"",
+  "ClickOrEnterToAddValue": "Click or enter to add",
   "SettingsApiKeyHint": "This value is optional for dedicated SCANOSS server instances. When this value is empty, scans will be launched against our free of charge public service. If you are interested in a dedicated instance with guaranteed availability and throughput please contact us at sales@scanoss.com.",
   "WorkspaceIsReduced": "The workspace context is reduced because there are active filters",
   "DecompressArchivesLabel": "Decompress archives and scan inner files",

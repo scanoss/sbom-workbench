@@ -74,7 +74,7 @@
   "NComponentWillNotIdentified_one": "{{count}} 组件将不会被识别，因为他们没有随组件声明的许可证。 请手动识别它们。",
   "NComponentWillNotIdentified_other": "{{count}} 组件将不会被识别，因为它们没有随组件声明的许可证。 请手动识别它们。",
   "DependenciesDeclaredIdentifyManual": "在包管理器文件中声明的依赖项将不被接受。 请手动识别它们。",
-  "ClickOrEnterToAddValue": "点击或输入添加 \"{{value}}\"",
+  "ClickOrEnterToAddValue": "点击或输入添加",
   "SettingsApiKeyHint": "此值对于专用 SCANOSS 服务器实例是可选的。 当此值为空时，将针对我们的免费公共服务启动扫描。 如果您对可用性和吞吐量有保证的专用实例感兴趣，请通过 sales@scanoss.com 联系我们。",
   "WorkspaceIsReduced": "工作区上下文减少，因为有启动的过滤器。",
   "NewGroup": "New Group",
