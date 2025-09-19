@@ -100,11 +100,10 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
 
       // Delete all local crypto
       await modelProvider.model.localCryptography.deleteAll();
-      const cryptoCfg = new CryptoCfg({
-        algorithmRulesPath: await this.getAlgorithmRulesPath(),
-        libraryRulesPath: await this.getLibraryRulesPath(),
-        threads: this.THREADS,
-      });
+      const cryptoCfg = new CryptoCfg();
+      cryptoCfg.ALGORITHM_RULES_PATH = await this.getAlgorithmRulesPath();
+      cryptoCfg.LIBRARY_RULES_PATH = await this.getLibraryRulesPath();
+      cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const files = this.project.getTree().getRootFolder().getFiles();
 
