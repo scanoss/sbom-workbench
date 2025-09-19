@@ -4,39 +4,9 @@ import { ITask } from '../Task';
 import { modelProvider } from '../../services/ModelProvider';
 import { ICryptographyTask } from './ICryptographyTask';
 import { AppConfigDefault } from '../../../config/AppConfigDefault';
-import { workspace } from '../../workspace/Workspace';
-import { userSettingService } from '../../services/UserSettingService';
+import { ScannerFactory } from '../scanner/ScannerFactory';
 
 export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
-
- // TODO: Remove when REST be implemented on cryptography decoration service
-  private  buildConfig() {
-    const project = workspace.getOpenProject();
-    const {
-      DEFAULT_API_INDEX,
-      APIS,
-      HTTP_PROXY,
-      HTTPS_PROXY,
-      PAC_PROXY,
-      CA_CERT,
-      IGNORE_CERT_ERRORS,
-      GRPC_PROXY
-    } = userSettingService.get();
-
-    const apiUrl = project.getApi() || APIS[DEFAULT_API_INDEX].URL;
-    const apiKey = project.getApiKey() || APIS[DEFAULT_API_INDEX].API_KEY;
-    const PAC_URL = PAC_PROXY ? `pac+${PAC_PROXY.trim()}` : null;
-
-    return {
-      API_URL: apiUrl,
-      API_KEY: apiKey,
-      HTTP_PROXY: PAC_URL || HTTP_PROXY || '',
-      HTTPS_PROXY: PAC_URL || HTTPS_PROXY || '',
-      IGNORE_CERT_ERRORS: IGNORE_CERT_ERRORS || false,
-      CA_CERT: CA_CERT || null,
-      GRPC_PROXY: GRPC_PROXY || '',
-    };
-  }
 
   private generateRequests(reqData: Array<string>): Array<any> {
     const chunks = [];
@@ -58,15 +28,11 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
   }
 
   private async getCryptography(components: Array<string>) {
-    // TODO: Remove when REST be implemented on cryptography decoration service
-    const configData = this.buildConfig();
-    const cryptographyCfg = new CryptoCfg();
-    Object.assign(cryptographyCfg, configData);
-    const cryptoScanner = new CryptographyScanner(cryptographyCfg);
+    const cryptographyScanner = ScannerFactory.createScanner(CryptoCfg, CryptographyScanner);
     const requests = this.generateRequests(components);
     const promises = requests.map(async (req: any) => {
       try {
-        const r = await cryptoScanner.scanComponents(req);
+        const r = await cryptographyScanner.scanComponents(req);
         return r;
       } catch (err: any) {
         log.warn('Warning:', err.message, req);
