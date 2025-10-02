@@ -83,7 +83,7 @@ export const IdentifiedList = () => {
           </p>
         )}
 
-        {filterItems?.length > limit && (
+        {filterItems && filterItems?.length > limit && (
         <Alert className="my-5" severity="info">
           <strong>
             {t('ShowingLimitOfTotalComponents', { limit, total: filterItems.length })}
