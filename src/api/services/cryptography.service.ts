@@ -13,6 +13,11 @@ class CryptographyService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.CRYPTOGRAPHY_GET_ALL, sourceType);
     return this.response(response);
   }
+
+  public async getKeyWords(key: string): Promise<Array<string>> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.CRYPTOGRAPHY_GET_KEYWORDS, key);
+    return this.response(response);
+  }
 }
 
 export const cryptographyService = new CryptographyService();

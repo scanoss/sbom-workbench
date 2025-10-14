@@ -45,6 +45,10 @@ const Editor = () => {
 
   const highlightParam = useSearchParams().get('highlight');
 
+  // Disable highlight of code snippets when crypto is enabled
+  const crypto = useSearchParams().get('crypto');
+  const isCryptoHighLight = crypto !== null;
+
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const {
@@ -54,8 +58,8 @@ const Editor = () => {
   const { appInfo } = useSelector(selectWorkspaceState);
 
   const file = node?.type === 'file' ? node.path : null;
-  const highlight = highlightParam ? SearchUtils.unStemmify(highlightParam) : null;
 
+  const highlight =  highlightParam && !isCryptoHighLight ? SearchUtils.unStemmify(decodeURIComponent(highlightParam)) : SearchUtils.unStemmifyCryptoKeywords(decodeURIComponent(highlightParam));
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [inventoriesMatchInfo, setInventoriesMatchInfo] = useState<Result[] | null>(null);
@@ -323,7 +327,7 @@ const Editor = () => {
         className={`
         editors
         app-content
-        ${isDiffView ? 'diff-view' : ''}
+        ${isDiffView && !isCryptoHighLight ? 'diff-view' : ''}
         `}
       >
         {(
@@ -335,7 +339,7 @@ const Editor = () => {
                 id={CodeViewerManager.LEFT}
                 language={getExtension(file)}
                 value={localFileContent?.content || ''}
-                highlight={currentMatch?.lines || null}
+                highlight={!isCryptoHighLight && currentMatch?.lines || null}
                 highlights={highlight || null}
               />
             ) : (
@@ -354,14 +358,14 @@ const Editor = () => {
           </div>
           )}
 
-        { (isDiffView) && currentMatch && (
+        { !isCryptoHighLight && (isDiffView) && currentMatch && (
           <div className="editor">
             {!remoteFileContent?.error && remoteFileContent?.content ? (
               <MemoCodeViewer
                 id={CodeViewerManager.RIGHT}
                 language={getExtension(file)}
                 value={remoteFileContent.content || ''}
-                highlight={currentMatch.oss_lines || null}
+                highlight={!isCryptoHighLight && currentMatch.oss_lines || null}
                 highlights={highlight || null}
               />
             ) : (

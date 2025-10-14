@@ -3,14 +3,13 @@ import { AutoSizer, List } from 'react-virtualized';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { cryptographyService } from '@api/services/cryptography.service';
 
 export const LocalCryptographyTable = ({data}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
   const rows = useMemo(() => {
     if (!data || !data.files) return [];
-
     return data.files.flatMap((item, itemIndex) =>
       item.values.map((algorithm, algIndex) => ({
         key: `${itemIndex}-${algIndex}`,
@@ -21,11 +20,12 @@ export const LocalCryptographyTable = ({data}) => {
     );
   }, [data]);
 
-  const onSelectFile = async (e, path) => {
+  const onSelectFile = async (e, path:string, algorithm:string) => {
     e.preventDefault();
+    const keywords = await cryptographyService.getKeyWords(algorithm);
     navigate({
       pathname: '/workbench/detected/file',
-      search: `?path=file|${encodeURIComponent(path)}`,
+      search: `?path=file|${encodeURIComponent(path)}&crypto=true&highlight=${encodeURIComponent(keywords.join(','))}}`,
     });
   };
 
@@ -38,7 +38,7 @@ export const LocalCryptographyTable = ({data}) => {
             href="#"
             underline="hover"
             color="inherit"
-            onClick={(e) => onSelectFile(e, row.fileName)}
+            onClick={(e) => onSelectFile(e, row.fileName, row.algorithm)}
           >
             {row.fileName}
           </Link>
