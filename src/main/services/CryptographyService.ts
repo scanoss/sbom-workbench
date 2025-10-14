@@ -6,8 +6,15 @@ import { modelProvider } from './ModelProvider';
 import { componentHelper } from '../helpers/ComponentHelper';
 import { SourceType } from '../../api/dto';
 import { LocalCryptographyTask } from '../task/scanner/cryptography/LocalCryptographyTask';
+import path from 'path';
+import { fileExists } from '../utils/utils';
+import fs from 'fs';
 
 class CryptographyService {
+  private readonly DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME = 'scanoss-crypto-algorithm-rules.json';
+
+  private readonly DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME = 'scanoss-crypto-library-rules.json';
+
   public async importFromComponents(components: Array<NewComponentDTO>) {
     try {
       const p = workspace.getOpenProject();
@@ -54,6 +61,27 @@ class CryptographyService {
 
   public async getAll(type: SourceType): Promise<CryptographyResponseDTO> {
     return type === SourceType.detected ? this.getDetected() : this.getIdentified();
+  }
+
+  public async getKeywordsByKey(key: string): Promise<Array<string>>{
+    const algorithmRulesPath = await this.getAlgorithmRulesPath();
+
+
+    // Algorithm
+    const algorithmData = await fs.promises.readFile(algorithmRulesPath,'utf8');
+    const algorithmRules = JSON.parse(algorithmData);
+    const algorithm = algorithmRules.find((rule: any) => rule.algorithmId.toLowerCase() === key.toLowerCase());
+
+    // Library
+    const libraryRulesPath = await this.getLibraryRulesPath();
+    const libraryRulesData = await fs.promises.readFile(libraryRulesPath,'utf8');
+    const libraryRules = JSON.parse(libraryRulesData);
+    const library = libraryRules.find((rule: any) => rule.id.toLowerCase() === key.toLowerCase());
+
+    const keywords =  algorithm ? algorithm.keywords : [];
+    keywords.push(...(library ? library.keywords : []));
+    return keywords;
+
   }
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
@@ -132,6 +160,56 @@ class CryptographyService {
     } catch (e: any) {
       throw new Error(`Error retrieving identified cryptography: cause: ${e.message}`);
     }
+  }
+
+  /**
+   * Gets the base asset path based on the current environment (development or production).
+   *
+   * @returns The appropriate base path for accessing assets based on the current environment
+   */
+  private getAssetPath(): string {
+    const isDev = process.env.NODE_ENV !== 'production';
+    return isDev
+      ? path.join(__dirname, '../../../assets/data')
+      : path.join(__dirname, '../../../assets/data');
+  }
+
+  /**
+   * Retrieves the file path to the cryptography algorithm rules.
+   *
+   * The method searches for algorithm rules in the following order:
+   * 1. Custom rules defined at the project's scan root
+   * 2. Default rules packaged with the application (location depends on environment)
+   *
+   * @returns Promise resolving to the absolute path of the algorithm rules file
+   */
+  private async getAlgorithmRulesPath(): Promise<string> {
+    const project = workspace.getOpenProject();
+    const customAlgorithmRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
+    if (await fileExists(customAlgorithmRulesFilePath)) {
+      log.info('[ Local Cryptography Task ] - Custom cryptography algorithm rules found');
+      return customAlgorithmRulesFilePath;
+    }
+    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
+  }
+
+  /**
+   * Retrieves the file path to the cryptography library rules.
+   *
+   * The method searches for cryptography library rules in the following order:
+   * 1. Custom rules defined at the project's scan root
+   * 2. Default rules packaged with the application (location depends on environment)
+   *
+   * @returns Promise resolving to the absolute path of the cryptography library rules file
+   */
+  private async getLibraryRulesPath():Promise<string> {
+    const project = workspace.getOpenProject();
+    const customLibraryRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
+    if (await fileExists(customLibraryRulesFilePath)) {
+      log.info('[ Local Cryptography Task ] - Custom cryptography library rules found');
+      return customLibraryRulesFilePath;
+    }
+    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
   }
 }
 

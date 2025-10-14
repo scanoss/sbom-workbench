@@ -24,3 +24,13 @@ api.handle(IpcChannels.CRYPTOGRAPHY_GET_ALL, async (event, { type }: Cryptograph
     return Response.fail({ message: error.message });
   }
 });
+
+api.handle(IpcChannels.CRYPTOGRAPHY_GET_KEYWORDS, async (event, key: string) => {
+  try {
+    const data = await cryptographyService.getKeywordsByKey(key);
+    return Response.ok({ message: 'Keywords retrieved successfully', data });
+  } catch (error: any) {
+    log.error('[Cryptography Get keywords]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});

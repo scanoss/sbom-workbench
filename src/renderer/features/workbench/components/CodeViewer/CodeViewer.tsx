@@ -14,7 +14,6 @@ interface ICodeViewerProps {
 const CodeViewer = ({ id, value, language, highlight, highlights, options }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
-
   const initMonaco = () => {
     const ref = editorContainerRef.current;
     if (ref) {
