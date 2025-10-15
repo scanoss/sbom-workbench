@@ -5,6 +5,7 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import WorkbenchFilters from '../WorkbenchFilters/WorkbenchFilters';
 import FileTree from '../FileTree/FileTree';
 import SearchPanel from '../SearchPanel/SearchPanel';
+import CryptoSearchPanel from '../CryptoSearchPanel/CryptoSearchPanel';
 
 const MainSidebar = () => {
   const { loaded } = useSelector(selectWorkbench);
@@ -36,6 +37,7 @@ const MainSidebar = () => {
           />
         ))}
         <Route path="search/*" element={<SearchPanel />} />
+        <Route path="crypto-search/*" element={<CryptoSearchPanel />} />
       </Routes>
     </aside>
   );
