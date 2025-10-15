@@ -1,9 +1,9 @@
 import { BrowserWindow, RelaunchOptions, app } from 'electron';
 import { GroupSearchKeywordDTO } from '@api/dto';
 import { userSettingService } from './UserSettingService';
-import { getContextFiles, getScanossSettingsFilePath } from './utils/workspace';
+import { getContextFiles, getScanossSettingsFilePath, getSettingsFileInfo } from './utils/workspace';
 import { modelProvider } from './ModelProvider';
-import { GroupSearchKeyword } from '../../api/types';
+import { SettingsFileInfo, GroupSearchKeyword } from '../../api/types';
 
 class WorkspaceService {
   public async setCurrent(wsPath: string): Promise<void> {
@@ -63,8 +63,15 @@ class WorkspaceService {
     return deletedGroup;
   }
 
+  /**
+   * @deprecated Use getSettingsFileInfo() instead
+   */
   public async getScanossSettingFilePath(scanRoot: string): Promise<string> {
     return getScanossSettingsFilePath(scanRoot);
+  }
+
+  public async getSettingsFileInfo(scanRoot: string): Promise<SettingsFileInfo> {
+    return getSettingsFileInfo(scanRoot);
   }
 }
 

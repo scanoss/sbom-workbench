@@ -1,6 +1,6 @@
 import { IpcChannels } from '../ipc-channels';
 import { BaseService } from './base.service';
-import { ContextFiles, GroupSearchKeyword, IProject, License } from '../types';
+import { SettingsFileInfo, ContextFiles, GroupSearchKeyword, IProject, License } from '../types';
 import { GroupSearchKeywordDTO } from '@api/dto';
 
 class WorkspaceService extends BaseService {
@@ -106,9 +106,21 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
+  /**
+   *
+   * @deprecated Use getConfigFileInfo() instead.
+   */
   public async getScanossSettingsFilePath(scanRoot: string): Promise<string> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_SCANOSS_SETTING_FILE,
+      scanRoot,
+    );
+    return this.response(response);
+  }
+
+  public async getSettingsFileInfo(scanRoot: string): Promise<SettingsFileInfo> {
+    const response = await window.electron.ipcRenderer.invoke(
+      IpcChannels.WORKSPACE_SETTINGS_FILE_INFO,
       scanRoot,
     );
     return this.response(response);
