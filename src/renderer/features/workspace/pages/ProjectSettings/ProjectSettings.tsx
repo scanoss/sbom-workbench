@@ -17,9 +17,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { Add } from '@mui/icons-material';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
-import { ContextFiles, INewProject } from '@api/types';
+import { SettingsFileInfo, INewProject } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
 import { workspaceService } from '@api/services/workspace.service';
 import { ResponseStatus } from '@api/Response';
@@ -44,8 +44,7 @@ const ProjectSettings = () => {
 
   const [licenses, setLicenses] = useState([]);
   const [apis, setApis] = useState([]);
-  const [context, setContext] = useState<ContextFiles>(null);
-  const [scanossSettingFilePath, setScanossSettingFilePath] = useState<string>(null);
+  const [settingsFileInfo, setSettingsFileInfo] = useState<SettingsFileInfo>({ type: 'none', fileName: null, legacyType: null });
 
   const [projectSettings, setProjectSettings] = useState<INewProject>({
     name: '',
@@ -84,7 +83,7 @@ const ProjectSettings = () => {
     const apiUrlKey = await userSettingService.get();
     setApis(apiUrlKey.APIS);
 
-    await getContextInfo();
+    await getSettingsFileInfo();
 
     let projectName: string = path.split(window.path.sep)[path.split(window.path.sep).length - 1];
 
@@ -102,12 +101,9 @@ const ProjectSettings = () => {
     setApis(settings.APIS);
   }, [settings]);
 
-  const getContextInfo = async () => {
+  const getSettingsFileInfo = async () => {
     const { path } = scanPath;
-    const nContext = await workspaceService.contextFiles(path);
-    setContext(nContext);
-    const scanossSettingsFilePath = await workspaceService.getScanossSettingsFilePath(path);
-    setScanossSettingFilePath(scanossSettingsFilePath);
+    setSettingsFileInfo(await workspaceService.getSettingsFileInfo(path));
   };
 
   const onOpenWorkRoot = () => {
@@ -121,7 +117,7 @@ const ProjectSettings = () => {
     window.shell.openPath(absolutePath);
   };
 
-  const onReload = () => getContextInfo();
+  const onReload = () => getSettingsFileInfo();
 
   useEffect(() => {
     const found = projects.find(
@@ -402,7 +398,7 @@ const ProjectSettings = () => {
             </div>
             <div className="grid-item">
               <div className="context-files-info">
-                { showConfigurationOptions && !context?.identifyFile && !context?.ignoreFile && !scanossSettingFilePath && (
+                { showConfigurationOptions && settingsFileInfo.type === 'none' && (
                   <Alert
                     severity="info"
                     action={(
@@ -411,31 +407,53 @@ const ProjectSettings = () => {
                       </Button>
                   )}
                   >
-                    No context file found. You can provide one by creating an SBOM file in the <Link className="cursor-pointer" color="inherit" onClick={onOpenWorkRoot}>root of your project</Link>.
+                    <Trans
+                      i18nKey="Common:NoConfigFileFoundOptional"
+                      components={{
+                        1: <strong />,
+                        2: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
+                      }}
+                    />
                   </Alert>
                 )}
 
-                { scanossSettingFilePath && (
-                  <Alert severity="success">
-                    A SCANOSS settings file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(scanossSettingFilePath)}>{scanossSettingFilePath}</Link>). It will be used to enhance the scan results.
+                { showConfigurationOptions && settingsFileInfo.type === 'legacy' && (
+                  <Alert
+                    severity="warning"
+                    action={(
+                      <Button color="inherit" size="small" onClick={onReload}>
+                        RELOAD
+                      </Button>
+                  )}
+                  >
+                    <Trans
+                      i18nKey="Common:LegacyConfigFileDetected"
+                      values={{ fileName: settingsFileInfo.fileName }}
+                      components={{
+                        1: <Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(settingsFileInfo.fileName)} />,
+                        2: <strong />,
+                        3: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
+                      }}
+                    />
                   </Alert>
                 )}
 
-                { !scanossSettingFilePath && context && (context.identifyFile) && (
-                  <Alert severity="success">
-                    A context file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.identifyFile)}>{context.identifyFile}</Link>). It will be used to enhance the scan results.
-                  </Alert>
-                )}
-
-                { !scanossSettingFilePath && context && (context.ignoreFile) && (
-                  <Alert severity="success">
-                    An ignore file was found (<Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(context.ignoreFile)}>{context.ignoreFile}</Link>). It will be used to avoid specific  results.
-                  </Alert>
-                )}
-
-                { !scanossSettingFilePath && context && context.identifyFile && context.ignoreFile && (
-                  <Alert severity="warning">
-                    The identified context file takes precedence over the ignore file.
+                { showConfigurationOptions && settingsFileInfo.type === 'standard' && settingsFileInfo.fileName && (
+                  <Alert
+                    severity="success"
+                    action={(
+                      <Button color="inherit" size="small" onClick={onReload}>
+                        RELOAD
+                      </Button>
+                  )}
+                  >
+                    <Trans
+                      i18nKey="Common:ScanossSettingsFileFound"
+                      values={{ fileName: settingsFileInfo.fileName }}
+                      components={{
+                        1: <Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(settingsFileInfo.fileName)} />
+                      }}
+                    />
                   </Alert>
                 )}
               </div>
