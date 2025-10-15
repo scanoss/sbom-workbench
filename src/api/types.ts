@@ -435,6 +435,12 @@ export interface ContextFiles {
   ignoreFile: string | null;
 }
 
+export interface SettingsFileInfo {
+  type: 'none' | 'legacy' | 'standard';
+  fileName: string | null;
+  legacyType?: 'identify' | 'ignore' | null;
+}
+
 export interface DependencyManifestFile {
   path: string;
   fileId: number;
