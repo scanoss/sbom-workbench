@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import FileViewer from '../detected/pages/FileViewer/FileViewer';
 import EmptyMessagePlaceholder from '../../components/EmptyMessagePlaceholder/EmptyMessagePlaceholder';
+import CryptoViewer from '../../components/CryptoViewer/CryptoViewer';
 
-const Search = () => {
+const CryptoSearch = () => {
   const { t } = useTranslation();
   return (
     <>
@@ -15,10 +15,10 @@ const Search = () => {
             <EmptyMessagePlaceholder>{t('UseLeftPanelForSearch')}</EmptyMessagePlaceholder>
           }
         />
-        <Route path="file/*" element={<FileViewer />} />
+        <Route path='file/*' element={<CryptoViewer/>} />
       </Routes>
     </>
   );
 };
 
-export default Search;
+export default CryptoSearch;

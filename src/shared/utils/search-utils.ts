@@ -46,6 +46,7 @@ const unStemmify = (text: string): string[] => {
  * @return A list of tokens
  */
 const unStemmifyCryptoKeywords = (text: string): string[] => {
+  if(!text) return [];
   return text.replace(/[{}]/g, '').split(/,/).map(t => t.trim());
 };
 

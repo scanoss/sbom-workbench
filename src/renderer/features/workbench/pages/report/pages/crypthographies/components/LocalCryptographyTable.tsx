@@ -24,8 +24,8 @@ export const LocalCryptographyTable = ({data}) => {
     e.preventDefault();
     const keywords = await cryptographyService.getKeyWords(algorithm);
     navigate({
-      pathname: '/workbench/detected/file',
-      search: `?path=file|${encodeURIComponent(path)}&crypto=true&highlight=${encodeURIComponent(keywords.join(','))}}`,
+      pathname: '/workbench/crypto-search/file',
+      search: `?path=${encodeURIComponent(path)}&highlight=${encodeURIComponent(keywords.join(','))}`,
     });
   };
 
