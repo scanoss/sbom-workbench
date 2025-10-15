@@ -9,6 +9,7 @@ import { LocalCryptographyTask } from '../task/scanner/cryptography/LocalCryptog
 import path from 'path';
 import { fileExists } from '../utils/utils';
 import fs from 'fs';
+import { CryptographicItem } from '../model/entity/Cryptography';
 
 class CryptographyService {
   private readonly DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME = 'scanoss-crypto-algorithm-rules.json';
@@ -82,6 +83,36 @@ class CryptographyService {
     keywords.push(...(library ? library.keywords : []));
     return keywords;
 
+  }
+
+  public async getFilesByCrypto(crypto: Array<string>): Promise<{ files: Array<string>, crypto: Array<string> }>{
+    const cryptoSet = new Set(crypto);
+    const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
+    const result = {
+      files: [],
+      crypto: []
+    };
+
+    const matchedCrypto = new Set<string>();
+
+    result.files = files.filter((file: CryptographicItem) => {
+      // Check if file has any matching crypto values
+      const hasMatch = file.values.some((v) => cryptoSet.has(v));
+
+      if (hasMatch) {
+        // Collect matched crypto algorithms
+        file.values.forEach((v) => {
+          if (cryptoSet.has(v)) {
+            matchedCrypto.add(v);
+          }
+        });
+      }
+      return hasMatch;
+    }).map((f)=> f.name);
+
+    result.crypto = Array.from(matchedCrypto);
+
+    return result;
   }
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
