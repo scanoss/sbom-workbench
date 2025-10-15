@@ -122,14 +122,14 @@ const CryptoSearchPanel = () => {
 
   return (
     <div className="panel panel-left search-panel-container">
-      <header className="panel-header border-bottom p-3 pr-2 pb-1">
+      <header className="panel-header border-bottom p-3 pb-1">
         <div className="panel-title">
           <h4>Cryptography Search</h4>
         </div>
         <div className="search-panel mt-3">
           <div className="search-panel-input d-flex align-center">
-            <FormControl size="small" sx={{ minWidth: 120, flex: 1 }}>
-              <InputLabel id="crypto-algorithm-label">Keys</InputLabel>
+            <FormControl size="small" sx={{ flex: '1 1 auto'}}>
+              <InputLabel id="crypto-algorithm-label">{selectedAlgorithms.length > 0 ? `Keys (${selectedAlgorithms.length})` : 'Keys'}</InputLabel>
               <Select
                 labelId="crypto-algorithm-label"
                 multiple
@@ -153,13 +153,13 @@ const CryptoSearchPanel = () => {
                   )
                 }
                 renderValue={(selected) => (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '6px 4px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, padding: '6px 5px', maxHeight: '80px', overflowY: 'auto' }}>
                     {selected.map((value) => (
                       <Chip
                         key={value}
                         label={value?.toUpperCase()}
                         size="small"
-                        sx={{ fontSize: '0.6rem', height: '15px' }}
+                        sx={{ fontSize: '0.7rem', height: '15px' }}
                       />
                     ))}
                   </div>
@@ -169,7 +169,9 @@ const CryptoSearchPanel = () => {
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: 0.5,
-                    paddingY: 0.5,
+                    padding: '12px 0 12px 3px !important',
+                    maxHeight: '80px',
+                    overflowY: 'auto',
                   }
                 }}
               >
@@ -195,7 +197,7 @@ const CryptoSearchPanel = () => {
             <IconButton
               size="small"
               onClick={search}
-              sx={{ ml: 1 }}
+              sx={{ ml: 1.5, mr: 1.5 }}
             >
               <i className="ri-search-line" />
             </IconButton>
