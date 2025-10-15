@@ -2,10 +2,7 @@ import { SbomMode, ScannerInput, WinnowingMode } from 'scanoss';
 import fs from 'fs';
 import log from 'electron-log';
 import path from 'path';
-import {
-  getContextFiles,
-  getScanossSettingsFilePath,
-} from '../../../services/utils/workspace';
+import { getSettingsFileInfo } from '../../../services/utils/workspace';
 import { IScannerInputAdapter } from './IScannerInputAdapter';
 import { BaseScannerInputAdapter } from './BaseScannerInputAdapter';
 import { Project } from '../../../workspace/Project';
@@ -52,57 +49,40 @@ export class CodeScannerInputAdapter extends BaseScannerInputAdapter implements 
     // Allows to ignore a list of components from a SBOM place in the root folder
     const rootPath = this.project.getScanRoot();
 
-    const scanossSettingsPath = await getScanossSettingsFilePath(rootPath);
-    if (scanossSettingsPath) {
+    const settingsFileInfo = await getSettingsFileInfo(rootPath);
+    if (settingsFileInfo.type === 'standard' && settingsFileInfo.fileName) {
       try {
         log.info('[ SCAN ] - Loading scanoss.json file');
-        const absoluteScanossSettingsPath = path.join(rootPath, scanossSettingsPath);
+        const absoluteScanossSettingsPath = path.join(rootPath, settingsFileInfo.fileName);
         const scanossSettings = JSON.parse(await fs.promises.readFile(absoluteScanossSettingsPath, 'utf8'));
         result.forEach((_, index, arr) => {
           arr[index].settings = scanossSettings;
         });
         return result;
       }catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: ${path.join(rootPath, scanossSettingsPath)}`, e);
-        throw new Error(`Invalid contextFile ${path.join(rootPath, scanossSettingsPath)}`);
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: ${path.join(rootPath, settingsFileInfo.fileName)}`, e);
+        throw new Error(`Invalid contextFile ${path.join(rootPath, settingsFileInfo.fileName)}`);
       }
     }
 
-    // Legacy
-    let sbom = '';
-    let sbomMode = SbomMode.SBOM_IDENTIFY;
-
-    const contextFiles = await getContextFiles(rootPath);
-
-    if (contextFiles.ignoreFile) {
+    if (settingsFileInfo.type === 'legacy' && settingsFileInfo.fileName) {
       try {
-        sbom = fs.readFileSync(path.join(rootPath,contextFiles.ignoreFile), 'utf-8');
+        const sbom = fs.readFileSync(path.join(rootPath,settingsFileInfo.fileName), 'utf-8');
+        const sbomMode = settingsFileInfo.legacyType == "identify" ? SbomMode.SBOM_IDENTIFY : SbomMode.SBOM_IGNORE;
+
         JSON.parse(sbom);
-        log.error(`Invalid contextFile ${contextFiles.ignoreFile}`);
-        sbomMode = SbomMode.SBOM_IGNORE;
+
+        result.forEach((_, index, arr) => {
+          arr[index].sbom = sbom;
+          arr[index].sbomMode = sbomMode;
+        });
+
       } catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: '${path.join(rootPath,contextFiles.ignoreFile)}'`, e);
-        throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.ignoreFile)}'`);
+        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid legacy settings file: '${path.join(rootPath,settingsFileInfo.fileName)}'`, e);
+        throw new Error(`Invalid legacy settings file '${path.join(rootPath,settingsFileInfo.fileName)}'`);
       }
     }
 
-    if (contextFiles.identifyFile) {
-      try {
-        sbom = fs.readFileSync(path.join(rootPath,contextFiles.identifyFile), 'utf-8');
-        JSON.parse(sbom);
-        sbomMode = SbomMode.SBOM_IDENTIFY;
-      }catch (e) {
-        log.error(`[CODE SCANNER INPUT ADAPTER]: Invalid context file: ${path.join(rootPath,contextFiles.identifyFile)}'`, e);
-        throw new Error(`Invalid contextFile '${path.join(rootPath,contextFiles.identifyFile)}'`);
-      }
-    }
-
-    if (sbom.length) {
-      result.forEach((_, index, arr) => {
-        arr[index].sbom = sbom;
-        arr[index].sbomMode = sbomMode;
-      });
-    }
     return result;
   }
 }
