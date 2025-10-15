@@ -1,7 +1,5 @@
-
-
 export {licenses}
-
+// REUSE-IgnoreStart
 const licenses = [
 
      {
