@@ -108,5 +108,6 @@
   "InvalidPortNumberRange": "Port number must be between 1 and 65535",
   "ProxyPacUrlRequired": "You must provide a valid URL to your PAC file",
   "ProxyHostUrlRequired": "You must provide a valid URL to your proxy host",
-  "PortRequired": "You must provide a valid port number"
+  "PortRequired": "You must provide a valid port number",
+  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files"
 }

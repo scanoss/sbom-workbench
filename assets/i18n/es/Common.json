@@ -104,5 +104,6 @@
   "InvalidPortNumberRange": "El número de puerto debe estar entre 1 y 65535",
   "ProxyPacUrlRequired": "Debe proporcionar una URL válida a su archivo PAC",
   "ProxyHostUrlRequired": "Debe proporcionar una URL válida a su servidor proxy",
-  "PortRequired": "Debe proporcionar un número de puerto válido"
+  "PortRequired": "Debe proporcionar un número de puerto válido",
+  "UseLeftPanelForSearchCryptography": "Use el panel de la izquierda para criptografía dentro de los ficheros"
 }

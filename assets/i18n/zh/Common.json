@@ -85,5 +85,6 @@
   "InvalidPortNumberRange": "ポート番号は 1 ～ 65535 でなければなりません",
   "ProxyPacUrlRequired": "PAC ファイルへの有効な URL を指定する必要があります",
   "ProxyHostUrlRequired": "プロキシ ホストに有効な URL を指定する必要があります",
-  "PortRequired": "有効なポート番号を指定する必要があります"
+  "PortRequired": "有効なポート番号を指定する必要があります",
+  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files"
 }

@@ -22,7 +22,7 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   '& .MuiDataGrid-columnHeader': {
     fontSize: '12px',
     fontWeight: '400 !important',
-    padding: 0,
+    padding: '0 0 0 12px',
     '& .MuiDataGrid-columnSeparator': {
       display: 'none',
     },
@@ -43,7 +43,8 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   border: 2,
   '& .MuiDataGrid-cell': {
     border: 0,
-    padding: '0 3px',
+    padding: '0 3px 0 25px',
+    cursor: 'pointer',
   },
   '& .MuiDataGrid-cell.MuiDataGrid-cellCheckbox': {
     visibility: 'hidden',
@@ -189,19 +190,34 @@ const CryptoSearchPanel = () => {
         <div className="search-panel mt-3">
           <div className="search-panel-input d-flex align-center">
             <FormControl size="small" sx={{ minWidth: 120, flex: 1 }}>
-              <InputLabel id="crypto-algorithm-label">Algorithms</InputLabel>
+              <InputLabel id="crypto-algorithm-label">Keys</InputLabel>
               <Select
                 labelId="crypto-algorithm-label"
                 multiple
                 value={selectedAlgorithms}
-                label="Algorithms"
+                size="small"
+                label="Keys"
                 onChange={(e) => setSelectedAlgorithms(e.target.value as string[])}
+                endAdornment={
+                  selectedAlgorithms.length > 0 && (
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAlgorithms([]);
+                      }}
+                      sx={{ mr: 2 }}
+                    >
+                      <i className="ri-close-circle-line" style={{ fontSize: '16px' }} />
+                    </IconButton>
+                  )
+                }
                 renderValue={(selected) => (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, padding: '6px 4px' }}>
                     {selected.map((value) => (
                       <Chip
                         key={value}
-                        label={value.toUpperCase()}
+                        label={value?.toUpperCase()}
                         size="small"
                         sx={{ fontSize: '0.6rem', height: '15px' }}
                       />
@@ -224,11 +240,12 @@ const CryptoSearchPanel = () => {
                     sx={{ padding: '4px 8px', minHeight: 'auto' }}
                   >
                     <Checkbox
-                      checked={selectedAlgorithms.indexOf(algo) > -1}
+                      size="small"
+                      checked={selectedAlgorithms?.indexOf(algo) > -1}
                       sx={{ padding: '4px' }}
                     />
                     <ListItemText
-                      primary={algo.toUpperCase()}
+                      primary={algo?.toUpperCase()}
                       primaryTypographyProps={{ fontSize: '0.8rem' }}
                     />
                   </MenuItem>
@@ -263,8 +280,7 @@ const CryptoSearchPanel = () => {
           rows={fileResults}
           columns={[
             {
-              field: 'filename',
-              headerName: t('NFilesSelected', { count: selected.length}),
+              field: `files (${fileResults.length})`,
               editable: false,
               sortable: false,
               flex: 1,
@@ -280,13 +296,12 @@ const CryptoSearchPanel = () => {
                 }`,
             },
           }}
-          rowHeight={23}
+          rowHeight={24}
           paginationModel={paginationModel}
           onPaginationModelChange={onPaginationModelChangeHandler}
           pageSizeOptions={[100]}
           disableColumnMenu
           hideFooterSelectedRowCount
-          checkboxSelection
           columnHeaderHeight={41}
           disableRowSelectionOnClick
           onRowClick={onRowClickHandler}
