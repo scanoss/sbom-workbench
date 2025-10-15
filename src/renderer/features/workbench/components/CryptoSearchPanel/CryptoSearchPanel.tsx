@@ -80,10 +80,10 @@ const CryptoSearchPanel = () => {
   const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 100 });
 
   const [value, setValue] = React.useState<string[]>([]);
-  const [results, setResults] = React.useState<any[]>([]);
+  const [fileResults, setFileResults] = React.useState<any[]>([]);
+  const [cryptoResults, setCryptoResults] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
-  const [isOpenGroupKeywordDialog, setOpenKeywordDialog] = React.useState<boolean>(false);
-  const [selectedAlgorithms, setSelectedAlgorithms] = React.useState<string[]>(['md5']);
+  const [selectedAlgorithms, setSelectedAlgorithms] = React.useState<string[]>([]);
 
   const cryptoAlgorithms = ['md5', 'sha2', 'sha256', 'aes', 'rsa'];
 
@@ -91,40 +91,25 @@ const CryptoSearchPanel = () => {
   const refResults = useRef([]);
 
   const search = async () => {
+   const results =  await cryptographyService.search(selectedAlgorithms);
+   // Transform file paths into DataGrid-compatible objects
+   const formattedResults = results.files.map((filePath, index) => ({
+     id: index,
+     path: filePath,
+     filename: filePath.split('/').pop() || filePath,
+   }));
 
-
+   setFileResults(formattedResults);
+   setCryptoResults(results.crypto);
   };
 
   const goto = (path: string) => {
     navigate({
-      pathname: '/workbench/search/file',
-      search: `?path=file|${encodeURIComponent(path)}&highlight=${encodeURIComponent(searchQuery.current)}`,
+      pathname: '/workbench/crypto-search/file',
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(cryptoResults.join(','))}`,
     });
   };
 
-  const onTagsHandler = (tags: string[]) => {
-    serverPage.current = 0;
-    setPaginationModel({ page: 0, pageSize: 100 });
-
-    const nTags = tags
-      .map((tag) => tag.toLowerCase().trim())
-      .map((tag) => SearchUtils.getTerms(tag))
-      .flat();
-    searchQuery.current = nTags.join(' ');
-    setValue(nTags);
-  };
-
-  const sanitizeTags = (tags: string[]) => {
-    const nTags = tags
-      .map((tag) => tag.toLowerCase().trim())
-      .map((tag) => SearchUtils.getTerms(tag))
-      .flat();
-    return nTags;
-  }
-
-  const onSearchResponse = (event, data) => {
-    setResults(serverPage.current === 0 ? (oldState) => [...data] : (oldState) => [...oldState, ...data]);
-  };
 
   const onRowClickHandler = ({ row }, event) => {
     goto(row.path);
@@ -187,27 +172,13 @@ const CryptoSearchPanel = () => {
     search();
   }, [value]); //
 
-  useEffect(() => {
-    refSelected.current = selected;
-    refResults.current = results;
-  }, [selected, results]);
 
-  const setupListeners = (): () => void => {
-    const subscriptions = [];
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.SEARCH_ENGINE_SEARCH_RESPONSE, onSearchResponse));
-    subscriptions.push(window.electron.ipcRenderer.on(IpcChannels.CONTEXT_MENU_COMMAND, onActionMenuHandler));
-    return () => subscriptions.forEach((unsubscribe) => unsubscribe());
-  };
 
 
   useEffect(() => {
     search();
   }, [summary]);
 
-  // setup listeners
-  useEffect(() => {
-    setupListeners();
-  } ,[]);
 
   return (
     <div className="panel panel-left search-panel-container">
@@ -289,7 +260,7 @@ const CryptoSearchPanel = () => {
           <i className="ri-more-line" />
         </IconButton>
         <StyledDataGrid
-          rows={results}
+          rows={fileResults}
           columns={[
             {
               field: 'filename',

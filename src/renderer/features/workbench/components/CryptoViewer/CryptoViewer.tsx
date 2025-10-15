@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CodeViewer from '../../components/CodeViewer/CodeViewer';
+import CodeViewer, { HighLighted } from '../../components/CodeViewer/CodeViewer';
 import useSearchParams from '@hooks/useSearchParams';
 import * as SearchUtils from '@shared/utils/search-utils';
 import { workbenchController } from '../../../../controllers/workbench-controller';
@@ -9,14 +9,18 @@ import { useSelector } from 'react-redux';
 import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { FileContent } from '../../pages/detected/pages/Editor/Editor';
 import { CodeViewerManager } from '../../pages/detected/pages/Editor/CodeViewerManager';
+import { cryptographyService } from '@api/services/cryptography.service';
+import { string } from 'zod';
+import { getExtension } from '@shared/utils/utils';
 
 const CryptoViewer = () => {
   const { sourceCodePath } = useSelector(selectWorkbench);
   const { t } = useTranslation();
   const [localFileContent, setLocalFileContent] = useState<FileContent | null>(null);
+  const [keywords, setKeywords] = useState<Array<string>>([]);
   const MemoCodeViewer = React.memo(CodeViewer);
-  const highlightParam = useSearchParams().get('highlight');
-  const highlight =  highlightParam ? SearchUtils.unStemmifyCryptoKeywords(decodeURIComponent(highlightParam)) : [];
+  const cryptoParam = useSearchParams().get('crypto');
+  const cryptography =  cryptoParam ? SearchUtils.unStemmifyCryptoKeywords(decodeURIComponent(cryptoParam)) : [];
   const fileParam = useSearchParams().get('path');
   const file = fileParam ? decodeURIComponent(fileParam) : null;
 
@@ -34,10 +38,20 @@ const CryptoViewer = () => {
     }
   };
 
+  const loadKeywords = async () => {
+    const highlightKeywords = await cryptographyService.getKeyWords(cryptography[0]);
+    setKeywords(highlightKeywords);
+  }
+
+  const onHighlighted = (highlightResults: Array<HighLighted>) => {
+    console.log('Highlighted terms:', highlightResults);
+  }
+
   useEffect(() => {
     if (file) {
       console.log('Loading file:', file);
       loadLocalFile(file);
+      loadKeywords()
     }
   }, [file]);
 
@@ -55,13 +69,19 @@ const CryptoViewer = () => {
             editors
             app-content`}
         >
-          <MemoCodeViewer
-            id={CodeViewerManager.LEFT}
-            language={'js'}
-            value={localFileContent?.content || ''}
-            highlight={null}
-            highlights={highlight || []}
-          />
+          <div className="editor">
+            <MemoCodeViewer
+              id={CodeViewerManager.LEFT}
+              language={getExtension(file)}
+              value={localFileContent?.content || ''}
+              highlight={null}
+              onHighlighted={onHighlighted}
+              highlights={keywords || null}
+              highlightMatchOptions={{
+                matchCase: false,
+              }}
+            />
+          </div>
         </main>
       </section>
     </>
