@@ -10,7 +10,6 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { FileContent } from '../../pages/detected/pages/Editor/Editor';
 import { CodeViewerManager } from '../../pages/detected/pages/Editor/CodeViewerManager';
 import { cryptographyService } from '@api/services/cryptography.service';
-import { string } from 'zod';
 import { getExtension } from '@shared/utils/utils';
 import { Card, useTheme, Collapse, IconButton } from '@mui/material';
 
@@ -33,7 +32,6 @@ const CryptoViewer = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false, loading: true });
-      console.log('Loading file:', `${sourceCodePath}/${path}`);
       const content = await workbenchController.fetchLocalFile(`${sourceCodePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
 
@@ -45,18 +43,16 @@ const CryptoViewer = () => {
   };
 
   const loadKeywords = async () => {
-    const highlightKeywords = await cryptographyService.getKeyWords(cryptography[0]);
+    const highlightKeywords = await cryptographyService.getKeyWords(cryptography);
     setKeywords(highlightKeywords);
   }
 
   const onHighlighted = (results: Array<HighLighted>) => {
-    console.log('Highlighted terms:', results);
     setHighlightResults(results);
   }
 
   useEffect(() => {
     if (file) {
-      console.log('Loading file:', file);
       loadLocalFile(file);
       loadKeywords()
     }
