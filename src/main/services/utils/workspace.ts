@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path from 'path';
+import { SettingsFileInfo } from '../../../api/types';
 
 export function isIdentifyFile(file: string) {
   const pattern = /sbom\.json/i;
@@ -56,6 +56,9 @@ export async function getContextFiles(scanRoot: string) {
   };
 }
 
+/**
+ * @deprecated Use getSettingsFileInfo() instead
+ */
 export async function getScanossSettingsFilePath(scanRoot: string) {
   const stats = await fs.promises.stat(scanRoot);
   const isDirectory = stats.isDirectory();
@@ -65,4 +68,35 @@ export async function getScanossSettingsFilePath(scanRoot: string) {
   const files = await fs.promises.readdir(scanRoot);
   if ((files.some((file) => file === 'scanoss.json'))) return 'scanoss.json';
   return null;
+}
+
+export async function getSettingsFileInfo(scanRoot: string): Promise<SettingsFileInfo> {
+  const stats = await fs.promises.stat(scanRoot);
+  const isDirectory = stats.isDirectory();
+
+  if (!isDirectory) {
+    return { type: 'none', fileName: null, legacyType: null };
+  }
+
+  const files = await fs.promises.readdir(scanRoot);
+
+  // Check for scanoss.json first
+  if (files.some((file) => file === 'scanoss.json')) {
+    return { type: 'standard', fileName: 'scanoss.json', legacyType: null };
+  }
+
+  // Check for legacy identify files
+  const legacyIdentifyFiles = ['scanoss-identify.json', 'SBOM.json', 'sbom.json'];
+  const foundIdentifyFile = files.find((file) => legacyIdentifyFiles.includes(file));
+
+  if (foundIdentifyFile) {
+    return { type: 'legacy', fileName: foundIdentifyFile, legacyType: 'identify' };
+  }
+
+  // Check for legacy ignore file
+  if (files.some((file) => file === 'scanoss-ignore.json')) {
+    return { type: 'legacy', fileName: 'scanoss-ignore.json', legacyType: 'ignore' };
+  }
+
+  return { type: 'none', fileName: null, legacyType: null };
 }
