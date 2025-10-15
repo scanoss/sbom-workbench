@@ -181,3 +181,16 @@ api.handle(IpcChannels.WORKSPACE_SCANOSS_SETTING_FILE, async (_event, scanRoot: 
     return Response.fail({ message: e.message });
   }
 });
+
+api.handle(IpcChannels.WORKSPACE_SETTINGS_FILE_INFO, async (_event, scanRoot: string) => {
+  try {
+    const configFileInfo = await workspaceService.getSettingsFileInfo(scanRoot);
+    return Response.ok({
+      message: 'Config file info retrieved successfully',
+      data: configFileInfo,
+    });
+  } catch (e: any) {
+    log.error('Catch an error: ', e);
+    return Response.fail({ message: e.message });
+  }
+});
