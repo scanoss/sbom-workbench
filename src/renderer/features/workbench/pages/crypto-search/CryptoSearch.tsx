@@ -12,7 +12,7 @@ const CryptoSearch = () => {
         <Route
           index
           element={
-            <EmptyMessagePlaceholder>{t('UseLeftPanelForSearch')}</EmptyMessagePlaceholder>
+            <EmptyMessagePlaceholder>{t('UseLeftPanelForSearchCryptography')}</EmptyMessagePlaceholder>
           }
         />
         <Route path='file/*' element={<CryptoViewer/>} />
