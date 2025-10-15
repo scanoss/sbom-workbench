@@ -29,6 +29,10 @@ class WorkspaceService {
     app.exit(0);
   }
 
+  /**
+   *
+   * @deprecated Use getSettingsFileInfo() instead
+   */
   public async contextFiles(scanRoot: string) {
     return getContextFiles(scanRoot);
   }
