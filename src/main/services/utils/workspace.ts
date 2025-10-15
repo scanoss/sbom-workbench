@@ -23,6 +23,9 @@ export function sortIdentifyFilesComparator(a, b) {
   return 0;
 }
 
+/**
+ * @deprecated Use getSettingsFileInfo() instead
+ */
 export async function getContextFiles(scanRoot: string) {
   const stats = await fs.promises.stat(scanRoot);
   const isDirectory = stats.isDirectory();
