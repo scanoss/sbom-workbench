@@ -1,20 +1,10 @@
-import React, { useContext, useEffect, useRef } from 'react';
-import { Chip, IconButton, styled, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText } from '@mui/material';
-import { IpcChannels } from '@api/ipc-channels';
+import React, { useEffect, useRef } from 'react';
+import { Chip, IconButton, styled, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText } from '@mui/material';
 import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
-import Autocomplete from '@mui/material/Autocomplete';
-import * as SearchUtils from '@shared/utils/search-utils';
 import { AppConfigDefault } from '@config/AppConfigDefault';
-import { useDispatch, useSelector } from 'react-redux';
-import { DialogContext, IDialogContext } from '@context/DialogProvider';
-import useBatch from '@hooks/useBatch';
-import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
 import TreeNode from '../TreeNode/TreeNode';
-import { KeywordGroupMenu } from '../KeywordGroupMenu/KeywordGroupMenu';
-import { GroupSearchKeyword } from '@api/types';
-import TocOutlinedIcon from '@mui/icons-material/TocOutlined';
 import { cryptographyService } from '@api/services/cryptography.service';
 
 // For the data grid
@@ -66,30 +56,16 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
   },
 }));
 
-
 const CryptoSearchPanel = () => {
   const navigate = useNavigate();
-  const searchQuery = useRef(null);
-  const { summary } = useSelector(selectWorkbench);
   const { t } = useTranslation();
-
-  const dispatch = useDispatch();
-  const batch = useBatch();
-  const dialogCtrl = useContext(DialogContext) as IDialogContext;
-
   const serverPage = useRef(0);
   const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 100 });
-
-  const [value, setValue] = React.useState<string[]>([]);
   const [fileResults, setFileResults] = React.useState<any[]>([]);
-  const [cryptoResults, setCryptoResults] = React.useState<any[]>([]);
+  const [detectedKeysInFiles, setDetectedKeysInFiles] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
   const [selectedAlgorithms, setSelectedAlgorithms] = React.useState<string[]>([]);
-
-  const cryptoAlgorithms = ['md5', 'sha2', 'sha256', 'aes', 'rsa'];
-
-  const refSelected = useRef([]);
-  const refResults = useRef([]);
+  const [detectedCryptoKeys, setDetectedCryptoKeys] = React.useState<string[]>([]);
 
   const search = async () => {
    const results =  await cryptographyService.search(selectedAlgorithms);
@@ -101,15 +77,20 @@ const CryptoSearchPanel = () => {
    }));
 
    setFileResults(formattedResults);
-   setCryptoResults(results.crypto);
+   setDetectedKeysInFiles(results.crypto);
   };
 
   const goto = (path: string) => {
     navigate({
       pathname: '/workbench/crypto-search/file',
-      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(cryptoResults.join(','))}`,
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(detectedKeysInFiles.join(','))}`,
     });
   };
+
+  const loadKeys = async () => {
+    const cryptoKeys = await cryptographyService.getDetectedKeys();
+    setDetectedCryptoKeys(cryptoKeys);
+  }
 
 
   const onRowClickHandler = ({ row }, event) => {
@@ -126,39 +107,6 @@ const CryptoSearchPanel = () => {
     setSelected(data);
   };
 
-  const getFilesSelected = () => {
-    const set = new Set(refSelected.current);
-    return refResults.current.filter((r) => set.has(r.id));
-  };
-
-  const onActionMenuHandler = (e, params) => {
-    switch (params) {
-      case 'Action:IdentifySelectedAs':
-        batch.identifyAll(getFilesSelected());
-        break;
-      case 'Action:MarkSelectedAsOriginal':
-        batch.ignoreAll(getFilesSelected());
-        break;
-      default:
-        break;
-    }
-  };
-
-  const onMenuActionHandler = () => {
-    const menu = [
-      {
-        label: t('AppMenu:IdentifySelectedAs'),
-        actionId: 'Action:IdentifySelectedAs',
-      },
-      {
-        label: t('AppMenu:MarkSelectedAsOriginal'),
-        actionId: 'Action:MarkSelectedAsOriginal',
-      },
-    ];
-
-    window.electron.ipcRenderer.send(IpcChannels.DIALOG_BUILD_CUSTOM_POPUP_MENU, menu);
-  };
-
   const onPaginationModelChangeHandler = (model: GridPaginationModel) => {
     setPaginationModel(model);
     const nextPageServer = Math.floor((model.page + 1) / (AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT / 100));
@@ -168,18 +116,9 @@ const CryptoSearchPanel = () => {
     }
   };
 
-  // trigger the search on value change
   useEffect(() => {
-    search();
-  }, [value]); //
-
-
-
-
-  useEffect(() => {
-    search();
-  }, [summary]);
-
+    loadKeys();
+  }, []);
 
   return (
     <div className="panel panel-left search-panel-container">
@@ -205,6 +144,7 @@ const CryptoSearchPanel = () => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedAlgorithms([]);
+                        setFileResults([]);
                       }}
                       sx={{ mr: 2 }}
                     >
@@ -233,19 +173,19 @@ const CryptoSearchPanel = () => {
                   }
                 }}
               >
-                {cryptoAlgorithms.map((algo) => (
+                {detectedCryptoKeys.map((key) => (
                   <MenuItem
-                    key={algo}
-                    value={algo}
+                    key={key}
+                    value={key}
                     sx={{ padding: '4px 8px', minHeight: 'auto' }}
                   >
                     <Checkbox
                       size="small"
-                      checked={selectedAlgorithms?.indexOf(algo) > -1}
+                      checked={selectedAlgorithms?.indexOf(key) > -1}
                       sx={{ padding: '4px' }}
                     />
                     <ListItemText
-                      primary={algo?.toUpperCase()}
+                      primary={key?.toUpperCase()}
                       primaryTypographyProps={{ fontSize: '0.8rem' }}
                     />
                   </MenuItem>
@@ -272,7 +212,6 @@ const CryptoSearchPanel = () => {
             right: 9,
             zIndex: 1,
           }}
-          onClick={onMenuActionHandler}
         >
           <i className="ri-more-line" />
         </IconButton>

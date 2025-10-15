@@ -64,25 +64,29 @@ class CryptographyService {
     return type === SourceType.detected ? this.getDetected() : this.getIdentified();
   }
 
-  public async getKeywordsByKey(key: string): Promise<Array<string>>{
+  public async getKeywordsByKeys(keys: Array<string>): Promise<Array<string>>{
+    const keySet = new Set(keys.map(key =>key.toLowerCase()));
     const algorithmRulesPath = await this.getAlgorithmRulesPath();
 
 
     // Algorithm
     const algorithmData = await fs.promises.readFile(algorithmRulesPath,'utf8');
     const algorithmRules = JSON.parse(algorithmData);
-    const algorithm = algorithmRules.find((rule: any) => rule.algorithmId.toLowerCase() === key.toLowerCase());
+    const algorithms = algorithmRules.filter((rule: any) => keySet.has(rule.algorithmId.toLowerCase()));
 
     // Library
     const libraryRulesPath = await this.getLibraryRulesPath();
     const libraryRulesData = await fs.promises.readFile(libraryRulesPath,'utf8');
     const libraryRules = JSON.parse(libraryRulesData);
-    const library = libraryRules.find((rule: any) => rule.id.toLowerCase() === key.toLowerCase());
-
-    const keywords =  algorithm ? algorithm.keywords : [];
-    keywords.push(...(library ? library.keywords : []));
+    const libraries = libraryRules.filter((rule: any) => keySet.has(rule.id.toLowerCase()));
+    const keywords: Array<string> = [];
+    algorithms.forEach((algorithm, index) => {
+      keywords.push(...(algorithm ? algorithm.keywords : []));
+    });
+    libraries.forEach((library, index) => {
+      keywords.push(...(library ? library.keywords : []));
+    });
     return keywords;
-
   }
 
   public async getFilesByCrypto(crypto: Array<string>): Promise<{ files: Array<string>, crypto: Array<string> }>{
@@ -113,6 +117,17 @@ class CryptographyService {
     result.crypto = Array.from(matchedCrypto);
 
     return result;
+  }
+
+  public async getDetectedKeys(): Promise<Array<string>> {
+    const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
+    const detectedKeys = new Set<string>();
+    files.forEach((file: CryptographicItem) => {
+      file.values.forEach((v) => {
+        detectedKeys.add(v);
+      });
+    });
+    return Array.from(detectedKeys);
   }
 
   private async getDetected(): Promise<CryptographyResponseDTO> {
