@@ -79,6 +79,9 @@
         a{
           cursor: pointer;
         }
+        .MuiAlert-message {
+          white-space: pre-line;
+        }
       }
     }
   }
