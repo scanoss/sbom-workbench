@@ -114,6 +114,8 @@ class CryptographyService {
       return hasMatch;
     }).map((f)=> f.name);
 
+    result.files = Array.from(new Set(result.files).values());
+
     result.crypto = Array.from(matchedCrypto);
 
     return result;
