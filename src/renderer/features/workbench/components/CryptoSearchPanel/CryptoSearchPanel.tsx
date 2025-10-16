@@ -116,6 +116,11 @@ const CryptoSearchPanel = () => {
     }
   };
 
+  const resetSearch = () => {
+    setSelectedAlgorithms([]);
+    setFileResults([]);
+  }
+
   useEffect(() => {
     loadKeys();
   }, []);
@@ -133,18 +138,27 @@ const CryptoSearchPanel = () => {
               <Select
                 labelId="crypto-algorithm-label"
                 multiple
+                label={selectedAlgorithms.length > 0 ? `Keys (${selectedAlgorithms.length})` : 'Keys'}
                 value={selectedAlgorithms}
                 size="small"
-                label="Keys"
+                onClose={() => {
+                  if (selectedAlgorithms.length > 0) {
+                    void search();
+                  }
+                }}
                 onChange={(e) => setSelectedAlgorithms(e.target.value as string[])}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    void search();
+                  }
+                }}
                 endAdornment={
                   selectedAlgorithms.length > 0 && (
                     <IconButton
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setSelectedAlgorithms([]);
-                        setFileResults([]);
+                        resetSearch();
                       }}
                       sx={{ mr: 2 }}
                     >
@@ -153,12 +167,30 @@ const CryptoSearchPanel = () => {
                   )
                 }
                 renderValue={(selected) => (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, padding: '6px 5px', maxHeight: '80px', overflowY: 'auto' }}>
+                  <div
+                    style={{ display: 'flex', flexWrap: 'wrap', gap: 5, padding: '6px 5px', maxHeight: '80px', overflowY: 'auto' }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
                     {selected.map((value) => (
                       <Chip
                         key={value}
                         label={value?.toUpperCase()}
                         size="small"
+                        onDelete={(e) => {
+                          e.stopPropagation();
+                          const filteredAlgorithms = selectedAlgorithms.filter(item => item !== value)
+                          setSelectedAlgorithms(filteredAlgorithms);
+                          if(filteredAlgorithms.length === 0) {
+                            resetSearch();
+                            return;
+                          }
+                          void search();
+                        }}
                         sx={{ fontSize: '0.7rem', height: '15px' }}
                       />
                     ))}
@@ -181,11 +213,11 @@ const CryptoSearchPanel = () => {
                     value={key}
                     sx={{ padding: '4px 8px', minHeight: 'auto' }}
                   >
-                    <Checkbox
-                      size="small"
-                      checked={selectedAlgorithms?.indexOf(key) > -1}
-                      sx={{ padding: '4px' }}
-                    />
+                  <Checkbox
+                    size="small"
+                    checked={selectedAlgorithms?.indexOf(key) > -1}
+                    sx={{ padding: '4px' }}
+                  />
                     <ListItemText
                       primary={key?.toUpperCase()}
                       primaryTypographyProps={{ fontSize: '0.8rem' }}
@@ -194,13 +226,6 @@ const CryptoSearchPanel = () => {
                 ))}
               </Select>
             </FormControl>
-            <IconButton
-              size="small"
-              onClick={search}
-              sx={{ ml: 1.5, mr: 1.5 }}
-            >
-              <i className="ri-search-line" />
-            </IconButton>
           </div>
         </div>
       </header>
