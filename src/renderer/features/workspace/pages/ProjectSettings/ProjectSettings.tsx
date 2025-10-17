@@ -410,8 +410,9 @@ const ProjectSettings = () => {
                     <Trans
                       i18nKey="Common:NoConfigFileFoundOptional"
                       components={{
-                        1: <strong />,
-                        2: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
+                        1: <Link className="cursor-pointer" color="inherit" onClick={onOpenWorkRoot} />,
+                        2: <strong />,
+                        3: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
                       }}
                     />
                   </Alert>
