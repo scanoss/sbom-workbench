@@ -80,10 +80,13 @@
   "NewGroup": "New Group",
   "NoDependenciesFoundMatching": "No dependencies found matching the current filter criteria",
   "NoDependenciesWereDetected": "No dependencies were detected",
-  "InvalidUrl": "URL が無効です",
-  "InvalidPortNumber": "無効なポート番号です",
-  "InvalidPortNumberRange": "ポート番号は 1 ～ 65535 でなければなりません",
-  "ProxyPacUrlRequired": "PAC ファイルへの有効な URL を指定する必要があります",
-  "ProxyHostUrlRequired": "プロキシ ホストに有効な URL を指定する必要があります",
-  "PortRequired": "有効なポート番号を指定する必要があります"
+  "InvalidUrl": "URL 无效",
+  "InvalidPortNumber": "端口号无效",
+  "InvalidPortNumberRange": "端口号必须在 1 到 65535 之间",
+  "ProxyPacUrlRequired": "您必须提供指向 PAC 文件的有效 URL",
+  "ProxyHostUrlRequired": "您必须提供指向代理主机的有效 URL",
+  "PortRequired": "您必须提供有效的端口号",
+  "NoConfigFileFoundOptional": "未找到配置文件（可选）。<1>打开项目文件夹</1>以创建<2>scanoss.json</2>文件来自定义扫描行为。<3>了解更多</3>",
+  "LegacyConfigFileDetected": "检测到旧版配置文件：<1>{{fileName}}</1>。考虑迁移到新的<2>scanoss.json</2>格式以获得更好的功能。<3>查看文档</3>",
+  "ScanossSettingsFileFound": "找到 SCANOSS 设置文件 (<1>{{fileName}}</1>)。它将用于增强扫描结果。"
 }

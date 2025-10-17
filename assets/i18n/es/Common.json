@@ -105,7 +105,7 @@
   "ProxyPacUrlRequired": "Debe proporcionar una URL válida a su archivo PAC",
   "ProxyHostUrlRequired": "Debe proporcionar una URL válida a su servidor proxy",
   "PortRequired": "Debe proporcionar un número de puerto válido",
-  "NoConfigFileFoundOptional": "No se encontró archivo de configuración (opcional).\n\nCree un archivo <1>scanoss.json</1> para personalizar el comportamiento del escaneo.\n\n<2>Más información</2>",
-  "LegacyConfigFileDetected": "Archivo de configuración deprecado detectado: <1>{{fileName}}</1>\n\nConsidere migrar al nuevo formato <2>scanoss.json</2> para obtener una mejor funcionalidad.\n\n<3>Ver documentación</3>",
+  "NoConfigFileFoundOptional": "No se encontró archivo de configuración (opcional). <1>Abrir carpeta del proyecto</1> para crear un archivo <2>scanoss.json</2> para personalizar el comportamiento del escaneo. <3>Más información</3>",
+  "LegacyConfigFileDetected": "Archivo de configuración deprecado detectado: <1>{{fileName}}</1>. Considere migrar al nuevo formato <2>scanoss.json</2> para obtener una mejor funcionalidad. <3>Ver documentación</3>",
   "ScanossSettingsFileFound": "Se encontró un archivo de configuración SCANOSS (<1>{{fileName}}</1>). Se utilizará para mejorar los resultados del escaneo."
 }
