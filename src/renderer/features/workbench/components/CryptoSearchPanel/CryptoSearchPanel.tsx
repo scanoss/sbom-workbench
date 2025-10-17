@@ -90,6 +90,7 @@ const CryptoSearchPanel = () => {
   const loadKeys = async () => {
     const cryptoKeys = await cryptographyService.getDetectedKeys();
     setDetectedCryptoKeys(cryptoKeys);
+    setSelectedAlgorithms(cryptoKeys);
   }
 
 
@@ -125,6 +126,11 @@ const CryptoSearchPanel = () => {
     loadKeys();
   }, []);
 
+
+  useEffect(() => {
+    search();
+  }, [selectedAlgorithms]);
+
   return (
     <div className="panel panel-left search-panel-container">
       <header className="panel-header border-bottom p-3 pb-1">
@@ -136,6 +142,9 @@ const CryptoSearchPanel = () => {
             <FormControl size="small" sx={{ flex: '1 1 auto'}}>
               <InputLabel id="crypto-algorithm-label">{selectedAlgorithms.length > 0 ? `Keys (${selectedAlgorithms.length})` : 'Keys'}</InputLabel>
               <Select
+                MenuProps={{
+                  autoFocus: false
+                }}
                 labelId="crypto-algorithm-label"
                 multiple
                 label={selectedAlgorithms.length > 0 ? `Keys (${selectedAlgorithms.length})` : 'Keys'}
@@ -148,7 +157,20 @@ const CryptoSearchPanel = () => {
                     void search();
                   }
                 }}
-                onChange={(e) => setSelectedAlgorithms(e.target.value as string[])}
+                onChange={(e) => {
+                  const value = e.target.value as string[];
+                  if (value.includes('select-all')) {
+                    // Toggle select all
+                    if (selectedAlgorithms.length === detectedCryptoKeys.length) {
+                      setSelectedAlgorithms([]);
+                      resetSearch();
+                    } else {
+                      setSelectedAlgorithms(detectedCryptoKeys);
+                    }
+                  } else {
+                    setSelectedAlgorithms(value);
+                  }
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     void search();
@@ -222,6 +244,30 @@ const CryptoSearchPanel = () => {
                   }
                 }}
               >
+                <MenuItem
+                  value="select-all"
+                  sx={{ padding: '4px 8px', minHeight: 'auto', borderBottom: '1px solid #e0e0e0' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (selectedAlgorithms.length === detectedCryptoKeys.length) {
+                      setSelectedAlgorithms([]);
+                      resetSearch();
+                    } else {
+                      setSelectedAlgorithms(detectedCryptoKeys);
+                    }
+                  }}
+                >
+                  <Checkbox
+                    size="small"
+                    checked={selectedAlgorithms.length === detectedCryptoKeys.length && detectedCryptoKeys.length > 0}
+                    indeterminate={selectedAlgorithms.length > 0 && selectedAlgorithms.length < detectedCryptoKeys.length}
+                    sx={{ padding: '4px' }}
+                  />
+                  <ListItemText
+                    primary="SELECT ALL"
+                    primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 600 }}
+                  />
+                </MenuItem>
                 {detectedCryptoKeys.map((key) => (
                   <MenuItem
                     key={key}
