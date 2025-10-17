@@ -3,7 +3,6 @@ import { AutoSizer, List } from 'react-virtualized';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { cryptographyService } from '@api/services/cryptography.service';
 
 export const LocalCryptographyTable = ({data}) => {
   const { t } = useTranslation();
@@ -13,6 +12,7 @@ export const LocalCryptographyTable = ({data}) => {
     return data.files.flatMap((item, itemIndex) =>
       item.values.map((algorithm, algIndex) => ({
         key: `${itemIndex}-${algIndex}`,
+        fileId: item.fileId,
         fileName: item.name,
         type: item.type,
         algorithm,
@@ -20,12 +20,14 @@ export const LocalCryptographyTable = ({data}) => {
     );
   }, [data]);
 
-  const onSelectFile = async (e, path:string, algorithm:string) => {
+  const onSelectFile = async (e, path:string, fileId:number) => {
     e.preventDefault();
-    const keywords = await cryptographyService.getKeyWords(algorithm);
+    const detectedKeys = data.files
+      .filter(f => f.fileId === fileId)
+      .flatMap(f => f.values);
     navigate({
       pathname: '/workbench/crypto-search/file',
-      search: `?path=${encodeURIComponent(path)}&highlight=${encodeURIComponent(keywords.join(','))}`,
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(detectedKeys.join(','))}`,
     });
   };
 
@@ -38,7 +40,7 @@ export const LocalCryptographyTable = ({data}) => {
             href="#"
             underline="hover"
             color="inherit"
-            onClick={(e) => onSelectFile(e, row.fileName, row.algorithm)}
+            onClick={(e) => onSelectFile(e, row.fileName, row.fileId)}
           >
             {row.fileName}
           </Link>

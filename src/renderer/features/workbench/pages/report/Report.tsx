@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import VulnerabilitiesReport from './pages/vulnerabilities/VulnerabilitiesReport';
 import ScanReport from './pages/scan/ScanReport';
-import CryptographyReport from './pages/crypthographies/CrypthographyReport';
+import CryptographyReport from './pages/crypthographies/CryptographyReport';
 
 const Reports = () => (
   <Routes>
