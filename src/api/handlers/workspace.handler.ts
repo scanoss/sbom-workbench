@@ -98,6 +98,9 @@ api.handle(IpcChannels.WORKSPACE_SET_CURRENT, async (_event, wsPath: string) => 
   }
 });
 
+/**
+ * @deprecated Use IpcChannels.WORKSPACE_SETTINGS_FILE_INFO instead
+ */
 api.handle(IpcChannels.WORKSPACE_CONTEXT_FILES, async (_event, scanRoot: string) => {
   try {
     const contextFiles = await workspaceService.contextFiles(scanRoot);
@@ -169,6 +172,9 @@ api.handle(IpcChannels.WORKSPACE_DELETE_SEARCH_GROUP, async (_event, id: number)
   }
 });
 
+/**
+ * @deprecated Use IpcChannels.WORKSPACE_SETTINGS_FILE_INFO instead
+ */
 api.handle(IpcChannels.WORKSPACE_SCANOSS_SETTING_FILE, async (_event, scanRoot: string) => {
   try {
     const scanossSettingsFilePath = await workspaceService.getScanossSettingFilePath(scanRoot);

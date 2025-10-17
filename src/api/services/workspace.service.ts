@@ -62,6 +62,9 @@ class WorkspaceService extends BaseService {
     return this.response(response);
   }
 
+  /**
+   * @deprecated Use getSettingsFileInfo() instead.
+   */
   public async contextFiles(scanRoot: string): Promise<ContextFiles> {
     const response = await window.electron.ipcRenderer.invoke(
       IpcChannels.WORKSPACE_CONTEXT_FILES,
@@ -107,7 +110,6 @@ class WorkspaceService extends BaseService {
   }
 
   /**
-   *
    * @deprecated Use getConfigFileInfo() instead.
    */
   public async getScanossSettingsFilePath(scanRoot: string): Promise<string> {
