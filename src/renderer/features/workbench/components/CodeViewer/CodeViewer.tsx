@@ -19,6 +19,7 @@ interface ICodeViewerProps {
   value: string;
   language: string;
   highlight: string;
+  scrollToLine?: number;
   highlights?: string[];
   highlightMatchOptions?: HighlightMatchOptions; // Configure match behavior
   onHighlighted?: (matchedTerms: Array<HighLighted>) => void;
@@ -26,9 +27,10 @@ interface ICodeViewerProps {
   options?: monaco.editor.IStandaloneEditorConstructionOptions;
 }
 
-const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatchOptions, onHighlighted, highlightHoverMessage, options }: ICodeViewerProps) => {
+const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatchOptions, onHighlighted, highlightHoverMessage, options, scrollToLine }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
+  const scrollLineDecorations = React.useRef<string[]>([]);
   const initMonaco = () => {
     const ref = editorContainerRef.current;
     if (ref) {
@@ -228,6 +230,33 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
       highlightTerms(highlights);
     }
   }, [highlights, value]);
+
+  useEffect(() => {
+    if(scrollToLine && editor.current) {
+      // Clear previous line highlight
+      scrollLineDecorations.current = editor.current.deltaDecorations(
+        scrollLineDecorations.current,
+        []
+      );
+
+      // Add new line highlight
+      scrollLineDecorations.current = editor.current.deltaDecorations(
+        [],
+        [{
+          range: new monaco.Range(scrollToLine, 1, scrollToLine, 1),
+          options: {
+            isWholeLine: true,
+            className: 'lineHighlightDecoration',
+            linesDecorationsClassName: 'lineRangeDecoration',
+          }
+        }]
+      );
+
+      editor.current.revealLineNearTop(scrollToLine);
+      editor.current.setPosition({ lineNumber: scrollToLine, column: 1 });
+      editor.current.focus();
+    }
+  }, [scrollToLine]);
 
   return <div ref={editorContainerRef} style={{ width: '100%', height: '100%' }} />;
 };

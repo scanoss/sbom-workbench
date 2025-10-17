@@ -28,6 +28,8 @@ const CryptoViewer = () => {
   const cryptography =  cryptoParam ? SearchUtils.unStemmifyCryptoKeywords(decodeURIComponent(cryptoParam)) : [];
   const fileParam = useSearchParams().get('path');
   const file = fileParam ? decodeURIComponent(fileParam) : null;
+  const [scrollToLine, setScrollToLine] = useState<number | null>(null);
+  const editorRef = React.useRef<HTMLDivElement>(null);
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -51,6 +53,10 @@ const CryptoViewer = () => {
     setHighlightResults(results);
   }
 
+  const handleLineClick = (lineNumber: number) => {
+    setScrollToLine(lineNumber);
+  }
+
   useEffect(() => {
     if (file) {
       loadLocalFile(file);
@@ -59,8 +65,19 @@ const CryptoViewer = () => {
   }, [file]);
 
   useEffect(() => {
-    console.log('file');
-  },[]);
+    if (scrollToLine !== null) {
+      // Find the app-page section (id="editor")
+      const scrollContainer = document.getElementById('editor');
+      if (scrollContainer) {
+        // Scroll to the absolute bottom of the app-page section
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }, [scrollToLine]);
+
 
   return (
     <>
@@ -120,7 +137,31 @@ const CryptoViewer = () => {
                           </span>
                         </div>
                         <div style={{ fontSize: '11px', opacity: 0.6 }}>
-                          Lines: {result.lines.join(', ')}
+                          Lines: {result.lines.map((line, index) => (
+                            <React.Fragment key={line}>
+                              {index > 0 && ', '}
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleLineClick(line);
+                                }}
+                                style={{
+                                  cursor: 'pointer',
+                                  color: theme.palette.primary.main,
+                                  textDecoration: 'underline',
+                                  textUnderlineOffset: '2px',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.opacity = '0.8';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.opacity = '1';
+                                }}
+                              >
+                                {line}
+                              </span>
+                            </React.Fragment>
+                          ))}
                         </div>
                       </div>
                     ))}
@@ -129,14 +170,15 @@ const CryptoViewer = () => {
               </div>
             )}
           </Card>
-          <div className="editor">
+          <div className="editor" ref={editorRef}>
             <MemoCodeViewer
-              id={CodeViewerManager.LEFT}
+              id={CodeViewerManager.CRYPTO}
               language={getExtension(file)}
               value={localFileContent?.content || ''}
               highlight={null}
               onHighlighted={onHighlighted}
               highlights={keywords || null}
+              scrollToLine={scrollToLine}
               highlightMatchOptions={{
                 matchCase: false,
               }}
