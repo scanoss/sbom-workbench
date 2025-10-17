@@ -7,6 +7,8 @@ export class CodeViewerManager {
 
   public static readonly MAIN: string = 'main';
 
+  public static readonly CRYPTO: string = 'crypto';
+
   private mosaic: Map<string, monaco.editor.IStandaloneCodeEditor | null>;
 
   constructor() {
@@ -14,6 +16,7 @@ export class CodeViewerManager {
     this.mosaic.set(CodeViewerManager.LEFT, null);
     this.mosaic.set(CodeViewerManager.RIGHT, null);
     this.mosaic.set(CodeViewerManager.MAIN, null);
+    this.mosaic.set(CodeViewerManager.CRYPTO, null);
   }
 
   public set(key: string, editor: monaco.editor.IStandaloneCodeEditor | null): void {
