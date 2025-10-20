@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { Chip, IconButton, styled, Select, MenuItem, FormControl, InputLabel, Checkbox, ListItemText, InputAdornment } from '@mui/material';
 import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AppConfigDefault } from '@config/AppConfigDefault';
 import { useTranslation } from 'react-i18next';
 import TreeNode from '../TreeNode/TreeNode';
 import { cryptographyService } from '@api/services/cryptography.service';
+import * as SearchUtils from '@shared/utils/search-utils';
 
 // For the data grid
 const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
@@ -59,15 +60,26 @@ const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 const CryptoSearchPanel = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const serverPage = useRef(0);
   const [paginationModel, setPaginationModel] = React.useState({ page: 0, pageSize: 100 });
   const [fileResults, setFileResults] = React.useState<any[]>([]);
+  const [defaultKeys, setDefaultKeys] = React.useState([]);
   const [detectedKeysInFiles, setDetectedKeysInFiles] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
   const [selectedAlgorithms, setSelectedAlgorithms] = React.useState<string[]>([]);
   const [detectedCryptoKeys, setDetectedCryptoKeys] = React.useState<string[]>([]);
+  const fileParam = searchParams.get('path');
+  const file = fileParam ? decodeURIComponent(fileParam) : null;
+  const cryptoParam = searchParams.get('crypto');
+  const cryptography =  cryptoParam ? SearchUtils.unStemmifyCryptoKeywords(decodeURIComponent(cryptoParam)) : [];
+  const forceSearchParam = searchParams.get('force-search');
+  const forceSearch =  forceSearchParam ? decodeURIComponent(forceSearchParam) : null;
+  const searchTypeSearchParam = searchParams.get('search-type');
+  const searchType =  searchTypeSearchParam ? decodeURIComponent(searchTypeSearchParam) : null;
 
   const search = async () => {
+    if(forceSearch) return;
    const results =  await cryptographyService.search(selectedAlgorithms);
    // Transform file paths into DataGrid-compatible objects
    const formattedResults = results.files.map((filePath, index) => ({
@@ -80,6 +92,24 @@ const CryptoSearchPanel = () => {
    setDetectedKeysInFiles(results.crypto);
   };
 
+  const forceSearchHandler = async ()=>{
+    if(!forceSearch) return;
+    // If searchType is "file", wait for defaultKeys to load first
+    if(searchType === "file" && defaultKeys.length === 0) return;
+    if(searchType === "algorithm") {
+      setDetectedCryptoKeys(cryptography);
+      setSelectedAlgorithms(cryptography);
+    } else {
+      setSelectedAlgorithms(defaultKeys);
+      setDetectedCryptoKeys(defaultKeys);
+    }
+    setFileResults([{
+      id: 1,
+      path: file,
+      filename: file.split('/').pop() || file,
+    }]);
+  };
+
   const goto = (path: string) => {
     navigate({
       pathname: '/workbench/crypto-search/file',
@@ -87,10 +117,15 @@ const CryptoSearchPanel = () => {
     });
   };
 
-  const loadKeys = async () => {
-    const cryptoKeys = await cryptographyService.getDetectedKeys();
-    setDetectedCryptoKeys(cryptoKeys);
-    setSelectedAlgorithms(cryptoKeys);
+  const getDefaultKeys = async () => {
+    const defaultCryptoKeys = await cryptographyService.getDetectedKeys();
+    setDefaultKeys(defaultCryptoKeys);
+  }
+
+  const loadDefaultDetectedKeys = async () => {
+    if(forceSearch) return;
+    setDetectedCryptoKeys(defaultKeys);
+    setSelectedAlgorithms(defaultKeys);
   }
 
 
@@ -117,19 +152,34 @@ const CryptoSearchPanel = () => {
     }
   };
 
-  const resetSearch = () => {
+  const resetSearch = async () => {
     setSelectedAlgorithms([]);
     setFileResults([]);
+    if(forceSearch) {
+      setDetectedCryptoKeys(defaultKeys);
+      // Remove query parameters from URL
+      searchParams.delete('force-search');
+      setSearchParams(searchParams);
+    }
   }
 
   useEffect(() => {
-    loadKeys();
+    getDefaultKeys();
   }, []);
+
+  useEffect(() => {
+    loadDefaultDetectedKeys();
+  }, [defaultKeys]);
 
 
   useEffect(() => {
     search();
   }, [selectedAlgorithms]);
+
+  useEffect(() => {
+   forceSearchHandler();
+  }, [forceSearch, defaultKeys]);
+
 
   return (
     <div className="panel panel-left search-panel-container">
