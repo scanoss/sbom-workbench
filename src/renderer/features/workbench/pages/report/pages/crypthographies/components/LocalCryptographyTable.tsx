@@ -27,7 +27,15 @@ export const LocalCryptographyTable = ({data}) => {
       .flatMap(f => f.values);
     navigate({
       pathname: '/workbench/crypto-search/file',
-      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(detectedKeys.join(','))}`,
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=file`,
+    });
+  };
+
+  const onSelectAlgorithm = async (e, path:string, key:number) => {
+    e.preventDefault();
+    navigate({
+      pathname: '/workbench/crypto-search/file',
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(key)}&force-search=true&search-type=algorithm`,
     });
   };
 
@@ -47,7 +55,14 @@ export const LocalCryptographyTable = ({data}) => {
         </TableCell>
         <TableCell style={{ width: '10%', display: 'flex', alignItems: 'center', justifyContent:'flex-start', padding:0, paddingRight:20  }}>{row.type}</TableCell>
         <TableCell style={{ width: '20%', display: 'flex', alignItems: 'center', justifyContent:'flex-start', padding: 0  }}>
-          <span className="tag">{row.algorithm}</span>
+          <Link
+            href="#"
+            underline="hover"
+            color="inherit"
+            onClick={(e) => onSelectAlgorithm(e, row.fileName, row.algorithm)}
+          >
+            {row.algorithm}
+          </Link>
         </TableCell>
       </div>
     );
