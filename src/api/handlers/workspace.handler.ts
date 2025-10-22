@@ -196,7 +196,7 @@ api.handle(IpcChannels.WORKSPACE_SETTINGS_FILE_INFO, async (_event, scanRoot: st
       data: configFileInfo,
     });
   } catch (e: any) {
-    log.error('Catch an error: ', e);
+    log.error('Workspace settings file info: err', e);
     return Response.fail({ message: e.message });
   }
 });
