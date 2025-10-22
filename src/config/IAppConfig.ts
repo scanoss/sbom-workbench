@@ -9,6 +9,7 @@ export interface IAppConfig {
 
   ABOUT_MESSAGE: string;
   DEFAULT_SETTING_NAME: string;
+  SCANOSS_SETTINGS_DOCS_URL: string;
 
   DEFAULT_SERVICE_CHUNK_LIMIT: number;
 

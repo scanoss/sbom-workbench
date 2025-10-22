@@ -412,7 +412,7 @@ const ProjectSettings = () => {
                       components={{
                         1: <Link className="cursor-pointer" color="inherit" onClick={onOpenWorkRoot} />,
                         2: <strong />,
-                        3: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
+                        3: <Link href={AppConfig.SCANOSS_SETTINGS_DOCS_URL} target="_blank" rel="noopener noreferrer" color="inherit" />
                       }}
                     />
                   </Alert>
@@ -433,7 +433,7 @@ const ProjectSettings = () => {
                       components={{
                         1: <Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(settingsFileInfo.fileName)} />,
                         2: <strong />,
-                        3: <Link href="https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file" target="_blank" rel="noopener noreferrer" color="inherit" />
+                        3: <Link href={AppConfig.SCANOSS_SETTINGS_DOCS_URL} target="_blank" rel="noopener noreferrer" color="inherit" />
                       }}
                     />
                   </Alert>
