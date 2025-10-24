@@ -15,6 +15,7 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import InsertChartOutlinedTwoToneIcon from '@mui/icons-material/InsertChartOutlinedTwoTone';
 import GavelIcon from '@mui/icons-material/Gavel';
 import SearchIcon from '@mui/icons-material/Search';
+import LockIcon from '@mui/icons-material/Lock';
 
 // eslint-disable-next-line import/no-named-default
 import { default as MaterialAppBar } from '@mui/material/AppBar';
@@ -67,6 +68,18 @@ const AppMenu = () => {
         <Tooltip title={t('Tooltip:SearchKeywords')} enterDelay={650}>
           <Button color="inherit">
             <SearchIcon />
+          </Button>
+        </Tooltip>
+      </NavLink>
+
+      <NavLink
+        to="/workbench/crypto-search"
+        className={({ isActive }) => `nav-link ${wfp ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
+        tabIndex={-1}
+      >
+        <Tooltip title={'Crypto Search'} enterDelay={650}>
+          <Button color="inherit">
+            <LockIcon />
           </Button>
         </Tooltip>
       </NavLink>

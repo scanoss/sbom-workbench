@@ -54,8 +54,8 @@ const Editor = () => {
   const { appInfo } = useSelector(selectWorkspaceState);
 
   const file = node?.type === 'file' ? node.path : null;
-  const highlight = highlightParam ? SearchUtils.unStemmify(highlightParam) : null;
 
+  const highlight =  highlightParam ? SearchUtils.unStemmify(decodeURIComponent(highlightParam)) : null;
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [inventoriesMatchInfo, setInventoriesMatchInfo] = useState<Result[] | null>(null);
@@ -335,7 +335,7 @@ const Editor = () => {
                 id={CodeViewerManager.LEFT}
                 language={getExtension(file)}
                 value={localFileContent?.content || ''}
-                highlight={currentMatch?.lines || null}
+                highlight={ currentMatch?.lines || null}
                 highlights={highlight || null}
               />
             ) : (
@@ -354,7 +354,7 @@ const Editor = () => {
           </div>
           )}
 
-        { (isDiffView) && currentMatch && (
+        {(isDiffView) && currentMatch && (
           <div className="editor">
             {!remoteFileContent?.error && remoteFileContent?.content ? (
               <MemoCodeViewer

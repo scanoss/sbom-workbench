@@ -7,13 +7,12 @@ import { useNavigate } from 'react-router-dom';
 export const LocalCryptographyTable = ({data}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
   const rows = useMemo(() => {
     if (!data || !data.files) return [];
-
     return data.files.flatMap((item, itemIndex) =>
       item.values.map((algorithm, algIndex) => ({
         key: `${itemIndex}-${algIndex}`,
+        id: algIndex,
         fileName: item.name,
         type: item.type,
         algorithm,
@@ -21,11 +20,22 @@ export const LocalCryptographyTable = ({data}) => {
     );
   }, [data]);
 
-  const onSelectFile = async (e, path) => {
+  const onSelectFile = async (e, filePath:string) => {
+    e.preventDefault();
+    const detectedKeys = data.files
+      .filter(f => f.name === filePath)
+      .flatMap(f => f.values);
+    navigate({
+      pathname: '/workbench/crypto-search/file',
+      search: `?path=${encodeURIComponent(filePath)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=file`,
+    });
+  };
+
+  const onSelectAlgorithm = async (e, path:string, key:number) => {
     e.preventDefault();
     navigate({
-      pathname: '/workbench/detected/file',
-      search: `?path=file|${encodeURIComponent(path)}`,
+      pathname: '/workbench/crypto-search/file',
+      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(key)}&force-search=true&search-type=algorithm`,
     });
   };
 
@@ -45,7 +55,14 @@ export const LocalCryptographyTable = ({data}) => {
         </TableCell>
         <TableCell style={{ width: '10%', display: 'flex', alignItems: 'center', justifyContent:'flex-start', padding:0, paddingRight:20  }}>{row.type}</TableCell>
         <TableCell style={{ width: '20%', display: 'flex', alignItems: 'center', justifyContent:'flex-start', padding: 0  }}>
-          <span className="tag">{row.algorithm}</span>
+          <Link
+            href="#"
+            underline="hover"
+            color="inherit"
+            onClick={(e) => onSelectAlgorithm(e, row.fileName, row.algorithm)}
+          >
+            {row.algorithm}
+          </Link>
         </TableCell>
       </div>
     );

@@ -24,3 +24,33 @@ api.handle(IpcChannels.CRYPTOGRAPHY_GET_ALL, async (event, { type }: Cryptograph
     return Response.fail({ message: error.message });
   }
 });
+
+api.handle(IpcChannels.CRYPTOGRAPHY_GET_KEYWORDS, async (event, keys: Array<string>) => {
+  try {
+    const data = await cryptographyService.getKeywordsByKeys(keys);
+    return Response.ok({ message: 'Keywords retrieved successfully', data });
+  } catch (error: any) {
+    log.error('[Cryptography Get keywords]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.CRYPTOGRAPHY_SEARCH, async (event, crypto: Array<string>) => {
+  try {
+    const data = await cryptographyService.getFilesByCrypto(crypto);
+    return Response.ok({ message: 'Cryptography files retrieved successfully', data });
+  } catch (error: any) {
+    log.error('[Cryptography Search]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.CRYPTOGRAPHY_GET_DETECTED_KEYS, async (event) => {
+  try {
+    const data = await cryptographyService.getDetectedKeys();
+    return Response.ok({ message: 'Keywords retrieved successfully', data });
+  } catch (error: any) {
+    log.error('[Cryptography get detected keys]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});

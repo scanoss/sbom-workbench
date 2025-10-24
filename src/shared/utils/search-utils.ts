@@ -41,6 +41,16 @@ const unStemmify = (text: string): string[] => {
 };
 
 /**
+ * Transform a query search in a list of crypto tokens.
+ * @param text The search query
+ * @return A list of tokens
+ */
+const unStemmifyCryptoKeywords = (text: string): string[] => {
+  if(!text) return [];
+  return text.replace(/[{}]/g, '').split(/,/).map(t => t.trim());
+};
+
+/**
  * Return a list of query terms by splitting the search query
  * @param querySearch The search query
  * @param regex The regex to split the query by. The default use same regex as the tokenizer
@@ -49,4 +59,4 @@ const getTerms = (querySearch: string, regex = /[\W_]+/): string[] => {
   return querySearch.split(regex);
 };
 
-export { getSearchConfig, unStemmify, getTerms };
+export { getSearchConfig, unStemmify, getTerms, unStemmifyCryptoKeywords };
