@@ -105,7 +105,7 @@ Default rules are provided for the detection of cryptographic algorithms and lib
 
 Custom rules can be defined through the following JSON files at the project root:
 
-- **Algorithm detection rules**: `scanoss-crypto-algorithm-rules.json`. See: [Algorithm Rules Sample](./samples/scanoss-crypto-rules.json)
+- **Algorithm detection rules**: `scanoss-crypto-algorithm-rules.json`. See: [Algorithm Rules Sample](./assets/data/scanoss-crypto-algorithm-rules.json)
 - **Library detection rules**: `scanoss-crypto-library-rules.json`
 
 ## Rule File Structure
