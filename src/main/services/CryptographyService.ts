@@ -231,7 +231,7 @@ class CryptographyService {
    *
    * @returns Promise resolving to the absolute path of the algorithm rules file
    */
-  private async getAlgorithmRulesPath(): Promise<string> {
+  public async getAlgorithmRulesPath(): Promise<string> {
     const project = workspace.getOpenProject();
     const customAlgorithmRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
     if (await fileExists(customAlgorithmRulesFilePath)) {
@@ -250,7 +250,7 @@ class CryptographyService {
    *
    * @returns Promise resolving to the absolute path of the cryptography library rules file
    */
-  private async getLibraryRulesPath():Promise<string> {
+  public async getLibraryRulesPath():Promise<string> {
     const project = workspace.getOpenProject();
     const customLibraryRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
     if (await fileExists(customLibraryRulesFilePath)) {

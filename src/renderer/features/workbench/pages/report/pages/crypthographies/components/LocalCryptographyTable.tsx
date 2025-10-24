@@ -12,7 +12,7 @@ export const LocalCryptographyTable = ({data}) => {
     return data.files.flatMap((item, itemIndex) =>
       item.values.map((algorithm, algIndex) => ({
         key: `${itemIndex}-${algIndex}`,
-        fileId: item.fileId,
+        id: algIndex,
         fileName: item.name,
         type: item.type,
         algorithm,
@@ -20,14 +20,14 @@ export const LocalCryptographyTable = ({data}) => {
     );
   }, [data]);
 
-  const onSelectFile = async (e, path:string, fileId:number) => {
+  const onSelectFile = async (e, filePath:string) => {
     e.preventDefault();
     const detectedKeys = data.files
-      .filter(f => f.fileId === fileId)
+      .filter(f => f.name === filePath)
       .flatMap(f => f.values);
     navigate({
       pathname: '/workbench/crypto-search/file',
-      search: `?path=${encodeURIComponent(path)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=file`,
+      search: `?path=${encodeURIComponent(filePath)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=file`,
     });
   };
 
@@ -48,7 +48,7 @@ export const LocalCryptographyTable = ({data}) => {
             href="#"
             underline="hover"
             color="inherit"
-            onClick={(e) => onSelectFile(e, row.fileName, row.fileId)}
+            onClick={(e) => onSelectFile(e, row.fileName)}
           >
             {row.fileName}
           </Link>

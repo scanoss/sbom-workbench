@@ -8,7 +8,7 @@ import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.adapter';
 import { NodeStatus } from '../../../workspace/tree/Node';
-import { fileExists } from '../../../utils/utils';
+import { cryptographyService } from '../../../services/CryptographyService';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
@@ -17,10 +17,6 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
   private project: Project;
 
   private readonly THREADS = 5;
-
-  private readonly DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME = 'scanoss-crypto-algorithm-rules.json';
-
-  private readonly DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME = 'scanoss-crypto-library-rules.json';
 
   /**
    * Constructs a new LocalCryptographyTask with the specified project.
@@ -43,54 +39,6 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
   }
 
   /**
-   * Gets the base asset path based on the current environment (development or production).
-   *
-   * @returns The appropriate base path for accessing assets based on the current environment
-   */
-  private getAssetPath(): string {
-    const isDev = process.env.NODE_ENV !== 'production';
-    return isDev
-      ? path.join(__dirname, '../../../../../assets/data')
-      : path.join(__dirname, '../../../assets/data');
-  }
-
-  /**
-   * Retrieves the file path to the cryptography algorithm rules.
-   *
-   * The method searches for algorithm rules in the following order:
-   * 1. Custom rules defined at the project's scan root
-   * 2. Default rules packaged with the application (location depends on environment)
-   *
-   * @returns Promise resolving to the absolute path of the algorithm rules file
-   */
-  private async getAlgorithmRulesPath(): Promise<string> {
-    const customAlgorithmRulesFilePath = path.join(this.project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
-    if (await fileExists(customAlgorithmRulesFilePath)) {
-      log.info('[ Local Cryptography Task ] - Custom cryptography algorithm rules found');
-      return customAlgorithmRulesFilePath;
-    }
-    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
-  }
-
-  /**
-   * Retrieves the file path to the cryptography library rules.
-   *
-   * The method searches for cryptography library rules in the following order:
-   * 1. Custom rules defined at the project's scan root
-   * 2. Default rules packaged with the application (location depends on environment)
-   *
-   * @returns Promise resolving to the absolute path of the cryptography library rules file
-   */
-  private async getLibraryRulesPath():Promise<string> {
-    const customLibraryRulesFilePath = path.join(this.project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
-    if (await fileExists(customLibraryRulesFilePath)) {
-      log.info('[ Local Cryptography Task ] - Custom cryptography library rules found');
-      return customLibraryRulesFilePath;
-    }
-    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
-  }
-
-  /**
    * Runs the local cryptography analysis task.
    * @returns A promise that resolves to a boolean indicating the success of the task.
    */
@@ -101,8 +49,8 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       // Delete all local crypto
       await modelProvider.model.localCryptography.deleteAll();
       const cryptoCfg = new CryptoCfg();
-      cryptoCfg.ALGORITHM_RULES_PATH = await this.getAlgorithmRulesPath();
-      cryptoCfg.LIBRARY_RULES_PATH = await this.getLibraryRulesPath();
+      cryptoCfg.ALGORITHM_RULES_PATH = await cryptographyService.getAlgorithmRulesPath();
+      cryptoCfg.LIBRARY_RULES_PATH = await cryptographyService.getLibraryRulesPath();
       cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const files = this.project.getTree().getRootFolder().getFiles();

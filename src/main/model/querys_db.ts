@@ -573,27 +573,27 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_GET_LOCAL_CRYPTOGRAPHY_ALL_IDENTIFIED_GROUPED_BY_TYPE = `WITH
     extracted_algorithms AS (
-      SELECT json_extract(value, '$.algorithm') as algorithm, f.path, f.fileId
+      SELECT json_extract(value, '$.algorithm') as algorithm, f.path
       FROM local_cryptography lc, json_each(lc.algorithms)
       INNER JOIN files f ON lc.file_Id = f.fileId
       INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
       WHERE json_valid(lc.algorithms)
     ),
     algorithm_results AS (
-     SELECT path as name, fileId ,'algorithm' as type, json_group_array(algorithm) as 'values'
+     SELECT path as name ,'algorithm' as type, json_group_array(algorithm) as 'values'
      FROM extracted_algorithms
      WHERE algorithm IS NOT NULL
      GROUP BY name
     ),
     extracted_hints AS (
-      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, f.path, f.fileId
+      SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, f.path
       FROM local_cryptography lc, json_each(lc.hints)
       INNER JOIN files f ON f.fileId = lc.file_id
       INNER JOIN file_inventories fi ON fi.fileId = lc.file_id
       WHERE json_valid(lc.hints)
     ),
     hint_results AS (
-      SELECT path AS name,fileId, type, json_group_array(hintId) as 'values'
+      SELECT path AS name, type, json_group_array(hintId) as 'values'
       FROM extracted_hints
       GROUP BY name, type
     )

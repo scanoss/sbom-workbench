@@ -23,7 +23,6 @@ export interface Algorithms {
 }
 
 export interface CryptographicItem {
-  fileId: number;
   name: string; // filePath | pkg@version
   type: string; // algorithm | library
   values: Array<string>;
