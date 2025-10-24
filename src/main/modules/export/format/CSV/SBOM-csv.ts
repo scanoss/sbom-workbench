@@ -15,9 +15,9 @@ export class SBOMCsv extends Format {
   }
 
   private csvCreate(data: Array<DataRecord>) {
-    let csv = 'path, usage, detected_component, concluded_component, detected_purl, concluded_purl,detected_version, concluded_version, latest_version, detected_license, concluded_license\n';
+    let csv = 'path, usage, detected_component, concluded_component, detected_purl, concluded_purl, detected_version, concluded_version,detected_url, concluded_url ,latest_version, detected_license, concluded_license\n';
     for (let i = 0; i < data.length; i += 1) {
-      const row = `${data[i].path},${data[i].usage},${data[i].detected_component},${data[i].concluded_component},${data[i].detected_purl},${data[i].concluded_purl},${data[i].detected_version},${data[i].concluded_version},${data[i].latest_version},${data[i].detected_license},${data[i].concluded_license}\r\n`;
+      const row = `${data[i].path}, ${data[i].usage}, ${data[i].detected_component}, ${data[i].concluded_component}, ${data[i].detected_purl}, ${data[i].concluded_purl}, ${data[i].detected_version}, ${data[i].concluded_version}, ${data[i].detected_url}, ${data[i].concluded_url}, ${data[i].latest_version}, ${data[i].detected_license}, ${data[i].concluded_license}\r\n`;
       csv += row;
     }
     return csv;
@@ -38,7 +38,8 @@ export class SBOMCsv extends Format {
         invalidPurls.add(comp.concluded_purl);
       }
 
-      if (validDetectedPurl && validConcludedPurl) {
+      // Not evaluate validConcludedPurl condition on detected report
+      if (validDetectedPurl && (validConcludedPurl || this.source === ExportSource.DETECTED)) {
         reportData.push(comp);
       }
     });

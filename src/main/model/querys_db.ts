@@ -755,7 +755,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     SELECT type ,json_group_array(detected) as detection  FROM hints_detection
     GROUP BY type;`;
 
-    /** ************** END Cryptography Shared Queries **************** */
+  /** ************** END Cryptography Shared Queries **************** */
 
   /** ******************************************************************
    *               END CRYPTOGRAPHY QUERIES                            *
@@ -797,27 +797,50 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN component_versions cv ON cv.id = i.cvid
   GROUP BY i.spdxid;`;
 
-  IDENTIFIED_REPORT_DATA_FILES = `SELECT * FROM (SELECT  DISTINCT i.id as inventory_id, f.path, i.usage,coalesce(r.component,'') as detected_component
-  ,coalesce(cv.name,'') as concluded_component, r.purl as detected_purl, cv.purl as concluded_purl,
-   r.version as detected_version, cv.version as concluded_version, r.latest_version,
-     (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
-       FROM license_component_version lcv
-       INNER JOIN licenses l ON lcv.licid = l.id
-       WHERE lcv.cvid = cv.id) AS detected_license, i.spdxid as concluded_license, cv.url
-    FROM inventories i
-    INNER JOIN file_inventories fi ON i.id = fi.inventoryid
-    INNER JOIN files f ON f.fileId = fi.fileId
-    INNER JOIN component_versions cv ON cv.id = i.cvid
-    INNER JOIN results r ON f.fileId = r.fileId
-    UNION
-    SELECT i.id as inventory_id, f.path, i.usage,d.component as detected_component,cv.name as concluded_component,d.purl as detected_purl, cv.purl as concluded_purl, d.originalVersion as detected_version, d.version as concluded_version, '' as latest_version, REPLACE(d.originalLicense, ',', '|') as detected_license, i.spdxid as concluded_license, '' as url
-    FROM dependencies d
-    INNER JOIN files f ON d.fileId = f.fileId
-    INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
-    INNER JOIN inventories i ON cv.id = i.cvid
-    WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
-    GROUP BY d.dependencyId)
-    ORDER BY usage DESC ;`;
+  IDENTIFIED_REPORT_DATA_FILES = `SELECT * FROM (
+  SELECT  DISTINCT
+    i.id as inventory_id,
+    f.path, i.usage,coalesce(r.component,'') as detected_component
+    ,coalesce(cv.name,'') as concluded_component,
+     r.purl as detected_purl,
+     cv.purl as concluded_purl,
+    r.version as detected_version,
+    cv.version as concluded_version,
+    r.latest_version,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+        FROM license_component_version lcv
+        INNER JOIN licenses l ON lcv.licid = l.id
+        WHERE lcv.cvid = cv.id) AS detected_license,
+    i.spdxid as concluded_license,
+    r.url as detected_url,
+    cv.url as concluded_url
+  FROM inventories i
+  INNER JOIN file_inventories fi ON i.id = fi.inventoryid
+  INNER JOIN files f ON f.fileId = fi.fileId
+  INNER JOIN component_versions cv ON cv.id = i.cvid
+  INNER JOIN results r ON f.fileId = r.fileId
+  UNION
+  SELECT i.id as inventory_id,
+         f.path,
+         i.usage,
+         d.component as detected_component,
+         cv.name as concluded_component,
+         d.purl as detected_purl,
+         cv.purl as concluded_purl,
+         d.originalVersion as detected_version,
+         d.version as concluded_version,
+         '' as latest_version,
+         REPLACE(d.originalLicense, ',', '|') as detected_license,
+         i.spdxid as concluded_license,
+         '' as detected_url,
+         '' as concluded_url
+  FROM dependencies d
+  INNER JOIN files f ON d.fileId = f.fileId
+  INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
+  INNER JOIN inventories i ON cv.id = i.cvid
+  WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+  GROUP BY d.dependencyId)
+  ORDER BY usage DESC;`;
 
   DETECTED_REPORT_DATA_FILES = `SELECT * FROM(
     SELECT DISTINCT '' as inventory_id, f.path,r.idtype as usage, r.component as detected_component, '' as concluded_component,
@@ -827,7 +850,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
        INNER JOIN licenses l ON lcv.licid = l.id
        WHERE lcv.cvid = cv.id) AS detected_license,
        '' as concluded_license,
-	  r.url
+	  r.url as detected_url, '' as concluded_url
     FROM files f
     INNER JOIN results r ON f.fileId = r.fileId
     LEFT JOIN result_license rl ON r.id = rl.resultId
@@ -835,7 +858,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     UNION
     SELECT '' as inventory_id, f.path, 'dependency' as usage, d.component as detected_component, '' as concluded_component,
     d.purl as detected_purl, '' as concluded_purl, d.originalVersion as detected_version , '' as concluded_version, '' as latest_version,
-    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, '' as url FROM dependencies d
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, '' as detected_url, '' as concluded_url FROM dependencies d
     INNER JOIN files f ON f.fileId = d.fileId
     GROUP BY d.dependencyId) as detected
     ORDER BY usage DESC;`;
@@ -874,8 +897,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
   /**
- * SQL query to retrieve identification decisions.
- * @type {string}
+    * SQL query to retrieve identification decisions.
+    * @type {string}
  */
   SQL_DECISION_DATA = `SELECT LTRIM(path, '/') as path , cv.purl as identifiedAs, r.purl as original, f.type , f.identified, f.ignored
   FROM files f

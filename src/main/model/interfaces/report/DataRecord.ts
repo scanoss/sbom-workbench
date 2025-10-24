@@ -11,5 +11,6 @@ export interface DataRecord {
     latest_version: string;
     detected_license: string;
     concluded_license: string;
-    url: string;
+    detected_url: string;
+    concluded_url: string;
   }

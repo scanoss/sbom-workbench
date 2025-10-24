@@ -94,6 +94,7 @@
   "ObfuscateFilePathsHint": "Todas sus rutas de ficheros se ofuscarán para garantizar una mayor confidencialidad.",
   "EnableHPSM": "Habilitar HPSM (High Precision Snippet Matching)",
   "HPSMHint": "HPSM requiere una suscripción premium",
+  "NoDataFound": "No se encontraron datos",
   "Current": "Actual",
   "Default": "Default",
   "NewGroup": "Nuevo Grupo",
@@ -108,5 +109,6 @@
   "NoConfigFileFoundOptional": "No se encontró archivo de configuración (opcional). <1>Abrir carpeta del proyecto</1> para crear un archivo <2>scanoss.json</2> para personalizar el comportamiento del escaneo. <3>Más información</3>",
   "LegacyConfigFileDetected": "Archivo de configuración deprecado detectado: <1>{{fileName}}</1>. Considere migrar al nuevo formato <2>scanoss.json</2> para obtener una mejor funcionalidad. <3>Ver documentación</3>",
   "ScanossSettingsFileFound": "Se encontró un archivo de configuración SCANOSS (<1>{{fileName}}</1>). Se utilizará para mejorar los resultados del escaneo.",
-  "UseLeftPanelForSearchCryptography": "Use el panel de la izquierda para criptografía dentro de los ficheros"
+  "UseLeftPanelForSearchCryptography": "Use el panel de la izquierda para criptografía dentro de los ficheros",
+  "LoadingComponents": "Cargando Componentes..."
 }

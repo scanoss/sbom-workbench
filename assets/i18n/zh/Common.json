@@ -89,5 +89,7 @@
   "NoConfigFileFoundOptional": "未找到配置文件（可选）。<1>打开项目文件夹</1>以创建<2>scanoss.json</2>文件来自定义扫描行为。<3>了解更多</3>",
   "LegacyConfigFileDetected": "检测到旧版配置文件：<1>{{fileName}}</1>。考虑迁移到新的<2>scanoss.json</2>格式以获得更好的功能。<3>查看文档</3>",
   "ScanossSettingsFileFound": "找到 SCANOSS 设置文件 (<1>{{fileName}}</1>)。它将用于增强扫描结果。",
-  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files"
+  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files",
+  "NoDataFound": "未找到数据",
+  "LoadingComponents": "正在加载组件..."
 }

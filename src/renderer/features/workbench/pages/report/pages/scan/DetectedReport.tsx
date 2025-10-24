@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
-import { Button, Card, Chip, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
+import { Card, Chip, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import obligationsService from '@api/services/obligations.service';
 import ArrowForwardOutlinedIcon from '@mui/icons-material/ArrowForwardOutlined';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -20,6 +20,8 @@ import VulnerabilitiesCard from '../../components/VulnerabilitiesCard';
 import { Scanner } from '../../../../../../../main/task/scanner/types';
 import DependenciesCard from '../../components/DependenciesCard';
 import CryptographyCard from '../../components/CryptographyCard';
+import { Component, ComponentReportResponse } from '@api/types';
+import { ReportComponent } from '../../../../../../../main/services/ReportService';
 
 Chart.register(...registerables);
 
@@ -35,11 +37,13 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
 
   const [licenseSelected, setLicenseSelected] = useState<any>(null);
 
-  const [componentsMatched, setComponentsMatched] = useState<Component[]>([]); // detected
-  const [componentsDeclared, setComponentsDeclared] = useState<Component[]>([]);
+  const [componentsMatched, setComponentsMatched] = useState<ReportComponent[]>([]); // detected
+  const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const init = async () => {
+    setIsLoading(true);
     const licenses = data.licenses.map((license) => license.label);
 
     obligations.current = await obligationsService.getObligations(licenses);
@@ -61,14 +65,16 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   };
 
   const onLicenseClear = async () => {
-    const items = data.components;
     const detected = await reportService.getDetectedComponents();
-
-    setComponentsMatched(detected.components);
     setComponentsDeclared(detected.declaredComponents);
     setObligationsFiltered(obligations.current);
+    setComponentsMatched(detected.components);
     setLicenseSelected(null);
   };
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [componentsMatched]);
 
   useEffect(() => {
     if (location) {
@@ -78,6 +84,7 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   }, [location]);
 
   useEffect(() => {
+    console.log("DetectedReport useEffect, init");
     init();
   }, []);
 
@@ -175,8 +182,8 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
 
       <Card className="report-item report-item-detail matches-for-license pt-1 mt-0">
         <Routes>
-          <Route path="matches" element={<MatchesForLicense components={componentsMatched} mode="detected" />} />
-          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} mode="detected" />} />
+          <Route path="matches" element={<MatchesForLicense components={componentsMatched} mode="detected" loading={isLoading} />} />
+          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} mode="detected" loading={isLoading} />} />
           <Route path="obligations" element={<LicensesObligations data={obligationsFiltered} />} />
           <Route path="" element={<Navigate to="matches" replace />} />
         </Routes>

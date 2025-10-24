@@ -44,10 +44,12 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
   const [componentsMatched, setComponentsMatched] = useState<ReportComponent[]>([]); // detected
   const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
 
   const init = async () => {
+    setIsLoading(true);
     const licenses = data.licenses.map((license) => license.label);
 
     obligations.current = await obligationsService.getObligations(licenses);
@@ -83,6 +85,10 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
       setTab(last);
     }
   }, [location]);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [componentsMatched]);
 
   useEffect(() => {
     init();
@@ -201,8 +207,8 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
       <Card className="report-item report-item-detail matches-for-license pt-1 mt-0">
         <Routes>
-          <Route path="matches" element={<MatchesForLicense components={componentsMatched} mode="identified" />} />
-          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} mode="identified" />} />
+          <Route path="matches" element={<MatchesForLicense components={componentsMatched} mode="identified" loading={isLoading} />} />
+          <Route path="declared" element={<MatchesForLicense components={componentsDeclared} mode="identified" loading={isLoading} />} />
           <Route path="obligations" element={<LicensesObligations data={obligationsFiltered} />} />
           <Route path="" element={<Navigate to="matches" replace />} />
         </Routes>
