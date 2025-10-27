@@ -103,5 +103,7 @@
   "NoConfigFileFoundOptional": "設定ファイルが見つかりません（オプション）。<1>プロジェクトフォルダを開く</1>して<2>scanoss.json</2>ファイルを作成し、スキャン動作をカスタマイズします。<3>詳細はこちら</3>",
   "LegacyConfigFileDetected": "レガシー設定ファイルが検出されました: <1>{{fileName}}</1>。より良い機能を得るために、新しい<2>scanoss.json</2>形式への移行を検討してください。<3>ドキュメントを表示</3>",
   "ScanossSettingsFileFound": "SCANOSS設定ファイルが見つかりました (<1>{{fileName}}</1>)。スキャン結果の向上に使用されます。",
-  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files"
+  "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files",
+  "NoDataFound": "データが見つかりません",
+  "LoadingComponents": "コンポーネントを読み込み中..."
 }
