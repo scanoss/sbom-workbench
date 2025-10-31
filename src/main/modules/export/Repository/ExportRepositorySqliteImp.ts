@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { FileUsageType } from '@api/types';
+import { ExportSource, FileUsageType } from '@api/types';
 import { undefined } from 'zod';
 import { workspace } from '../../../workspace/Workspace';
 import { modelProvider } from '../../../services/ModelProvider';
@@ -10,6 +10,7 @@ import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerabi
 import { LicenseDTO } from '../../../../api/dto';
 import { CryptographicItem } from '../../../model/entity/Cryptography';
 import { ExportCryptographyData } from '../../../model/interfaces/report/ExportCryptographyData';
+import { DataRecord } from '../../../model/interfaces/report/DataRecord';
 
 export interface ExportData {
   inventoryId: number;
@@ -82,5 +83,13 @@ export class ExportRepositorySqliteImp implements ExportRepository {
       localCryptography: localCrypto,
       componentCryptography: componentCrypto,
     };
+  }
+
+  public async getAllDetectedRecordFiles(): Promise<Array<DataRecord>>{
+    return modelProvider.model.report.fetchAllDetectedRecordsFiles();
+  }
+
+  public async getAllIdentifiedRecordFiles(): Promise<Array<DataRecord>>{
+    return modelProvider.model.report.fetchAllIdentifiedRecordsFiles();
   }
 }

@@ -4,13 +4,30 @@ import { isValidPurl } from '../../helpers/exportHelper';
 import { ReportData } from '../../ReportData';
 import { ComponentVulnerability } from '../../../../model/entity/ComponentVulnerability';
 
+/**
+ * CycloneDX exporter for detected components.
+ *
+ * This class generates a CycloneDX SBOM containing components that were automatically detected
+ * during scanning. Detected components represent the software dependencies found in the project
+ * before any manual identification or confirmation.
+ *
+ * @extends CycloneDX
+ *
+ * @example
+ * // Basic usage with default repository:
+ * const exporter = new CycloneDXDetected(project);
+ *
+ * @example
+ * // Include vulnerabilities with default repository:
+ * const exporter = new CycloneDXDetected(project, undefined, true);
+ */
 export class CycloneDXDetected extends CycloneDX {
   protected async getComponents(): Promise<Array<ExportComponentData>> {
-    return this.export.getDetectedData();
+    return this.repository.getDetectedData();
   }
 
   protected async getVulnerabilities(): Promise<Array<ComponentVulnerability>> {
-    return this.export.getDetectedVulnerability();
+    return this.repository.getDetectedVulnerability();
   }
 
   protected getUniqueComponents(data: ExportComponentData[]): ReportData<ExportComponentData[]> {

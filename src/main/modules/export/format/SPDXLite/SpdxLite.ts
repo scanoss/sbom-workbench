@@ -11,6 +11,7 @@ import { getSPDXLicenseInfos, getSupplier } from '../../helpers/exportHelper';
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { ReportData } from '../../ReportData';
+import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 
 const crypto = require('crypto');
 
@@ -26,11 +27,10 @@ export abstract class SpdxLite extends Format {
 
   protected project:Project;
 
-  constructor(source: string, project: Project, exportModel: ExportRepository) {
-    super();
+  constructor(source: string, project: Project, repository: ExportRepository = new ExportRepositorySqliteImp()) {
+    super(repository);
     this.source = source;
     this.extension = '-SPDXLite.json';
-    this.export = exportModel;
     this.project = project;
   }
 
@@ -40,15 +40,15 @@ export abstract class SpdxLite extends Format {
 
   // @override
   public async generate(): Promise<ExportResult> {
-    const licenses = await this.export.getAllLicensesWithFullText();
+    const licenses = await this.repository.getAllLicensesWithFullText();
     this.licenseMapper = new Map<string, any>();
     licenses.forEach((l) => {
       this.licenseMapper.set(l.spdxid, l);
     });
 
     const data = this.source === ExportSource.IDENTIFIED
-      ? await this.export.getIdentifiedData()
-      : await this.export.getDetectedData();
+      ? await this.repository.getIdentifiedData()
+      : await this.repository.getDetectedData();
 
     const { components, invalidPurls } = this.getUniqueComponents(data);
 
