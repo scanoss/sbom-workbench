@@ -10,7 +10,6 @@ import { IExportResult } from '../../modules/export/IExportResult';
 import { ExportFormat, ExportSource, InventoryType } from '../../../api/types';
 import { CryptographyCsv } from '../../modules/export/format/CSV/Cryptography-csv';
 import { workspace } from '../../workspace/Workspace';
-import { ExportRepositorySqliteImp } from '../../modules/export/Repository/ExportRepositorySqliteImp';
 import { CycloneDXDetected } from '../../modules/export/format/CycloneDX/CycloneDXDetected';
 import { CycloneDXIdentified } from '../../modules/export/format/CycloneDX/CycloneDXIdentified';
 import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteDetected';
@@ -32,12 +31,11 @@ export class Export implements ITask<string, IExportResult> {
   }
 
   public setFormat(exportDTO: NewExportDTO): void {
-    const repository = new ExportRepositorySqliteImp();
     const project = workspace.getOpenedProjects()[0];
 
     switch (exportDTO.format as ExportFormat) {
       case ExportFormat.CSV:
-        this.setCsvFormat(exportDTO, repository);
+        this.setCsvFormat(exportDTO);
         break;
       case ExportFormat.RAW:
         this.format = new Raw();
@@ -46,7 +44,7 @@ export class Export implements ITask<string, IExportResult> {
         this.format = new Wfp();
         break;
       case ExportFormat.BOM:
-        this.setBomFormat(exportDTO, project, repository);
+        this.setBomFormat(exportDTO, project);
         break;
       case ExportFormat.HTMLSUMMARY:
         this.format = new HtmlSummary(exportDTO.source);
@@ -59,40 +57,40 @@ export class Export implements ITask<string, IExportResult> {
     }
   }
 
-  private setCsvFormat(exportDTO: NewExportDTO, repository: ExportRepositorySqliteImp): void {
+  private setCsvFormat(exportDTO: NewExportDTO): void {
     switch (exportDTO.inventoryType) {
       case InventoryType.SBOM:
         this.format = new SBOMCsv(exportDTO.source);
         break;
       case InventoryType.CRYPTOGRAPHY:
-        this.format = new CryptographyCsv(exportDTO.source, repository);
+        this.format = new CryptographyCsv(exportDTO.source);
         break;
       case InventoryType.VULNERABILITY:
-        this.format = new VulnerabilityCsv(exportDTO.source, repository);
+        this.format = new VulnerabilityCsv(exportDTO.source);
         break;
       default:
         throw new Error(`Unsupported inventory type: ${exportDTO.inventoryType} for CSV format`);
     }
   }
 
-  private setBomFormat(exportDTO: NewExportDTO, project: any, repository: ExportRepositorySqliteImp): void {
+  private setBomFormat(exportDTO: NewExportDTO, project: any): void {
     const isIdentified = exportDTO.source === ExportSource.IDENTIFIED;
 
     switch (exportDTO.inventoryType) {
       case InventoryType.CYLONEDX:
         this.format = isIdentified
-          ? new CycloneDXIdentified(project, repository)
-          : new CycloneDXDetected(project, repository);
+          ? new CycloneDXIdentified(project)
+          : new CycloneDXDetected(project);
         break;
       case InventoryType.CYCLONEDX_WITH_VULNERABILITIES:
         this.format = isIdentified
-          ? new CycloneDXIdentified(project, repository, true)
-          : new CycloneDXDetected(project, repository, true);
+          ? new CycloneDXIdentified(project, undefined, true)
+          : new CycloneDXDetected(project, undefined, true);
         break;
       case InventoryType.SPDXLITE:
         this.format = exportDTO.source === ExportSource.DETECTED
-          ? new SpdxLiteDetected(project, repository)
-          : new SpdxLiteIdentified(project, repository);
+          ? new SpdxLiteDetected(project)
+          : new SpdxLiteIdentified(project);
         break;
       default:
         throw new Error(`Unsupported inventory type: ${exportDTO.inventoryType} for BOM format`);

@@ -11,6 +11,7 @@ import { getSPDXLicenseInfos, getSupplier } from '../../helpers/exportHelper';
 import { Project } from '../../../../workspace/Project';
 import { ExportRepository } from '../../Repository/ExportRepository';
 import { ReportData } from '../../ReportData';
+import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 
 const crypto = require('crypto');
 
@@ -26,11 +27,10 @@ export abstract class SpdxLite extends Format {
 
   protected project:Project;
 
-  constructor(source: string, project: Project, exportModel: ExportRepository) {
-    super();
+  constructor(source: string, project: Project, repository: ExportRepository = new ExportRepositorySqliteImp()) {
+    super(repository);
     this.source = source;
     this.extension = '-SPDXLite.json';
-    this.repository = exportModel;
     this.project = project;
   }
 

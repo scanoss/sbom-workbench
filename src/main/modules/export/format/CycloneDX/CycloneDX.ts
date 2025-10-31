@@ -10,14 +10,43 @@ import { getSupplier, resolveVulnerabilityURL, toVulnerabilityExportData } from 
 import { ReportData } from '../../ReportData';
 import { ComponentVulnerability } from 'main/model/entity/ComponentVulnerability';
 import { VulnerabilityExportData } from '../../../../model/interfaces/report/VulnerabilityExportData';
+import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 
+/**
+ * Abstract base class for generating CycloneDX SBOM (Software Bill of Materials) exports.
+ *
+ * CycloneDX is a standard format for describing software components and their dependencies.
+ * This class provides the core functionality for generating CycloneDX BOMs in JSON format,
+ * including component information, licenses, and optionally vulnerability data.
+ *
+ * @see https://cyclonedx.org/
+ */
 export abstract class CycloneDX extends Format {
 
   private project: Project;
   private includeVulnerabilities: boolean;
 
-  constructor(project: Project, exportModel: ExportRepository, includeVulnerabilities: boolean = false) {
-    super(exportModel);
+  /**
+   * Creates a new CycloneDX export format instance.
+   *
+   * @param project - The project to export as a CycloneDX BOM
+   * @param repository - Repository for accessing export data.
+   *                     Defaults to a new ExportRepositorySqliteImp instance if omitted or undefined.
+   *                     Pass `undefined` explicitly to use the default repository when you need to
+   *                     specify the third parameter.
+   * @param includeVulnerabilities - Whether to include vulnerability data in the export (default: false)
+   *
+   * @example
+   * // Using default repository:
+   * const exporter = new CycloneDXIdentified(project);
+   *
+   * @example
+   * // Using default repository with vulnerabilities enabled:
+   * const exporter = new CycloneDXIdentified(project, undefined, true);
+   *
+   */
+  constructor(project: Project, repository: ExportRepository = new ExportRepositorySqliteImp(), includeVulnerabilities: boolean = false) {
+    super(repository);
     this.extension = '.bom';
     this.project = project;
     this.includeVulnerabilities = includeVulnerabilities;
