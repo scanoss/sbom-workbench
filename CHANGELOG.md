@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added fh2 support
+### Changed
+- Upgraded `scanoss.js` version to v0.26.0
 
 ## [1.24.0] - 2025-10-27
 ### Added
