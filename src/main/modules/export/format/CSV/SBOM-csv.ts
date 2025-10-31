@@ -4,23 +4,42 @@ import { modelProvider } from '../../../../services/ModelProvider';
 import { DataRecord } from '../../../../model/interfaces/report/DataRecord';
 import { isValidPurl } from '../../helpers/exportHelper';
 import { ReportData } from '../../ReportData';
+import { ExportRepository } from '../../Repository/ExportRepository';
+import { ExportRepositorySqliteImp } from '../../Repository/ExportRepositorySqliteImp';
 
 export class SBOMCsv extends Format {
   private source: string;
 
-  constructor(source: string) {
-    super();
+  constructor(source: string, exportRepository: ExportRepository = new ExportRepositorySqliteImp()) {
+    super(exportRepository);
     this.source = source;
     this.extension = '.csv';
   }
 
+
   private csvCreate(data: Array<DataRecord>) {
-    let csv = 'path, usage, detected_component, concluded_component, detected_purl, concluded_purl, detected_version, concluded_version,detected_url, concluded_url ,latest_version, detected_license, concluded_license\n';
-    for (let i = 0; i < data.length; i += 1) {
-      const row = `${data[i].path}, ${data[i].usage}, ${data[i].detected_component}, ${data[i].concluded_component}, ${data[i].detected_purl}, ${data[i].concluded_purl}, ${data[i].detected_version}, ${data[i].concluded_version}, ${data[i].detected_url}, ${data[i].concluded_url}, ${data[i].latest_version}, ${data[i].detected_license}, ${data[i].concluded_license}\r\n`;
-      csv += row;
+    const headers = ['path','usage','detected_component','concluded_component','detected_purl','concluded_purl','detected_version','concluded_version','detected_url','concluded_url','latest_version','detected_license','concluded_license','comment'];
+    const lines = [headers.join(',')];
+    for (const record of data) {
+      lines.push([
+        record.path,
+        record.usage,
+        record.detected_component,
+        record.concluded_component,
+        record.detected_purl,
+        record.concluded_purl,
+        record.detected_version,
+        record.concluded_version,
+        record.detected_url,
+        record.concluded_url,
+        record.latest_version,
+        record.detected_license,
+        record.concluded_license,
+        record.comment
+      ].join(','));
     }
-    return csv;
+
+    return lines.join('\r\n');
   }
 
   private getReportData(data: Array<DataRecord>): ReportData<Array<DataRecord>> {
@@ -52,8 +71,8 @@ export class SBOMCsv extends Format {
   // @override
   public async generate() {
     const data = this.source === ExportSource.IDENTIFIED
-      ? await modelProvider.model.report.fetchAllIdentifiedRecordsFiles()
-      : await modelProvider.model.report.fetchAllDetectedRecordsFiles();
+      ? await this.repository.getAllIdentifiedRecordFiles()
+      : await this.repository.getAllDetectedRecordFiles();
 
     const { components, invalidPurls } = this.getReportData(data);
     const csv = this.csvCreate(components);

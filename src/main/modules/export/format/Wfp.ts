@@ -10,7 +10,7 @@ export class Wfp extends Format {
   }
 
   public async generate() {
-    const data = await this.export.getWfpData();
+    const data = await this.repository.getWfpData();
     return {
       report: data,
       status: {

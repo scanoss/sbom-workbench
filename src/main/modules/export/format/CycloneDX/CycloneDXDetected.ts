@@ -6,11 +6,11 @@ import { ComponentVulnerability } from '../../../../model/entity/ComponentVulner
 
 export class CycloneDXDetected extends CycloneDX {
   protected async getComponents(): Promise<Array<ExportComponentData>> {
-    return this.export.getDetectedData();
+    return this.repository.getDetectedData();
   }
 
   protected async getVulnerabilities(): Promise<Array<ComponentVulnerability>> {
-    return this.export.getDetectedVulnerability();
+    return this.repository.getDetectedVulnerability();
   }
 
   protected getUniqueComponents(data: ExportComponentData[]): ReportData<ExportComponentData[]> {

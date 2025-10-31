@@ -8,10 +8,8 @@ import { ExportRepository } from '../../Repository/ExportRepository';
 export class CryptographyCsv extends Format {
   private source: string;
 
-  private repository: ExportRepository;
-
   constructor(source: string, repository: ExportRepository) {
-    super();
+    super(repository);
     this.source = source;
     this.extension = '.csv';
     this.repository = repository;

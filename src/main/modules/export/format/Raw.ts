@@ -10,7 +10,7 @@ export class Raw extends Format {
 
   // @override
   public async generate() {
-    const data = await this.export.getRawData();
+    const data = await this.repository.getRawData();
     const out = {};
     for (const [key, obj] of Object.entries(data)) {
       let vKey = key;

@@ -15,12 +15,12 @@ export interface ExportResult {
 }
 
 export abstract class Format {
-  protected export: ExportRepository;
+  protected repository: ExportRepository;
 
   protected extension: string;
 
   constructor(exportModel: ExportRepository = new ExportRepositorySqliteImp()) {
-    this.export = exportModel;
+    this.repository = exportModel;
   }
 
   public abstract generate(): Promise<ExportResult>;

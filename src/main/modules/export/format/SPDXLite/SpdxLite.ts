@@ -30,7 +30,7 @@ export abstract class SpdxLite extends Format {
     super();
     this.source = source;
     this.extension = '-SPDXLite.json';
-    this.export = exportModel;
+    this.repository = exportModel;
     this.project = project;
   }
 
@@ -40,15 +40,15 @@ export abstract class SpdxLite extends Format {
 
   // @override
   public async generate(): Promise<ExportResult> {
-    const licenses = await this.export.getAllLicensesWithFullText();
+    const licenses = await this.repository.getAllLicensesWithFullText();
     this.licenseMapper = new Map<string, any>();
     licenses.forEach((l) => {
       this.licenseMapper.set(l.spdxid, l);
     });
 
     const data = this.source === ExportSource.IDENTIFIED
-      ? await this.export.getIdentifiedData()
-      : await this.export.getDetectedData();
+      ? await this.repository.getIdentifiedData()
+      : await this.repository.getDetectedData();
 
     const { components, invalidPurls } = this.getUniqueComponents(data);
 
