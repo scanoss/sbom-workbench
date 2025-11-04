@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- Upcoming changes ...
+
+## [1.25.0] - 2025-11-05
 ### Added
 - Added fh2 support
 - Added comments on CSV SBOM export output
@@ -28,3 +31,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update configuration alerts translations and enhance link handling in project settings
 
 [1.24.0]: https://github.com/scanoss/sbom-workbench/tag/v1.24.0
+[1.25.0]: https://github.com/scanoss/sbom-workbench/compare/v1.24.0...v1.25.0
