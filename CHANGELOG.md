@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Added fh2 support
-- Added comments on CSV SBOM export output 
+- Added comments on CSV SBOM export output
+- Added option to copy file path to clipboard on cryptography search screen
 ### Changed
 - Upgraded `scanoss.js` version to v0.26.0
 

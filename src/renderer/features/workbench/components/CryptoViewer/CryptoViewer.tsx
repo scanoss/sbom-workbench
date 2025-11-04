@@ -11,7 +11,7 @@ import { FileContent } from '../../pages/detected/pages/Editor/Editor';
 import { CodeViewerManager } from '../../pages/detected/pages/Editor/CodeViewerManager';
 import { cryptographyService } from '@api/services/cryptography.service';
 import { getExtension } from '@shared/utils/utils';
-import { Card, useTheme, Collapse, IconButton } from '@mui/material';
+import { Card, useTheme, Collapse, IconButton, Snackbar, Alert } from '@mui/material';
 
 // Move MemoCodeViewer outside component to prevent re-creation
 const MemoCodeViewer = React.memo(CodeViewer);
@@ -29,6 +29,7 @@ const CryptoViewer = () => {
   const fileParam = useSearchParams().get('path');
   const file = fileParam ? decodeURIComponent(fileParam) : null;
   const [scrollToLine, setScrollToLine] = useState<number | null>(null);
+  const [showCopiedSnackbar, setShowCopiedSnackbar] = useState(false);
   const editorRef = React.useRef<HTMLDivElement>(null);
 
   const loadLocalFile = async (path: string): Promise<void> => {
@@ -43,6 +44,11 @@ const CryptoViewer = () => {
       setLocalFileContent({ content, error: true, loading: false });
     }
   };
+
+  const copyFilePath = () => {
+    navigator.clipboard.writeText(`${sourceCodePath}/${file}`);
+    setShowCopiedSnackbar(true);
+  }
 
   const loadKeywords = async () => {
     const highlightKeywords = await cryptographyService.getKeyWords(cryptography);
@@ -92,8 +98,11 @@ const CryptoViewer = () => {
 
           <Card style={{ padding: '16px', marginBottom: '16px', marginTop: '16px' }}>
             <div style={{ marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '14px' ,fontWeight:400 ,color: theme.palette.grey['600']  }}>
-                File: {file}
+              <h2 style={{ fontSize: '14px', fontWeight: 400, color: theme.palette.grey['600'], display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <IconButton disableRipple size="small" title={t('Tooltip:CopyFilePath')} onClick={copyFilePath} sx={{ borderRadius: '5px', "&:hover": { backgroundColor: "rgba(218,218,218,0.42)" } }}>
+                  <i className="ri-file-copy-line" />
+                </IconButton>
+                {file}
               </h2>
             </div>
             {/* Crypto Matches */}
@@ -186,6 +195,16 @@ const CryptoViewer = () => {
           </div>
         </main>
       </section>
+      <Snackbar
+        open={showCopiedSnackbar}
+        autoHideDuration={2000}
+        onClose={() => setShowCopiedSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setShowCopiedSnackbar(false)} severity="success" sx={{ width: '100%' }}>
+          File path copied to clipboard
+        </Alert>
+      </Snackbar>
     </>
   );
 };
