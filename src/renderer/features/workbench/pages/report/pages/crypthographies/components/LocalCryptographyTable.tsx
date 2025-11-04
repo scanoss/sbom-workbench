@@ -27,7 +27,7 @@ export const LocalCryptographyTable = ({data}) => {
       .flatMap(f => f.values);
     navigate({
       pathname: '/workbench/crypto-search/file',
-      search: `?path=${encodeURIComponent(filePath)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=algorithm`,
+      search: `?path=${encodeURIComponent(filePath)}&crypto=${encodeURIComponent(detectedKeys.join(','))}&force-search=true&search-type=file`,
     });
   };
 

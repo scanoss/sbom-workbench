@@ -31,6 +31,16 @@ const CryptoViewer = () => {
   const [scrollToLine, setScrollToLine] = useState<number | null>(null);
   const [showCopiedSnackbar, setShowCopiedSnackbar] = useState(false);
   const editorRef = React.useRef<HTMLDivElement>(null);
+  const [keywordCryptoMap, setKeywordCryptoMap] = useState<Map<string,Array<string>>>(new Map());
+
+  const loadKeywordCryptoMap = async (): Promise<void> => {
+    try {
+      const keywordCryptoMap = await cryptographyService.getKeywordCryptoMap();
+      setKeywordCryptoMap(keywordCryptoMap);
+    } catch (error: any) {
+      console.error('Error loading keywordCryptoMap:', error);
+    }
+  };
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
@@ -83,6 +93,10 @@ const CryptoViewer = () => {
       }
     }
   }, [scrollToLine]);
+
+  useEffect(() => {
+    loadKeywordCryptoMap();
+  },[]);
 
 
   return (
@@ -139,7 +153,7 @@ const CryptoViewer = () => {
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span style={{ fontWeight: '500', color: theme.palette.primary.main }}>
-                            {result.match}
+                            {result.match}{keywordCryptoMap.get(result.match) && ` (${keywordCryptoMap.get(result.match).join(', ').toUpperCase()})`}
                           </span>
                           <span style={{ opacity: 0.6 }}>
                             {result.count} {result.count === 1 ? 'match' : 'matches'}

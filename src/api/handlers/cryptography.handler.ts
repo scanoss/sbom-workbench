@@ -54,3 +54,13 @@ api.handle(IpcChannels.CRYPTOGRAPHY_GET_DETECTED_KEYS, async (event) => {
     return Response.fail({ message: error.message });
   }
 });
+
+api.handle(IpcChannels.CRYPTOGRAPHY_GET_KEYWORD_CRYPTO_MAP, async (event) => {
+  try {
+    const data = await cryptographyService.getKeywordsCryptoMap();
+    return Response.ok({ message: 'Cryptography keyword map retrieved successfully', data });
+  } catch (error: any) {
+    log.error('[Cryptography keyword map]: ', error);
+    return Response.fail({ message: error.message });
+  }
+});

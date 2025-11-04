@@ -28,6 +28,11 @@ class CryptographyService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.CRYPTOGRAPHY_GET_DETECTED_KEYS);
     return this.response(response);
   }
+
+  public async getKeywordCryptoMap(): Promise<Map<string,Array<string>>> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.CRYPTOGRAPHY_GET_KEYWORD_CRYPTO_MAP);
+    return this.response(response);
+  }
 }
 
 export const cryptographyService = new CryptographyService();
