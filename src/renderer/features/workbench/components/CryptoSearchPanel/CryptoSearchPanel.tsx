@@ -68,7 +68,6 @@ const CryptoSearchPanel = () => {
   const [detectedKeysInFiles, setDetectedKeysInFiles] = React.useState<any[]>([]);
   const [selected, setSelected] = React.useState<any[]>([]);
   const [selectedAlgorithms, setSelectedAlgorithms] = React.useState<string[]>([]);
-  const [detectedCryptoKeys, setDetectedCryptoKeys] = React.useState<string[]>([]);
   const fileParam = searchParams.get('path');
   const file = fileParam ? decodeURIComponent(fileParam) : null;
   const cryptoParam = searchParams.get('crypto');
@@ -78,8 +77,20 @@ const CryptoSearchPanel = () => {
   const searchTypeSearchParam = searchParams.get('search-type');
   const searchType =  searchTypeSearchParam ? decodeURIComponent(searchTypeSearchParam) : null;
 
+  // Force search mode: When navigating from another component with specific search criteria,
+  // this prevents automatic search until user interaction modifies the selection
+  const isForceSearchActive = forceSearch !== null;
+
+  // Utility function to exit force search mode and enable normal search behavior
+  const exitForceSearchMode = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete('force-search');
+    setSearchParams(newParams);
+  };
+
   const search = async () => {
-    if(forceSearch) return;
+    // Skip automatic search when in force search mode
+    if(isForceSearchActive) return;
    const results =  await cryptographyService.search(selectedAlgorithms);
    // Transform file paths into DataGrid-compatible objects
    const formattedResults = results.files.map((filePath, index) => ({
@@ -92,16 +103,19 @@ const CryptoSearchPanel = () => {
    setDetectedKeysInFiles(results.crypto);
   };
 
+  // Handles initialization when in force search mode (e.g., when navigating from another component)
+  // Sets up the initial state based on the search type (file or algorithm)
   const forceSearchHandler = async ()=>{
-    if(!forceSearch) return;
+    if(!isForceSearchActive) return;
     // If searchType is "file", wait for defaultKeys to load first
     if(searchType === "file" && defaultKeys.length === 0) return;
-    if(searchType === "algorithm") {
-      setDetectedCryptoKeys(cryptography);
-      setSelectedAlgorithms(cryptography);
-    } else {
-      setSelectedAlgorithms(defaultKeys);
-      setDetectedCryptoKeys(defaultKeys);
+    switch(searchType) {
+      case "file":
+        setSelectedAlgorithms(cryptography);
+        break;
+      case 'algorithm':
+        setSelectedAlgorithms(cryptography);
+        break;
     }
     setFileResults([{
       id: 1,
@@ -122,9 +136,9 @@ const CryptoSearchPanel = () => {
     setDefaultKeys(defaultCryptoKeys);
   }
 
+  // Loads default crypto keys when NOT in force search mode (normal mode initialization)
   const loadDefaultDetectedKeys = async () => {
-    if(forceSearch) return;
-    setDetectedCryptoKeys(defaultKeys);
+    if(isForceSearchActive) return;
     setSelectedAlgorithms(defaultKeys);
   }
 
@@ -155,11 +169,8 @@ const CryptoSearchPanel = () => {
   const resetSearch = async () => {
     setSelectedAlgorithms([]);
     setFileResults([]);
-    if(forceSearch) {
-      setDetectedCryptoKeys(defaultKeys);
-      // Remove query parameters from URL
-      searchParams.delete('force-search');
-      setSearchParams(searchParams);
+    if(isForceSearchActive) {
+      exitForceSearchMode();
     }
   }
 
@@ -209,16 +220,24 @@ const CryptoSearchPanel = () => {
                 }}
                 onChange={(e) => {
                   const value = e.target.value as string[];
+
+                  // Handle "select all" checkbox option
                   if (value.includes('select-all')) {
-                    // Toggle select all
-                    if (selectedAlgorithms.length === detectedCryptoKeys.length) {
+                    // Toggle select all: if all are selected, deselect all; otherwise, select all
+                    if (selectedAlgorithms.length === defaultKeys.length) {
                       setSelectedAlgorithms([]);
                       resetSearch();
                     } else {
-                      setSelectedAlgorithms(detectedCryptoKeys);
+                      setSelectedAlgorithms(defaultKeys);
                     }
                   } else {
+                    // Handle individual algorithm selection
                     setSelectedAlgorithms(value);
+                    // Exit force search mode when user manually changes selection
+                    // This enables normal search behavior after user interaction
+                    if(isForceSearchActive){
+                      exitForceSearchMode();
+                    }
                   }
                 }}
                 onKeyDown={(e) => {
@@ -299,18 +318,18 @@ const CryptoSearchPanel = () => {
                   sx={{ padding: '4px 8px', minHeight: 'auto', borderBottom: '1px solid #e0e0e0' }}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (selectedAlgorithms.length === detectedCryptoKeys.length) {
+                    if (selectedAlgorithms.length === defaultKeys.length) {
                       setSelectedAlgorithms([]);
                       resetSearch();
                     } else {
-                      setSelectedAlgorithms(detectedCryptoKeys);
+                      setSelectedAlgorithms(defaultKeys);
                     }
                   }}
                 >
                   <Checkbox
                     size="small"
-                    checked={selectedAlgorithms.length === detectedCryptoKeys.length && detectedCryptoKeys.length > 0}
-                    indeterminate={selectedAlgorithms.length > 0 && selectedAlgorithms.length < detectedCryptoKeys.length}
+                    checked={selectedAlgorithms.length === defaultKeys.length}
+                    indeterminate={selectedAlgorithms.length > 0 && selectedAlgorithms.length < defaultKeys.length}
                     sx={{ padding: '4px' }}
                   />
                   <ListItemText
@@ -318,7 +337,7 @@ const CryptoSearchPanel = () => {
                     primaryTypographyProps={{ fontSize: '0.8rem', fontWeight: 600 }}
                   />
                 </MenuItem>
-                {detectedCryptoKeys.map((key) => (
+                {defaultKeys.map((key) => (
                   <MenuItem
                     key={key}
                     value={key}
