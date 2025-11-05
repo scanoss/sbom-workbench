@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added option to copy file path to clipboard on cryptography search screen
 - Displayed detected cryptography for a selected file in cryptography search screen
 - Displayed detected keys and keywords on crypto viewer component
+- Included dependency files on local cryptography scanning
 ### Changed
 - Upgraded `scanoss.js` version to v0.26.0
 
