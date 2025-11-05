@@ -54,12 +54,10 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const files = this.project.getTree().getRootFolder().getFiles();
-
-      // Filter dependency files, binary files and filtered files
+      // Filter binary files and filtered files
       const filePaths: string[] = files
-        .filter((f) => !f.isBinaryFile && !f.isDependencyFile && f.type !== NodeStatus.FILTERED)
+        .filter((f) => !f.isBinaryFile && (f.type !== NodeStatus.FILTERED || f.isDependencyFile))
         .map((f) => path.join(this.project.getScanRoot(), f.path));
-
       // Create map to get fileId from absolute file path
       const dbFiles = await modelProvider.model.file.getAll(null);
       const dbFileMapper = new Map<string, number>();
