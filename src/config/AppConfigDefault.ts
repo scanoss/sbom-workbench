@@ -42,4 +42,8 @@ export const AppConfigDefault: IAppConfig = {
   // other config
   MIN_VERSION_SUPPORTED: '0.17.0',
   SEARCH_ENGINE_DEFAULT_LIMIT: 500,
+
+  // default crypto rule file paths
+  SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME : 'scanoss-crypto-algorithm-rules.json',
+  SCANOSS_CRYPTO_LIBRARY_RULES_FILE_NAME : 'scanoss-crypto-library-rules.json',
 };

@@ -10,6 +10,7 @@ import path from 'path';
 import { fileExists } from '../utils/utils';
 import fs from 'fs';
 import { CryptographicItem } from '../model/entity/Cryptography';
+import AppConfig from '../../config/AppConfigModule';
 
 /**
  * Interface for algorithm rule structure from JSON
@@ -33,9 +34,6 @@ interface LibraryRule {
 }
 
 class CryptographyService {
-  private readonly DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME = 'scanoss-crypto-algorithm-rules.json';
-
-  private readonly DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME = 'scanoss-crypto-library-rules.json';
   private lastAlgorithmPath = null;
   private lastLibraryPath = null;
   private cryptoKeywordsMap: Map<string,Array<string>> = null;
@@ -337,12 +335,12 @@ class CryptographyService {
    */
   public async getAlgorithmRulesPath(): Promise<string> {
     const project = workspace.getOpenProject();
-    const customAlgorithmRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
+    const customAlgorithmRulesFilePath = path.join(project.getScanRoot(), AppConfig.SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
     if (await fileExists(customAlgorithmRulesFilePath)) {
       log.info('[ Cryptography Service ] - Custom cryptography algorithm rules found');
       return customAlgorithmRulesFilePath;
     }
-    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
+    return path.join(this.getAssetPath(), AppConfig.SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME);
   }
 
   /**
@@ -356,12 +354,12 @@ class CryptographyService {
    */
   public async getLibraryRulesPath():Promise<string> {
     const project = workspace.getOpenProject();
-    const customLibraryRulesFilePath = path.join(project.getScanRoot(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
+    const customLibraryRulesFilePath = path.join(project.getScanRoot(), AppConfig.SCANOSS_CRYPTO_LIBRARY_RULES_FILE_NAME);
     if (await fileExists(customLibraryRulesFilePath)) {
       log.info('[ Cryptography Service ] - Custom cryptography library rules found');
       return customLibraryRulesFilePath;
     }
-    return path.join(this.getAssetPath(), this.DEFAULT_SCANOSS_CRYPTO_LIBRARY_RULES_FILENAME);
+    return path.join(this.getAssetPath(), AppConfig.SCANOSS_CRYPTO_LIBRARY_RULES_FILE_NAME);
   }
 
   /**
