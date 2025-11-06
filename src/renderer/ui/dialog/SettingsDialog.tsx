@@ -66,15 +66,32 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
     DESCRIPTION: '',
   };
   const [data, setData] = useState<any>(initial);
+  const [urlWarning, setUrlWarning] = useState<string>('');
 
   const isValid = () => data.URL.trim().length > 0;
 
   const onSubmit = (e) => {
     e.preventDefault();
     if (isValid()) {
+      let cleanedUrl = data.URL?.replace(/\/$/, '');
+      let warning = '';
+
+      // Validate and clean URL if it contains a pathname
+      try {
+        const url = new URL(cleanedUrl);
+        if (url.pathname !== '/' && url.pathname !== '') {
+          warning = `The entered URL "${cleanedUrl}" contains a pathname "${url.pathname}", which is not supported. Setting URL to "${url.origin}".`;
+          console.warn(warning);
+          cleanedUrl = url.origin;
+        }
+      } catch (error) {
+        // If URL parsing fails, continue with the original value
+      }
+
       const nData = {
         ...data,
-        URL: data.URL?.replace(/\/$/, ''),
+        URL: cleanedUrl,
+        warning,
       };
 
       onClose({ action: DIALOG_ACTIONS.OK, data: nData });
@@ -83,9 +100,30 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
 
   const setDefaults = () => {
     setData(defaultData || initial);
+    setUrlWarning('');
   };
 
   useEffect(setDefaults, [open]);
+
+  // Real-time URL validation
+  useEffect(() => {
+    if (data.URL.trim().length === 0) {
+      setUrlWarning('');
+      return;
+    }
+
+    try {
+      const url = new URL(data.URL);
+      if (url.pathname !== '/' && url.pathname !== '') {
+        setUrlWarning(`The entered URL "${data.URL}" contains a pathname "${url.pathname}", which is not supported. The URL will be set to "${url.origin}".`);
+      } else {
+        setUrlWarning('');
+      }
+    } catch (error) {
+      // Invalid URL, but don't show pathname warning
+      setUrlWarning('');
+    }
+  }, [data.URL]);
 
   return (
     <Dialog
@@ -111,6 +149,11 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
                 autoFocus
               />
             </Paper>
+            {urlWarning && (
+              <FormHelperText error sx={{ mt: 0.5 }}>
+                {urlWarning}
+              </FormHelperText>
+            )}
           </div>
           <div className="dialog-form-field">
             <label className="dialog-form-field-label">
@@ -155,6 +198,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     open: false,
     data: null,
   });
+  const [urlWarning, setUrlWarning] = useState<string>('');
 
   const onSubmit = async (data: GlobalSettingsFormValues) => {
     const dto = mapToWorkspaceConfig(data);
@@ -192,6 +236,11 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     setValue('apiUrl', response.data.URL);
     setValue('apiKey', response.data.API_KEY);
     setValue('apis', [...apis, response.data]);
+
+    // Set warning if there was one
+    if (response.data.warning) {
+      setUrlWarning(response.data.warning);
+    }
   };
 
   const handleChangeApi = (_: SyntheticEvent<Element, Event>, newValue: ApiFormValues) => {
@@ -378,6 +427,11 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                           )}
                         />
                       </Paper>
+                      {urlWarning && (
+                        <FormHelperText error sx={{ mt: 0.5 }}>
+                          {urlWarning}
+                        </FormHelperText>
+                      )}
                       {AppConfig.FF_ENABLE_SETTINGS_HINT && <FormHelperText>{t('SettingsApiKeyHint')}</FormHelperText>}
                     </Stack>
                   </Stack>
