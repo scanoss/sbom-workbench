@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upcoming changes ...
 ### Added
 - Added real-time URL validation with pathname removal and warning message
+- Added migration to remove pathname from API URL from `sbom-workbench-settings.json` file
 
 ## [1.25.0] - 2025-11-05
 ### Added

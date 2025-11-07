@@ -3,8 +3,6 @@ import { HttpClient } from 'scanoss';
 import log from 'electron-log';
 import { modelProvider } from './ModelProvider';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
-import { userSettingService } from './UserSettingService';
-import { workspace } from '../workspace/Workspace';
 import AppConfig from '../../config/AppConfigModule';
 import { getHttpConfig } from './utils/httpUtil';
 
@@ -23,19 +21,11 @@ class FileService {
     const file = await modelProvider.model.file.get(queryBuilder);
     return file;
   }
-
+  // TODO: Move this call to scanoss.js SDK
   public async getRemoteFileContent(fileHash: string): Promise<string> {
-    const project = workspace.getOpenedProjects()[0];
-    const {
-      DEFAULT_API_INDEX,
-      APIS,
-    } = userSettingService.get();
-
-    const scanossHttp = new HttpClient(getHttpConfig());
-
-    const URL = project.getApi() ? project.getApi() : APIS[DEFAULT_API_INDEX].URL;
-    const fileContentUrl = `${URL}${AppConfig.API_CONTENT_PATH}/${fileHash}`;
-
+    const clientConfig = getHttpConfig();
+    const scanossHttp = new HttpClient(clientConfig);
+    const fileContentUrl = `${clientConfig.HOST_URL}${AppConfig.API_CONTENT_PATH}/${fileHash}`;
     const response = await scanossHttp.get(fileContentUrl);
 
     if (!response.ok) {
