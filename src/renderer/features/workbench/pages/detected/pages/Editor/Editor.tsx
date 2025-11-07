@@ -43,8 +43,6 @@ const Editor = () => {
 
   const isLoaded = useRef<boolean>(false);
 
-  const highlightParam = useSearchParams().get('highlight');
-
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
   const {
@@ -55,7 +53,6 @@ const Editor = () => {
 
   const file = node?.type === 'file' ? node.path : null;
 
-  const highlight =  highlightParam ? SearchUtils.unStemmify(decodeURIComponent(highlightParam)) : null;
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
   const [inventoriesMatchInfo, setInventoriesMatchInfo] = useState<Result[] | null>(null);
@@ -199,10 +196,10 @@ const Editor = () => {
 
   useEffect(() => {
     if (currentMatch) {
-      const diff = currentMatch?.type !== 'file' && sourceCodePath;
-      setIsDiffView(diff);
+      const enableDiff = (currentMatch?.type == 'snippet' && sourceCodePath !== null);
+      setIsDiffView(enableDiff);
 
-      if (diff || wfp || imported) loadRemoteFile(currentMatch.md5_file);
+      if (enableDiff || wfp || imported) loadRemoteFile(currentMatch.md5_file);
     }
   }, [currentMatch]);
 
@@ -336,7 +333,6 @@ const Editor = () => {
                 language={getExtension(file)}
                 value={localFileContent?.content || ''}
                 highlight={ currentMatch?.lines || null}
-                highlights={highlight || null}
               />
             ) : (
               <div className="file-loader">{localFileContent?.content || t('LoadingLocalFile')}</div>
@@ -362,7 +358,6 @@ const Editor = () => {
                 language={getExtension(file)}
                 value={remoteFileContent.content || ''}
                 highlight={currentMatch.oss_lines || null}
-                highlights={highlight || null}
               />
             ) : (
               <div className="file-loader">

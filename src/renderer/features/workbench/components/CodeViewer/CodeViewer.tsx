@@ -31,6 +31,7 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
   const scrollLineDecorations = React.useRef<string[]>([]);
+  const highlightDecorations = React.useRef<string[]>([]);
   const initMonaco = () => {
     const ref = editorContainerRef.current;
     if (ref) {
@@ -116,12 +117,19 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
               ];
             })
             .flat();
-        editor.current.deltaDecorations([], decorations);
+        // Clear previous highlights and add new ones
+        highlightDecorations.current = editor.current.deltaDecorations(
+          highlightDecorations.current,
+          decorations
+        );
 
         editor.current.revealLineNearTop(decorations[0].range.startLineNumber);
       } else {
-        // remove all decorations
-        // editor.current.deltaDecorations([], []);
+        // Clear all decorations when highlight is null or 'all'
+        highlightDecorations.current = editor.current.deltaDecorations(
+          highlightDecorations.current,
+          []
+        );
       }
     }
   };
