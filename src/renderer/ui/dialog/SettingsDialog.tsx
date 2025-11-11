@@ -36,6 +36,7 @@ import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappe
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import ControlledInput from '../Input';
 import { useTheme } from '@mui/material';
+import appConfigModule from '@config/AppConfigModule';
 const filter = createFilterOptions();
 
 const StyledSpan = styled('span')(({ theme }) => ({
@@ -219,7 +220,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
     resolver: zodResolver(globalSettingsFormSchema),
     defaultValues: async () => {
       const initialConfig = await userSettingService.get();
-
       return mapToGlobalSettingsFormValues(initialConfig);
     },
   });
@@ -250,7 +250,6 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         API_KEY: '',
       };
       setApiDialog({ ...apiDialog, open: true, data: value });
-
       return;
     }
 
@@ -397,7 +396,11 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                       },
                                     }}
                                   >
-                                    <span>{option.URL}</span>
+                                    {option.URL === AppConfig.API_URL ? (
+                                      <span style={{ color: '#9e9e9e' }}>{option.URL}</span>
+                                    ) : (
+                                      <span>{option.URL}</span>
+                                    )}
                                     {option.API_KEY && (
                                       <span className="middle">API KEY:
                                         <StyledSpan>{'*'.repeat(8)}</StyledSpan>
@@ -405,7 +408,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                     )}
                                   </Box>
                                   <IconButton
-                                    disabled={apis && apis?.length <= 1}
+                                    disabled={apis && (apis?.length <= 1  || option.URL === AppConfig.API_URL)}
                                     size="small"
                                     aria-label="delete"
                                     className="btn-delete"
