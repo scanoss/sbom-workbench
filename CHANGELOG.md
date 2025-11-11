@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Upcoming changes ...
+
+## [1.26.0] - 2025-11-13
 ### Fixed
+- Prevented deletion of `https://api.osskb.org` default URL
 - Fixed Monaco editor decorations not being cleared when switching files
 ### Added
 - Added real-time URL validation with pathname removal and warning message
@@ -40,3 +43,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.24.0]: https://github.com/scanoss/sbom-workbench/tag/v1.24.0
 [1.25.0]: https://github.com/scanoss/sbom-workbench/compare/v1.24.0...v1.25.0
+[1.26.0]: https://github.com/scanoss/sbom-workbench/compare/v1.25.0...v1.26.0
+
