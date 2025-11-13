@@ -139,10 +139,10 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     } = userSettingService.get();
 
     if (this.project.getApi()) {
-      scannerCfg.API_URL = this.project.getApi() + AppConfig.API_SCAN_PATH;
+      scannerCfg.API_URL = this.project.getApi();
       scannerCfg.API_KEY = this.project.getApiKey();
     } else {
-      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL + AppConfig.API_SCAN_PATH;
+      scannerCfg.API_URL = APIS[DEFAULT_API_INDEX].URL;
       scannerCfg.API_KEY = APIS[DEFAULT_API_INDEX].API_KEY;
     }
 
@@ -170,7 +170,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     scannerCfg.RESULTS_DEOBFUSCATION = this.project.getDto().scannerConfig.obfuscate;
 
     // Allows Scanoss SDK to write into project.log
-    logger.setTransport((msg) => log.info(`%c${msg}`, 'color: green'));
+    logger.setTransport(log);
 
     this.scanner = new Scanner(scannerCfg);
     this.project.scanner = this.scanner;
