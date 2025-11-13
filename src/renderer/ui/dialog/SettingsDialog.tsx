@@ -36,7 +36,6 @@ import { mapToGlobalSettingsFormValues } from 'renderer/features/workspace/mappe
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import ControlledInput from '../Input';
 import { useTheme } from '@mui/material';
-import appConfigModule from '@config/AppConfigModule';
 const filter = createFilterOptions();
 
 const StyledSpan = styled('span')(({ theme }) => ({
@@ -55,11 +54,12 @@ interface NewEndpointDialogProps {
   defaultData: any;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
+  currentApis: any[];
 }
 
 const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const { t } = useTranslation();
-  const { open, onClose, onCancel, defaultData } = props;
+  const { open, onClose, onCancel, defaultData, currentApis } = props;
 
   const initial = {
     URL: '',
@@ -68,15 +68,21 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   };
   const [data, setData] = useState<any>(initial);
   const [urlWarning, setUrlWarning] = useState<string>('');
+  const [urlExistsWarning, setUrlExistsWarning] = useState<string>('');
+  const [isValid, setIsValid] = useState<boolean>(false);
 
-  const isValid = () => data.URL.trim().length > 0;
+  const onCancelAction = () =>{
+    setUrlWarning('');
+    setIsValid(false);
+    setUrlExistsWarning('');
+    onCancel();
+  }
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (isValid()) {
+    if (data.URL.trim().length > 0) {
       let cleanedUrl = data.URL?.replace(/\/$/, '');
       let warning = '';
-
       // Validate and clean URL if it contains a pathname
       try {
         const url = new URL(cleanedUrl);
@@ -112,9 +118,22 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
       setUrlWarning('');
       return;
     }
+    setIsValid(true);
 
+    let url = null;
+    try{
+      url = new URL(data.URL);
+    }catch(e){
+      setIsValid(false);
+      return;
+    }
+    setUrlExistsWarning(``);
+    if(currentApis.some((api)=> api.URL === url.origin && api.API_KEY === data.API_KEY)) {
+      setUrlExistsWarning(`The entered URL and API KEY already exists`);
+      setIsValid(false);
+      return;
+    }
     try {
-      const url = new URL(data.URL);
       if (url.pathname !== '/' && url.pathname !== '') {
         setUrlWarning(`The entered URL "${data.URL}" contains a pathname "${url.pathname}", which is not supported. The URL will be set to "${url.origin}".`);
       } else {
@@ -124,7 +143,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
       // Invalid URL, but don't show pathname warning
       setUrlWarning('');
     }
-  }, [data.URL]);
+  }, [data.URL, data.API_KEY]);
 
   return (
     <Dialog
@@ -170,12 +189,17 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
               />
             </Paper>
           </div>
+          {urlExistsWarning && (
+            <FormHelperText error sx={{ mt: 0.7 }}>
+              {urlExistsWarning}
+            </FormHelperText>
+          )}
         </div>
         <DialogActions>
-          <Button color="inherit" tabIndex={-1} onClick={onCancel}>
+          <Button color="inherit" tabIndex={-1} onClick={onCancelAction}>
             {t('Button:Cancel')}
           </Button>
-          <Button type="submit" variant="contained" color="secondary" disabled={!isValid()}>
+          <Button type="submit" variant="contained" color="secondary" disabled={!isValid}>
             {t('Button:Add')}
           </Button>
         </DialogActions>
@@ -259,13 +283,11 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
 
   const handleTrash = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>, option: ApiFormValues) => {
     e.stopPropagation();
-
-    const newApis = apis.filter((api) => api.URL !== option.URL);
-
+    const newApis = apis.filter((api) => ((api.URL !== option.URL) || (api.API_KEY !== option.API_KEY)));
     setValue('apis', newApis);
     dispatch(workbenchStoreApi(newApis));
 
-    if (apiUrl === option.URL) {
+    if (apiUrl === option.URL && apiKey === option.API_KEY) {
       setValue('apiUrl', '');
       setValue('apiKey', '');
     }
@@ -486,6 +508,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
         defaultData={apiDialog.data}
         onCancel={() => setApiDialog({ ...apiDialog, open: false })}
         onClose={(e) => onCloseDialogHandler(e)}
+        currentApis={apis}
       />
     </FormProvider>
   );
