@@ -62,7 +62,7 @@ const NewEndpointDialog = (props: NewEndpointDialogProps) => {
   const { open, onClose, onCancel, defaultData, currentApis } = props;
 
   const initial = {
-    URL: '',
+    URL: 'https://',
     API_KEY: '',
     DESCRIPTION: '',
   };
@@ -418,7 +418,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                       },
                                     }}
                                   >
-                                    {option.URL === AppConfig.API_URL ? (
+                                    {option.URL === AppConfig.API_URL && option.API_KEY === "" ? (
                                       <span style={{ color: '#9e9e9e' }}>{option.URL}</span>
                                     ) : (
                                       <span>{option.URL}</span>
@@ -430,7 +430,7 @@ const SettingDialog = ({ open, onClose, onCancel }: SettingDialogProps) => {
                                     )}
                                   </Box>
                                   <IconButton
-                                    disabled={apis && (apis?.length <= 1  || option.URL === AppConfig.API_URL)}
+                                    disabled={apis && (apis?.length <= 1  || (option.URL === AppConfig.API_URL && option.API_KEY === ""))}
                                     size="small"
                                     aria-label="delete"
                                     className="btn-delete"
