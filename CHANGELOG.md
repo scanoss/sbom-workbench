@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Upcoming changes ...
 
-## [1.26.0] - 2025-11-13
+## [1.26.0] - 2025-11-17
 ### Fixed
 - Prevented deletion of `https://api.osskb.org` default URL
 - Fixed Monaco editor decorations not being cleared when switching files
@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added real-time URL validation with pathname removal and warning message
 - Added migration to remove pathname from API URL from `sbom-workbench-settings.json` file
 - Added validation to prevent duplicate API URL and API KEY combinations in settings
+- Added `https://` prefix on new API URL creation
 ### Changed
 - Upgraded scanoss.js SDK version to v0.27.0
 - Improved API endpoint deletion to check both URL and API KEY for unique identification
