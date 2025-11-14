@@ -10,8 +10,9 @@ export class AddCryptographyTask implements ITask<ICryptographyTask, void> {
 
   private generateRequests(reqData: Array<string>): Array<any> {
     const chunks = [];
-    for (let i = 0; i < reqData.length; i += AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT) {
-      chunks.push(reqData.slice(i, i + AppConfigDefault.DEFAULT_SERVICE_CHUNK_LIMIT));
+    //TODO: Move chunk request logic to scanoss SDK
+    for (let i = 0; i < reqData.length; i += AppConfigDefault.DEFAULT_CRYPTOGRAPHY_SERVICE_CHUNK_LIMIT) {
+      chunks.push(reqData.slice(i, i + AppConfigDefault.DEFAULT_CRYPTOGRAPHY_SERVICE_CHUNK_LIMIT));
     }
     const requests = [];
     chunks.forEach((components: Array<string>) => {
