@@ -1,4 +1,4 @@
-import { DependencyScanner, DependencyScannerCfg, VulnerabilityCfg } from 'scanoss';
+import { DependencyScanner, DependencyScannerCfg } from 'scanoss';
 import { ScannerFactory } from '../ScannerFactory';
 import fs from 'fs';
 import log from 'electron-log';
@@ -9,7 +9,6 @@ import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
-import AppConfigModule from '../../../../config/AppConfigModule';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   protected project: Project;
@@ -30,7 +29,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
     log.info('[ DependencyTask init ]');
     await this.scanDependencies();
     await this.addDependencies();
-    await this.project.save();
+    this.project.save();
     return true;
   }
 
@@ -45,31 +44,12 @@ export class DependencyTask implements Scanner.IPipelineTask {
           allFiles.push(rootPath + f.path);
         });
       const depScanner = ScannerFactory.createScanner(DependencyScannerCfg, DependencyScanner);
-      const chunks = [];
-      for (let i = 0; i < allFiles.length; i += AppConfigModule.DEFAULT_SERVICE_CHUNK_LIMIT) {
-        chunks.push(allFiles.slice(i, i + 10));
-      }
-      const promises = chunks.map(async (chunk) => {
-        try {
-          return await depScanner.scan(chunk);
-        } catch (err: any) {
-          log.error('[ DependencyTask ] Request failed for files:', chunk.map((file: any) => file));
-          log.error('Error:', err);
-          return null;
-        }
-      });
-      const results = await Promise.all(promises);
-
-      const dependencies = results.reduce((acc, curr) => {
-        if (!curr) return acc;
-        return {
-          filesList: [...(acc.filesList || []), ...(curr.filesList || [])],
-        };
-      }, { filesList: [] });
-      dependencies.filesList.forEach((f) => {
+      const resp = await depScanner.scan(allFiles);
+      resp.filesList.forEach((f) => {})
+      resp.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
-      await fs.promises.writeFile(`${this.project.metadata.getMyPath()}/dependencies.json`, JSON.stringify(dependencies, null, 2));
+      await fs.promises.writeFile(`${this.project.metadata.getMyPath()}/dependencies.json`, JSON.stringify(resp, null, 2));
     } catch (e) {
       log.error(e);
       throw e;
