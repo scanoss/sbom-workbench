@@ -29,27 +29,8 @@ export class ScanossResultValidator {
   validate(data): ValidationResult {
     this.errors = [];
 
-    // Parse JSON if it's a string
-    let response;
-    try {
-      response = typeof data === 'string' ? JSON.parse(data) : data;
-    } catch (error: unknown) {
-      throw new Error(`Invalid JSON: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-
-    // Validate top-level structure
-    if (!response || typeof response !== 'object' || Array.isArray(response)) {
-      this.addError('root', 'response must be an object', response);
-      return this.getValidationResult();
-    }
-
-    if (Object.keys(response).length === 0) {
-      this.addError('root', 'response is empty', response);
-      return this.getValidationResult();
-    }
-
     // Validate each file path and its results
-    for (const [filePath, results] of Object.entries(response)) {
+    for (const [filePath, results] of Object.entries(data)) {
       this.validateFilePath(filePath);
       this.validateFileResults(filePath, results);
     }
@@ -86,7 +67,7 @@ export class ScanossResultValidator {
 
   private validateMatchResults(filePath, results){
     if (!Array.isArray(results)) {
-      this.addError(`${filePath}.results`, 'results must be an array', results);
+      this.addError(filePath, 'results must be an array', results);
       return;
     }
 
@@ -110,7 +91,12 @@ export class ScanossResultValidator {
   }
 
   // Validate the array of results for a file
-  private validateFileResults(filePath, results) {
+  validateFileResults(filePath, results) {
+
+    if (!Array.isArray(results)) {
+      this.addError(`${filePath} results`, 'results must be an array', null);
+      return;
+    }
 
     if (results.length === 0) return;
 
@@ -192,6 +178,16 @@ export class ScanossResultValidator {
         value: err.value,
       }))
     };
+  }
+
+  // Public method to get current errors
+  getErrors(): ValidationError[] {
+    return this.errors;
+  }
+
+  // Public method to check if valid
+  hasErrors(): boolean {
+    return this.errors.length > 0;
   }
 
 }

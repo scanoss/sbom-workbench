@@ -25,20 +25,25 @@ export class RawResultImportPipelineTask extends ScannerPipeline {
     // Import task
     this.queue.push(new ImportTask(project));
 
-    // Dependency
+    /// Dependency
     this.queue.push(new RawResultDependencyImportTask(project));
 
     // Vulnerabilities
     if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) {
-      this.queue.push(new VulnerabilitiesTask(project));
+       this.queue.push(new VulnerabilitiesTask(project));
     }
 
     // Cryptography
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
-      this.queue.push(new CryptographyTask(project));
+       this.queue.push(new CryptographyTask(project));
     }
 
     for await (const [index, task] of this.queue.entries()) {
+      const success= await this.executeTask(task, index);
+      if (!success) {
+        // Task was stopped
+        return false;
+      }
       await this.executeTask(task, index);
     }
 
