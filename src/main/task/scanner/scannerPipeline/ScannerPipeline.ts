@@ -14,14 +14,14 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
 
   public abstract run(params: Project): Promise<boolean>;
 
-  protected async executeTask(task: Scanner.IPipelineTask, stageStep = 1) {
+  protected async executeTask(task: Scanner.IPipelineTask, stageStep = 1): Promise<boolean> {
     try {
       broadcastManager.get().send(IpcChannels.SCANNER_UPDATE_STAGE, {
         stageName: task.getStageProperties().name,
         stageLabel: task.getStageProperties().label,
         stageStep: `${stageStep + 1}/${this.queue.length}`,
       });
-      await task.run();
+      return await task.run();
     } catch (e: any) {
       if (task.getStageProperties().isCritical) {
         log.error(
@@ -36,6 +36,7 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         });
         throw e;
       }
+      return true; // Non-critical task failed, continue pipeline
     }
   }
 

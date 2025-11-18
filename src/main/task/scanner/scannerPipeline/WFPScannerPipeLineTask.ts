@@ -39,7 +39,11 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes(ScannerType.CRYPTOGRAPHY) && project.getApiKey()) this.queue.push(new CryptographyTask(project));
 
     for await (const [index, task] of this.queue.entries()) {
-      await this.executeTask(task, index);
+      const success = await this.executeTask(task, index);
+      if (!success) {
+        // Task was stopped
+        return false;
+      }
     }
     await this.done(project);
 

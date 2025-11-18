@@ -44,8 +44,7 @@ export class Tree {
     broadcastManager.get().send(eventName, data);
   }
 
-  public build(files: Array<string>) {
-    const addedNodes = {};
+  public build(files: Array<string>, addedNodes: Record<string, Folder> = {}) {
     files.forEach((f) => {
       const splitPath = f.split('/');
       if (splitPath.length > 1) {

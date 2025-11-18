@@ -4,7 +4,6 @@ import { Scanner } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
 import { Tree } from "../../workspace/tree/Tree";
 
-
 export abstract class IndexTreeTask implements Scanner.IPipelineTask {
   protected project: Project;
 
@@ -13,7 +12,6 @@ export abstract class IndexTreeTask implements Scanner.IPipelineTask {
   }
 
   public abstract run(): Promise<boolean>;
-  public abstract buildTree(files: Array<string>):Promise<Tree>;
 
   public getStageProperties(): Scanner.StageProperties {
     return {

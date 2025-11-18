@@ -8,7 +8,7 @@ import {ScanTask} from "../scan/ScanTask";
 export class WFPResumeTask extends ScanTask<WFPDispatcher, WFPResumeScannerInputAdapter> {
 
   constructor(project: Project) {
-    super(project,new WFPDispatcher(),new WFPResumeScannerInputAdapter());
+    super(project,new WFPDispatcher(),new WFPResumeScannerInputAdapter(project));
   }
 
   // @Override

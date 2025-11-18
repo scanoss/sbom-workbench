@@ -95,17 +95,17 @@ export class Project {
   }
 
   public async close() {
-    if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
     log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, 'color: green');
     log.info('%c[ PROJECT ]: Closing Database', 'color: green');
     await modelProvider.model.destroy();
     this.state = ProjectState.CLOSED;
-    this.scanner = null;
     this.logical_tree = null;
     this.tree = null;
     this.store = null;
     this.filesToScan = null;
     this.filter = null;
+    if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
+    this.scanner = null;
   }
 
   public save(): void {

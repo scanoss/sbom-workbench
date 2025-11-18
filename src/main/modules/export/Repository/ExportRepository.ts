@@ -8,7 +8,7 @@ import { DataRecord } from '../../../model/interfaces/report/DataRecord';
 export interface ExportRepository {
   getIdentifiedData(): Promise<ExportComponentData[]>;
   getDetectedData(): Promise<ExportComponentData[]>;
-  getRawData();
+  getRawFilePath(): string;
   getWfpData(): Promise<string>;
   getDecisionData(): Promise<Array<DecisionData>>;
   getDetectedVulnerability(): Promise<Array<ComponentVulnerability>>;

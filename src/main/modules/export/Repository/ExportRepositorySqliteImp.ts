@@ -11,6 +11,7 @@ import { LicenseDTO } from '../../../../api/dto';
 import { CryptographicItem } from '../../../model/entity/Cryptography';
 import { ExportCryptographyData } from '../../../model/interfaces/report/ExportCryptographyData';
 import { DataRecord } from '../../../model/interfaces/report/DataRecord';
+import path from 'path';
 
 export interface ExportData {
   inventoryId: number;
@@ -39,8 +40,8 @@ export class ExportRepositorySqliteImp implements ExportRepository {
     return modelProvider.model.report.fetchAllDetectedComponents();
   }
 
-  public getRawData() {
-    return workspace.getOpenedProjects()[0].getResults();
+  public getRawFilePath(): string {
+    return path.join(`${workspace.getOpenedProjects()[0].getMyPath()}`, '/result.json');
   }
 
   public async getWfpData(): Promise<string> {
