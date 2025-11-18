@@ -56,6 +56,39 @@ export class Tree {
     return this.rootFolder;
   }
 
+  public buildStream(fileStream: NodeJS.ReadableStream): Promise<Folder> {
+    const addedNodes = {};
+
+    fileStream.on('data', (file: string) => {
+      const splitPath = file.split('/');
+      if (splitPath.length > 1) {
+        if (splitPath[0] === '') splitPath.shift();
+        this.recursive(splitPath, this.rootFolder, addedNodes);
+      } else {
+        this.recursive([file], this.rootFolder, addedNodes);
+      }
+    });
+
+    return new Promise((resolve, reject) => {
+      fileStream.on('end', () => resolve(this.rootFolder));
+      fileStream.on('error', reject);
+    });
+  }
+
+  public buildFlatStream(fileStream: NodeJS.ReadableStream): Promise<Folder> {
+    fileStream.on('data', (filePath: string) => {
+      // Just create a file node directly under root, skip folder hierarchy
+      const fileName = filePath.split('/').pop() || filePath;
+      const file = new File(filePath, fileName);
+      this.rootFolder.addChild(file);
+    });
+
+    return new Promise((resolve, reject) => {
+      fileStream.on('end', () => resolve(this.rootFolder));
+      fileStream.on('error', reject);
+    });
+  }
+
   /**
    * @brief order file tree by folder and files
    * */

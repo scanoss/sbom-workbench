@@ -1,7 +1,6 @@
 import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
-import { IInsertResult } from '../model/interfaces/IInsertResult';
 import { ResultAdapter } from '../adapters/ResultAdapter';
 
 class ResultService {
@@ -38,9 +37,8 @@ class ResultService {
     return results;
   }
 
-  public async insertFromFile(resultPath: string, files: any) {
-    const resultLicenses: IInsertResult = await modelProvider.model.result.insertFromFile(resultPath, files);
-    await modelProvider.model.result.insertResultLicense(resultLicenses);
+  public async  insertFromFile(resultPath: string, files: any) {
+    await modelProvider.model.result.insertFromFile(resultPath, files);
   }
 }
 export const resultService = new ResultService();

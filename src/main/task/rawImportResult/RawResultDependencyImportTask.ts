@@ -9,6 +9,9 @@ import fs from 'fs';
 import { DependenciesList } from 'scanoss/build/main/sdk/Dependencies/DependencyTypes';
 import { ScannerStage } from '../../../api/types';
 import log from 'electron-log';
+import { EOL } from 'os';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject';
 
 interface DependencyLicense{
   "is_spdx_approved": boolean;
@@ -68,18 +71,27 @@ export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
 
   private async getDependencies(): Promise<IDependencyResponse> {
     const resultPath = path.join(this.project.getMyPath(), 'result.json');
-    const results = await fs.promises.readFile(resultPath, 'utf-8');
     const dependencies: IDependencyResponse = { filesList: [] };
-    for (const [file, data] of Object.entries(JSON.parse(results))) {
-      const fileData = data as any;
-      fileData.forEach((fd: any) => {
-          if(fd.id === "dependency"){
-            const fileList = this.processFileDependencies(file,fd.dependencies);
+    const pipeline = fs.createReadStream(resultPath)
+      .pipe(parser())
+      .pipe(streamObject());
+
+    return new Promise((resolve, reject) => {
+      pipeline.on('data', async ({ file, results }) => {
+        results.forEach((r: any) => {
+          if(r.id === "dependency"){
+            const fileList = this.processFileDependencies(file, r.dependencies);
             dependencies.filesList.push(fileList)
           }
+        });
       });
-    }
-    return dependencies;
+      pipeline.on('end', () => {
+        resolve(dependencies);
+      });
+      pipeline.on('error', (err) => {
+        reject(err);
+      });
+    })
   }
 
   public getStageProperties(): Scanner.StageProperties{

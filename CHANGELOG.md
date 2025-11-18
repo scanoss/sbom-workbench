@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Upcoming changes ...
+### Changed
+- Upgraded scanoss.js SDK version to v0.28.0-beta.1
+### Added
+- Added read/write stream support to read scan raw results
 
 ## [1.26.0] - 2025-11-17
 ### Fixed

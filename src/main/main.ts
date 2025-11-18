@@ -27,6 +27,9 @@ import { broadcastManager } from './broadcastManager/BroadcastManager';
 import AppConfig from '../config/AppConfigModule';
 import { modelProvider } from './services/ModelProvider';
 
+// Increase heap memory for large projects
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=8192');
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';

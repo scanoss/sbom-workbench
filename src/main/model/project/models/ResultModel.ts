@@ -7,6 +7,10 @@ import { licenseHelper } from '../../../helpers/LicenseHelper';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { IInsertResult, IResultLicense } from '../../interfaces/IInsertResult';
 import { Model } from '../../Model';
+import fs from 'fs';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject';
+import log from 'electron-log';
 
 export class ResultModel extends Model {
   private connection: sqlite3.Database;
@@ -34,24 +38,35 @@ export class ResultModel extends Model {
         const result: Record<any, any> = await utilModel.readFile(resultPath);
         this.connection.serialize(async () => {
           this.connection.run('begin transaction');
-          let data: any;
-          for (const [key, value] of Object.entries(result)) {
+
+          const pipeline = fs.createReadStream(resultPath)
+            .pipe(parser())
+            .pipe(streamObject());
+
+          pipeline.on('data', async ({ key, value }) => {
             for (let i = 0; i < value.length; i += 1) {
-              const filePath = key;
-              data = value[i];
-              if (data.id !== 'none') {
-                const resultId = await self.insertResultBulkReScan(this.connection, data, files[filePath]);
-                if (resultId > 0) resultLicense[resultId] = data.licenses;
+              if (value[i].id !== 'none') {
+                const resultId = await self.insertResultBulkReScan(this.connection, value[i], files[key]);
+                if (resultId > 0) resultLicense[resultId] = value[i].licenses;
               }
             }
-          }
-          this.connection.run('commit', () => {
-            if (Object.keys(result).length > 0) resolve(resultLicense);
-            resolve(null);
+          });
+
+          pipeline.on('end', () => {
+            this.connection.run('commit', () => {
+              if (Object.keys(result).length > 0) resolve(resultLicense);
+              resolve(null);
+            });
+          });
+
+          pipeline.on('error', () => {
+            this.connection.run('commit', (err ) => {
+              reject(err);
+            });
           });
         });
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        log.error(error);
         reject(error);
       }
     });
@@ -59,26 +74,70 @@ export class ResultModel extends Model {
 
   public async insertFromFile(resultPath: string, files: any): Promise<IInsertResult> {
     return new Promise<IInsertResult>(async (resolve, reject) => {
-      const resultLicense: any = {};
-      const result: Record<any, any> = await utilModel.readFile(resultPath);
-      let data: any;
+      const run = util.promisify(this.connection.run.bind(this.connection)) as any;
+
       this.connection.serialize(async () => {
-        this.connection.run('begin transaction');
-        for (const [key, value] of Object.entries(result)) {
-          for (let i = 0; i < value.length; i += 1) {
-            const filePath = key;
-            data = value[i];
-            if (data.id !== 'none' && data.id!="dependency") {
-              const resultId = await this.insertResultBulk(this.connection, data, files[filePath]);
-              resultLicense[resultId] = data.licenses;
+        await run('begin transaction');
+        const pipeline = fs.createReadStream(resultPath).pipe(parser()).pipe(streamObject());
+        const pendingOperations: Promise<void>[] = [];
+
+        const insertLicense = async (resultId: number, license: IResultLicense) => {
+          await run(
+            'INSERT OR IGNORE INTO result_license (spdxid,source,resultId,patent_hints,copyLeft,osadl_updated,incompatible_with,checklist_url) VALUES (?,?,?,?,?,?,?,?);',
+            license.name,
+            license.source,
+            resultId,
+            license.patent_hints || null,
+            license.copyleft || null,
+            license.osadl_updated || null,
+            license.incompatible_with || null,
+            license.checklist_url || null,
+          );
+        };
+
+        pipeline.on('data', ({ key, value }) => {
+          pipeline.pause();
+
+          const processData = async () => {
+            for (let i = 0; i < value.length; i += 1) {
+              if (value[i].id !== 'none' && value[i].id !== 'dependency') {
+                const resultId = await this.insertResultBulk(this.connection, value[i], files[key]);
+
+                if (value[i].licenses && value[i].licenses.length > 0) {
+                  for (const license of value[i].licenses) {
+                    await insertLicense(resultId, license);
+                  }
+                }
+              }
             }
-          }
-        }
-        this.connection.run('commit', (err: any) => {
-          if (!err) resolve(resultLicense);
-          reject(err);
+            pipeline.resume();
+          };
+
+          pendingOperations.push(processData());
         });
-      });
+
+        pipeline.on('end', async () => {
+          try {
+            await Promise.all(pendingOperations);
+            await run('commit');
+            resolve({});
+          } catch (err) {
+            await run('rollback');
+            reject(err);
+          }
+        });
+
+        pipeline.on('error', async (error) => {
+          try {
+            await run('rollback');
+          } catch (rollbackErr) {
+            reject(rollbackErr);
+            return;
+          }
+          reject(error);
+        });
+       });
+
     });
   }
 
