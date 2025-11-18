@@ -3,6 +3,11 @@ import { Project } from '../../workspace/Project';
 import { Scanner } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
 import { Tree } from "../../workspace/tree/Tree";
+import path from 'path';
+import fs from 'fs';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject';
+import log from 'electron-log';
 
 
 export abstract class IndexTreeTask implements Scanner.IPipelineTask {
@@ -13,7 +18,6 @@ export abstract class IndexTreeTask implements Scanner.IPipelineTask {
   }
 
   public abstract run(): Promise<boolean>;
-  public abstract buildTree(files: Array<string>):Promise<Tree>;
 
   public getStageProperties(): Scanner.StageProperties {
     return {

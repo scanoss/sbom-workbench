@@ -8,6 +8,8 @@ import i18next from 'i18next';
 import { modelProvider } from '../../services/ModelProvider';
 import { licenseService } from '../../services/LicenseService';
 import { ScanossResultValidator } from '../../modules/validator/ScanossResultValidator';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject';
 
 export class RawResultSetupTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -15,30 +17,84 @@ export class RawResultSetupTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  private validateResults(results: any){
-    const scanossResultValidator = new ScanossResultValidator();
-    const r = scanossResultValidator.validate(results);
-    if (!r.isValid){
-      log.error('[ ResultFileTreeTask validateResults ]', r.getDetailedErrors());
-      throw new Error(`Invalid SCANOSS scan result: ${r.getDetailedErrors()[0].field} - ${r.getDetailedErrors()[0].message}`);
-    }
-  }
-
-  private async processScanResults(){
+  private async processScanResults(): Promise<void> {
     log.info('[ ResultFileTreeTask saveResults ]');
-    const results = await fs.promises.readFile(this.project.getScanRoot(),'utf-8');
-    const parsedResults =  JSON.parse(results);
-    for (const [key, value] of Object.entries(parsedResults)) {
-      if (!key.startsWith('/')) {
-        parsedResults[`/${key}`] = value;
-        delete parsedResults[key];
-      }
-    }
-    // validate file
-    this.validateResults(parsedResults);
-    // Save result.json file
-    const resultPath = path.join(this.project.getMyPath(),'result.json');
-    await fs.promises.writeFile(resultPath, JSON.stringify(parsedResults,null,2));
+    const scanRootPath = this.project.getScanRoot();
+    const resultPath = path.join(this.project.getMyPath(), 'result.json');
+
+    const readStream = fs.createReadStream(scanRootPath);
+    const writeStream = fs.createWriteStream(resultPath);
+
+    const pipeline = readStream
+      .pipe(parser())
+      .pipe(streamObject());
+
+    return new Promise((resolve, reject) => {
+      let isFirstEntry = true;
+      let hasError = false;
+
+      // Start JSON object
+      writeStream.write('{\n');
+
+      pipeline.on('data', ({ key, value }) => {
+        try {
+          // Create a new validator for each entry to avoid error accumulation
+        /*  const entryValidator = new ScanossResultValidator();
+
+          // Validate entry as it streams
+          entryValidator.validateFilePath(key);
+          entryValidator.validateFileResults(key, value);
+
+          // Check if validation found errors
+          if (entryValidator.hasErrors()) {
+            const errors = entryValidator.getErrors();
+            const errorDetails = errors.map(err => `${err.cause}: ${err.message}`).join('; ');
+            throw new Error(`Invalid SCANOSS scan result for '${key}': ${errorDetails}`);
+          }*/
+
+          // Add '/' prefix if not present
+          const normalizedKey = key.startsWith('/') ? key : `/${key}`;
+
+          // Write entry to output stream
+          if (!isFirstEntry) {
+            writeStream.write(',\n');
+          }
+          writeStream.write(`  ${JSON.stringify(normalizedKey)}: ${JSON.stringify(value, null, 2).split('\n').join('\n  ')}`);
+          isFirstEntry = false;
+        } catch (error) {
+          hasError = true;
+          log.error('[ Error validating entry ]', key, error);
+          pipeline.destroy();
+          writeStream.destroy();
+          reject(error);
+        }
+      });
+
+      pipeline.on('end', () => {
+        if (!hasError) {
+          // Close JSON object
+          writeStream.write('\n}\n');
+          writeStream.end();
+
+          writeStream.on('finish', () => {
+            log.info('[ ResultFileTreeTask saveResults completed ]');
+            resolve();
+          });
+
+          writeStream.on('error', (err) => {
+            log.error('[ Error writing result file ]', err);
+            reject(err);
+          });
+        }
+      });
+
+      pipeline.on('error', (err) => {
+        hasError = true;
+        log.error('[ Error processing scan results ]', err);
+        writeStream.destroy();
+        reject(err);
+      });
+    });
   }
 
   private async setProjectSource(){

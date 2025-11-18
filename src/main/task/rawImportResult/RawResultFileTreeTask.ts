@@ -3,49 +3,86 @@ import fs from 'fs';
 import { Tree } from '../../workspace/tree/Tree';
 import path from 'path';
 import log from 'electron-log';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject';
 
 export class RawResultFileTreeTask extends IndexTreeTask {
 
   filesToScan: Array<string>;
 
 
-  private getFiles(): Array<string> {
-    const results = this.getFileResultJsonContent();
-    return Array.from(Object.keys(results));
-  }
-
-  private getFileResultJsonContent():Record<string, any>{
+  private async buildTreeInChunks(): Promise<Tree> {
     const resultPath = path.join(this.project.getMyPath(), 'result.json');
-    const resultJson = fs.readFileSync(resultPath, {encoding:'utf8'});
-    return JSON.parse(resultJson);
+    const tree = new Tree(this.project.metadata.getName(), this.project.getMyPath());
+    const files: Array<string> = [];
+
+    const pipeline = fs.createReadStream(resultPath)
+      .pipe(parser())
+      .pipe(streamObject());
+
+    const CHUNK_SIZE = 1000;
+    let fileChunk: string[] = [];
+
+    return new Promise((resolve, reject) => {
+      pipeline.on('data', ({ key }) => {
+        files.push(key);
+        fileChunk.push(key);
+
+        // Process chunk when it reaches CHUNK_SIZE
+        if (fileChunk.length >= CHUNK_SIZE) {
+          tree.build(fileChunk);
+          fileChunk = []; // Clear chunk
+        }
+      });
+
+      pipeline.on('end', () => {
+        // Process remaining files in the last chunk
+        if (fileChunk.length > 0) {
+          tree.build(fileChunk);
+        }
+
+        this.filesToScan = files;
+        tree.orderTree();
+        resolve(tree);
+      });
+
+      pipeline.on('error', (err) => {
+        log.error('[ Error reading file list from result.json ]', err);
+        reject(err);
+      });
+    });
   }
 
-  private loadScanResultsOnFileTree(){
+  private async loadScanResultsOnFileTree(): Promise<void> {
     log.info('[ Loading scan results on file tree... ]');
-    const results = this.getFileResultJsonContent();
-    this.project.tree.attachResults(results);
-    this.project.tree.updateFlags();
+    const resultPath = path.join(this.project.getMyPath(), 'result.json');
+    const pipeline = fs.createReadStream(resultPath)
+      .pipe(parser())
+      .pipe(streamObject());
+
+    return new Promise((resolve, reject) => {
+      pipeline.on('data', ({ key, value }) => {
+        this.project.tree.attachResults({[key]: value});
+      });
+
+      pipeline.on('end', () => {
+        // Update flags once at the end instead of for every file
+        this.project.tree.updateFlags();
+        resolve();
+      });
+
+      pipeline.on('error', (err) => {
+        log.error('[ Error loading scan results ]', err);
+        reject(err);
+      });
+    });
   }
 
   public async run(): Promise<boolean> {
-    const files = this.getFiles();
-    this.filesToScan = files;
-    const tree =  await this.buildTree(this.filesToScan);
+    const tree = await this.buildTreeInChunks();
     this.setTreeSummary(tree);
-    this.loadScanResultsOnFileTree();
+    await this.loadScanResultsOnFileTree();
     return true;
-  }
-
-  /**
-   * @brief build tree from array of paths
-   * @param files array of paths
-   * @return Tree return a tree
-   * */
-  public async buildTree(files: Array<string>): Promise<Tree> {
-    const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath());
-    tree.build(files);
-    tree.orderTree();
-    return tree;
   }
 
   public setTreeSummary(tree: Tree):void {

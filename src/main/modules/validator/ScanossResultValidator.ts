@@ -110,7 +110,7 @@ export class ScanossResultValidator {
   }
 
   // Validate the array of results for a file
-  private validateFileResults(filePath, results) {
+  validateFileResults(filePath, results) {
 
     if (results.length === 0) return;
 
@@ -192,6 +192,16 @@ export class ScanossResultValidator {
         value: err.value,
       }))
     };
+  }
+
+  // Public method to get current errors
+  getErrors(): ValidationError[] {
+    return this.errors;
+  }
+
+  // Public method to check if valid
+  hasErrors(): boolean {
+    return this.errors.length > 0;
   }
 
 }

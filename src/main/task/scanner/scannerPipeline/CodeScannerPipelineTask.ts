@@ -45,7 +45,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     }
 
     // dependencies
-    const dependencyTask: DependencyTask = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+   /* const dependencyTask: DependencyTask = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
       ? new DependencyTask(project) : new ReScanDependencyTask(project);
 
     this.queue.push(dependencyTask);
@@ -57,7 +57,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
       this.queue.push(new CryptographyTask(project, forceDataReset));
       this.queue.push(new LocalCryptographyTask(project));
-    }
+    }*/
 
     // search index
     this.queue.push(new IndexTask(project));
