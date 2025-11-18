@@ -16,20 +16,24 @@ export interface ExportResult {
 
 export abstract class Format {
   protected repository: ExportRepository;
-
+  protected outputPath: string;
   protected extension: string;
 
   constructor(exportModel: ExportRepository = new ExportRepositorySqliteImp()) {
     this.repository = exportModel;
   }
 
+  public setOutputPath(path: string) {
+    this.outputPath = path;
+  }
+
   public abstract generate(): Promise<ExportResult>;
 
   public async save(path: string): Promise<IExportResult> {
-    const { report, status } = await this.generate();
-    log.info('[ Report ]: Status: ', status);
     try {
-      await fs.promises.writeFile(path, report);
+      const { report, status } = await this.generate();
+        log.info('[ Report ]: Status: ', status);
+        await fs.promises.writeFile(path, report);
       return {
         success: true,
         message: 'Export successful',

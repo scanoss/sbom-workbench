@@ -55,6 +55,7 @@ export class Export implements ITask<string, IExportResult> {
       default:
         throw new Error(`Unsupported export format: ${exportDTO.format}`);
     }
+    this.format.setOutputPath(exportDTO.path);
   }
 
   private setCsvFormat(exportDTO: NewExportDTO): void {

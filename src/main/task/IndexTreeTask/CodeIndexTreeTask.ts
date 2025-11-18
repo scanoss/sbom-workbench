@@ -1,48 +1,72 @@
-import fs from "fs";
 import { IndexTreeTask } from "./IndexTreeTask";
-import Folder from "../../workspace/tree/Folder";
 import { Tree } from "../../workspace/tree/Tree";
 import log from 'electron-log';
-import { broadcastManager } from '../../broadcastManager/BroadcastManager';
+import { promises as fsPromises } from 'fs';
 
 export class CodeIndexTreeTask  extends IndexTreeTask {
 
   public async run(params: void):Promise<boolean> {
     log.info('[ CodeIndexTreeTask init ]');
-
-    const files = this.getProjectFiles(this.project.getScanRoot(),this.project.getScanRoot());
-    const tree = await this.buildTree(files);
+    const tree = await this.buildTreeFromDirectory();
     this.setTreeSummary(tree);
+    tree.orderTree();
+    log.info('[ CodeIndexTreeTask end ]');
     return true;
   }
 
-  private getProjectFiles(dir : string, rootPath: string): Array<string> {
-    let results: Array<string> = [];
-    const dirEntries = fs
-      .readdirSync(dir, { withFileTypes: true }) // Returns a list of files and folders
-      .sort(this.dirFirstFileAfter)
-      .filter((dirent: any) => !dirent.isSymbolicLink());
+  /**
+   * Recursively scan directory and build tree in chunks
+   */
+  private async buildTreeFromDirectory(): Promise<Tree> {
+    const tree = new Tree(
+      this.project.metadata.getName(),
+      this.project.getMyPath(),
+      this.project.metadata.getScanRoot()
+    );
 
-    for (const dirEntry of dirEntries) {
-      const relativePath = `${dir}/${dirEntry.name}`.replace(rootPath, '');
-      if (dirEntry.isDirectory()) {
-        const f: Folder = new Folder(relativePath, dirEntry.name);
-        const subTree = this.getProjectFiles(
-          `${dir}/${dirEntry.name}`,
-          rootPath
-        );
+    const CHUNK_SIZE = 1000;
+    let fileChunk: string[] = [];
+    const addedNodes = {}; // Shared across all chunks to prevent duplicate folders
 
-        results = results.concat(subTree);
-      } else results.push(relativePath);
+    const scanDirectory = async (dir: string, rootPath: string) => {
+      try {
+        const dirHandle = await fsPromises.opendir(dir);
+
+        for await (const dirent of dirHandle) {
+          // Skip symbolic links
+          if (dirent.isSymbolicLink()) continue;
+
+          const relativePath = `${dir}/${dirent.name}`.replace(rootPath, '');
+
+          if (dirent.isDirectory()) {
+            // Recursively scan subdirectory
+            await scanDirectory(`${dir}/${dirent.name}`, rootPath);
+          } else {
+            // Add file to chunk
+            fileChunk.push(relativePath);
+
+            // Process chunk when it reaches CHUNK_SIZE
+            if (fileChunk.length >= CHUNK_SIZE) {
+              tree.build(fileChunk, addedNodes);
+              fileChunk = []; // Clear chunk
+            }
+          }
+        }
+      } catch (err) {
+        log.error(`Error scanning directory ${dir}:`, err);
+      }
+    };
+
+    // Start scanning from root
+    await scanDirectory(this.project.getScanRoot(), this.project.getScanRoot());
+
+    // Process remaining files in the last chunk
+    if (fileChunk.length > 0) {
+      tree.build(fileChunk, addedNodes);
     }
-    return results;
-  }
 
-  // This is a sorter that will sort folders before files in alphabetical order.
-  private dirFirstFileAfter(a: any, b: any): number {
-    if (!a.isDirectory() && b.isDirectory()) return 1;
-    if (a.isDirectory() && !b.isDirectory()) return -1;
-    return 0;
+    tree.setFilter();
+    return tree;
   }
 
   public async buildTree(files: Array<string>): Promise<Tree> {

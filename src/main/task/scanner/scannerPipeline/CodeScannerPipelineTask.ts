@@ -63,7 +63,11 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     this.queue.push(new IndexTask(project));
 
     for await (const [index, task] of this.queue.entries()) {
-      await this.executeTask(task, index);
+      const success = await this.executeTask(task, index);
+      if (!success) {
+        // Task was stopped
+        return false;
+      }
     }
 
     await this.done(project);

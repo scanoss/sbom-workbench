@@ -17,8 +17,10 @@ import { broadcastManager } from '../../broadcastManager/BroadcastManager';
 import { Scanner as ScannerModule } from './types';
 import { IDispatch } from './dispatcher/IDispatch';
 import { IScannerInputAdapter } from './adapter/IScannerInputAdapter';
-import { utilModel } from '../../model/UtilModel';
 import { ImportTask } from '../import/ImportTask';
+import { parser } from 'stream-json';
+import { streamObject } from 'stream-json/streamers/StreamObject.js';
+import  { EOL } from 'os';
 
 
 export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> implements ScannerModule.IPipelineTask {
@@ -99,15 +101,54 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
   public async done() {
     const resultPath = `${this.project.getMyPath()}/result.json`;
-    const result: Record<any, any> = await utilModel.readFile(resultPath);
-    this.project.tree.attachResults(result);
-    for (const [key, value] of Object.entries(result)) {
-      if (!key.startsWith('/')) {
-        result[`/${key}`] = value;
-        delete result[key];
+    const tempPath = `${this.project.getMyPath()}/result_temp.json`;
+    const writeStream = fs.createWriteStream(tempPath);
+    writeStream.write(`{${EOL}`); // Start JSON object
+
+    let isFirst = true;
+
+    const pipeline = fs.createReadStream(resultPath)
+      .pipe(parser())
+      .pipe(streamObject());
+
+    pipeline.on('data', ({ key, value }) => {
+      // Modify key to ensure it starts with '/'
+      const modifiedKey = key.startsWith('/') ? key : `/${key}`;
+
+      // Write to output file
+      if (!isFirst) {
+        writeStream.write(`,${EOL}`);
       }
-    }
-    await fs.promises.writeFile(resultPath, JSON.stringify(result, null, 2));
+      isFirst = false;
+
+      writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
+
+      // Attach results to project tree
+      this.project.tree.attachResults({ [modifiedKey]: value } );
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      pipeline.on('end', () => {
+        writeStream.write(`${EOL}}`); // Close JSON object
+        writeStream.end(() => {
+          // Rename temp file to original after write completes
+          fs.renameSync(tempPath, resultPath);
+          log.info('Finished parsing and writing SCANOSS raw results JSON');
+          resolve();
+        });
+      });
+
+      pipeline.on('error', (err) => {
+        writeStream.end();
+        log.error('Error:', err);
+        reject(err);
+      });
+
+      writeStream.on('error', (err) => {
+        log.error('Write error:', err);
+        reject(err);
+      });
+    });
 
     // Import task
     const componentImportTask = new ImportTask(this.project);
@@ -181,15 +222,22 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     log.info('[ BaseScannerTask init scanner]');
     await this.set();
     await this.init();
-    await this.scan();
+    const resultPath = await this.scan();
+
+    // If scan was stopped (no result path returned), skip done process
+    if (!resultPath) {
+      log.info('[ BaseScannerTask ]: Scan was stopped, skipping import');
+      return false;
+    }
+
     await this.done();
     this.project.save();
     return true;
   }
 
-  private async scan() {
+  private async scan(): Promise<string | undefined> {
     const scanIn = await this.inputAdapter.adapterToScannerInput(this.project.filesToScan);
-    await this.scanner.scan(scanIn);
+    return this.scanner.scan(scanIn);
   }
 
   public cleanWorkDirectory() {
