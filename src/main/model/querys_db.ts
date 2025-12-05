@@ -391,10 +391,10 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       WHERE json_valid(c.algorithms)
     ),
     algorithm_results AS (
-      SELECT purl || '@' || version AS name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+      SELECT purl, version, 'algorithm' as type, json_group_array(algorithm) as 'values'
       FROM extracted_algorithms
       WHERE algorithm IS NOT NULL
-      GROUP BY name
+      GROUP BY purl, version
     ),
     extracted_hints AS (
       SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, c.purl, c.version
@@ -402,9 +402,9 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       WHERE json_valid(c.hints)
     ),
     hint_results AS (
-      SELECT purl || '@' || version AS name, type, json_group_array(hintId) as 'values'
+      SELECT purl, version, type, json_group_array(hintId) as 'values'
       FROM extracted_hints
-      GROUP BY name, type
+      GROUP BY purl, version, type
     )
     SELECT * FROM algorithm_results
     UNION
@@ -418,10 +418,10 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       AND cv.id IN (SELECT cvid FROM inventories)
     ),
     algorithm_results AS (
-      SELECT purl || '@' || version AS name, 'algorithm' as type, json_group_array(algorithm) as 'values'
+      SELECT purl, version, 'algorithm' as type, json_group_array(algorithm) as 'values'
       FROM extracted_algorithms
       WHERE algorithm IS NOT NULL
-      GROUP BY name
+      GROUP BY purl, version
     ),
     extracted_hints AS (
       SELECT json_extract(value, '$.category') as type, json_extract(value, '$.id') as hintId, c.purl, c.version
@@ -431,9 +431,9 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       AND cv.id IN (SELECT cvid FROM inventories)
     ),
     hint_results AS (
-      SELECT purl || '@' || version AS name, type, json_group_array(hintId) as 'values'
+      SELECT purl, version, type, json_group_array(hintId) as 'values'
       FROM extracted_hints
-      GROUP BY name, type
+      GROUP BY purl, version, type
     )
     SELECT * FROM algorithm_results
     UNION
