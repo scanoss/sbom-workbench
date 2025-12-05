@@ -58,28 +58,51 @@ jobs:
         with:
           name: artifact_w_unsigned
 
-        #This stage locates the unsigned .exe binary and move to win_unsigned folder.
-        #CodeSignTool does not support reading and writting into the same filepath
-      - name: Find Windows Artifact Path
-        id: win-path-artifact
+        # Move all unsigned .exe files to win_unsigned folder
+        # CodeSignTool does not support reading and writing into the same filepath
+      - name: Prepare Windows Artifacts for Signing
         run: |
-          export WIN_BINARY_FILEPATH=$(ls ${{ env.ARTIFACT_NAME_PREFIX }}*.exe)
-          mkdir win_unsigned
-          mv "$WIN_BINARY_FILEPATH" win_unsigned/
-          echo "ARTIFACT_WIN_PATH=win_unsigned/$WIN_BINARY_FILEPATH" >> "$GITHUB_OUTPUT"
+          mkdir -p win_unsigned
+          for f in ${{ env.ARTIFACT_NAME_PREFIX }}*.exe; do
+            mv "$f" win_unsigned/
+          done
+          ls -la win_unsigned/
 
-      - name: Sign Windows Artifact with CodeSignTool
+      - name: Find installer artifact
+        id: find-installer
+        run: |
+          INSTALLER=$(ls win_unsigned/${{ env.ARTIFACT_NAME_PREFIX }}-*-win-x64.exe | grep -v portable || true)
+          echo "path=$INSTALLER" >> "$GITHUB_OUTPUT"
+          echo "Found installer: $INSTALLER"
+
+      - name: Find portable artifact
+        id: find-portable
+        run: |
+          PORTABLE=$(ls win_unsigned/${{ env.ARTIFACT_NAME_PREFIX }}-*-portable.exe)
+          echo "path=$PORTABLE" >> "$GITHUB_OUTPUT"
+          echo "Found portable: $PORTABLE"
+
+      - name: Sign NSIS Installer
         uses: sslcom/actions-codesigner@develop
-        env:
-          ARTIFACT_WIN_PATH: ${{ steps.win-path-artifact.outputs.ARTIFACT_WIN_PATH }}
         with:
           command: sign
-          username: ${{secrets.ES_USERNAME}}
-          password: ${{secrets.ES_PASSWORD}}
-          credential_id: ${{secrets.CREDENTIAL_ID}}
-          totp_secret: ${{secrets.ES_TOTP_SECRET}}
-          file_path:  ${GITHUB_WORKSPACE}/${{ env.ARTIFACT_WIN_PATH }}
-          output_path:  ${GITHUB_WORKSPACE}
+          username: ${{ secrets.ES_USERNAME }}
+          password: ${{ secrets.ES_PASSWORD }}
+          credential_id: ${{ secrets.CREDENTIAL_ID }}
+          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
+          file_path: ${{ github.workspace }}/${{ steps.find-installer.outputs.path }}
+          output_path: ${{ github.workspace }}
+
+      - name: Sign Portable Executable
+        uses: sslcom/actions-codesigner@develop
+        with:
+          command: sign
+          username: ${{ secrets.ES_USERNAME }}
+          password: ${{ secrets.ES_PASSWORD }}
+          credential_id: ${{ secrets.CREDENTIAL_ID }}
+          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
+          file_path: ${{ github.workspace }}/${{ steps.find-portable.outputs.path }}
+          output_path: ${{ github.workspace }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -119,6 +142,7 @@ jobs:
           name: artifact_m
           path: |
             release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.dmg
+            release/build/${{ env.ARTIFACT_NAME_PREFIX }}*.zip
             release/build/latest-mac.yml
             release/build/*dmg.blockmap
           retention-days: 2
@@ -179,4 +203,4 @@ jobs:
                             --repo ${{ github.server_url }}/${{ github.repository }} \
                             --generate-notes \
                             --draft \
-                            $(ls *.AppImage *.exe *.dmg *.yml *.blockmap)
+                            $(ls *.AppImage *.exe *.dmg *.zip *.yml *.blockmap)
