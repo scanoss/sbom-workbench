@@ -56,6 +56,8 @@ class UserSettingService {
     this.store = this.defaultStore;
   }
 
+  // WARNING: Despite accepting Partial<IWorkspaceCfg>, this method requires APIS and DEFAULT_API_INDEX
+  // to be present to avoid runtime errors. Always pass the full settings object from get().
   public set(setting: Partial<IWorkspaceCfg>) {
     if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
 

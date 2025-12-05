@@ -147,18 +147,19 @@ export class Workspace {
       });
 
       if (response === 1) {
-        const settings = userSettingService.get();
-        const workspaces = settings.WORKSPACES;
+        // Get user settings
+        const userSettings = userSettingService.get();
 
-        // Override default workspace
-        workspaces[0] = userSettingService.getDefault().WORKSPACES[0];
+        // Override with the default workspace
+        userSettings.WORKSPACES[0] = userSettingService.getDefault().WORKSPACES[0];
+        userSettings.DEFAULT_WORKSPACE_INDEX = 0;
 
-        // Set default workspace if selected workspace cannot be created
-        userSettingService.set({ WORKSPACES: workspaces, DEFAULT_WORKSPACE_INDEX: 0 });
+        // Reload attribute workspace path
+        this.wsPath = userSettings.WORKSPACES[0].PATH;
+
+        // Save user settings
+        userSettingService.set(userSettings);
         await userSettingService.save();
-
-        // Set the default workspace path
-        this.wsPath = userSettingService.getDefault().WORKSPACES[0].PATH;
       }
 
       if (response === 0 || response === 1) { await this.initWorkspaceFileSystem(); }
