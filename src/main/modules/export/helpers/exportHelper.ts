@@ -92,7 +92,7 @@ export function getSupplier(component: ExportComponentData) {
 
 export function isValidPurl(purl: string): boolean {
   try {
-    PackageURL.fromString(purl.replace('@', '%40'));
+    PackageURL.fromString(purl);
     return true;
   } catch (e) {
     return false;
