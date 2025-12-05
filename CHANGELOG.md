@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Upcoming changes ...
 
+### Fixed
+- Fixed malformed PURLs in crypto exports when version contains special characters like `@`
+
+
 ## [1.26.1] - 2025-11-20
 ### Security
   - Upgraded glob package to address command injection vulnerability (CVE-2025-64756)
