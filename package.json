@@ -252,13 +252,16 @@
     "afterSign": ".erb/scripts/notarize.js",
     "mac": {
       "notarize": false,
-      "target": {
-        "target": "default",
-        "arch": [
-          "arm64",
-          "x64"
-        ]
-      },
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["arm64", "x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["arm64", "x64"]
+        }
+      ],
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
@@ -280,12 +283,22 @@
       ]
     },
     "win": {
-      "target": {
-        "target": "nsis",
-        "arch": [
-          "x64"
-        ]
-      }
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
+    },
+    "zip": {
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
     },
     "linux": {
       "target": {
