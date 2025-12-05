@@ -1,6 +1,6 @@
 import { ExportRepositoryMock } from '../ExportRepositoryMock';
 import {
-  getSPDXLicenseInfos, getSupplier, isValidPurl,
+  getSPDXLicenseInfos, getSupplier, isValidPurl, purlAddVersion,
   removeRepeatedLicenses,
   toVulnerabilityExportData,
 } from '../../../main/modules/export/helpers/exportHelper';
@@ -233,6 +233,35 @@ describe('export helper tests', () => {
     ];
     tests.forEach((test) => {
       expect(getSupplier(test.component)).toEqual(test.expectedResult);
+    });
+  });
+
+  describe('purlAddVersion', () => {
+    it('should add a normal version to a base purl', () => {
+      const result = purlAddVersion('pkg:github/scanoss/scanner.c', '1.0.0');
+      expect(result).toEqual('pkg:github/scanoss/scanner.c@1.0.0');
+    });
+
+    it('should properly encode @ characters in version', () => {
+      // This is the case from the ticket - version contains @ characters
+      const result = purlAddVersion('pkg:github/belgattitude/flowblade', '@flowblade/source-duckdb@0.1.13');
+      expect(result).toEqual('pkg:github/belgattitude/flowblade@%40flowblade%2Fsource-duckdb%400.1.13');
+    });
+
+    it('should return purl without version when version is null', () => {
+      const result = purlAddVersion('pkg:github/scanoss/scanner.c', null);
+      expect(result).toEqual('pkg:github/scanoss/scanner.c');
+    });
+
+    it('should return null for invalid base purl', () => {
+      const result = purlAddVersion('pkg:RFC4634', '1.0.0');
+      expect(result).toBeNull();
+    });
+
+    it('should preserve qualifiers from base purl', () => {
+      const result = purlAddVersion('pkg:npm/%40types/node?repository_url=https://registry.npmjs.org', '18.0.0');
+      expect(result).toContain('@18.0.0');
+      expect(result).toContain('repository_url=');
     });
   });
 });

@@ -99,6 +99,25 @@ export function isValidPurl(purl: string): boolean {
   }
 }
 
+/**
+ * Adds a version to a PURL and returns the full PURL string.
+ *
+ * @param purl - The base PURL without a version (e.g., "pkg:github/owner/repo")
+ * @param version - The version to add
+ * @returns The full PURL with encoded version, or null if the base PURL is invalid
+ */
+export function purlAddVersion(purl: string, version: string | null): string | null {
+  try {
+    const parsed = PackageURL.fromString(purl);
+    // Direct assignment is safe, constructor only validates version is string|null
+    // See: https://github.com/package-url/packageurl-js/blob/v1.2.1/src/package-url.js#L47-L53
+    parsed.version = version;
+    return parsed.toString();
+  } catch (e) {
+    return null;
+  }
+}
+
 export function resolveVulnerabilityURL(source: string, cve:string): string {
   return source.toUpperCase() === 'NVD' ? `https://nvd.nist.gov/vuln/detail/${cve}` : `https://osv.dev/vulnerability/${cve}`;
 }
