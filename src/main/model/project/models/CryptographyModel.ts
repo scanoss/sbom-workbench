@@ -3,6 +3,7 @@ import sqlite3 from 'sqlite3';
 import { queries } from '../../querys_db';
 import { Model } from '../../Model';
 import { Algorithms, CryptographicItem, Cryptography, Hint } from '../../entity/Cryptography';
+import { purlAddVersion } from '../../../modules/export/helpers/exportHelper';
 
 export class CryptographyModel extends Model {
   private connection: sqlite3.Database;
@@ -96,7 +97,8 @@ export class CryptographyModel extends Model {
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const results = await call(query);
     return results.map((item: any) => ({
-      ...item,
+      name: purlAddVersion(item.purl, item.version),
+      type: item.type,
       values: JSON.parse(item.values),
     }));
   }
@@ -111,7 +113,8 @@ export class CryptographyModel extends Model {
     const call = await util.promisify(this.connection.all.bind(this.connection)) as any;
     const results = await call(query);
     return results.map((item: any) => ({
-      ...item,
+      name: purlAddVersion(item.purl, item.version),
+      type: item.type,
       values: JSON.parse(item.values),
     }));
   }
