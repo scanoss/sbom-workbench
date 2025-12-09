@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
+- Workspace configuration not persisting when clicking "Switch to default workspace" (#855, #856)
+
 
 ### Changed
 - Improved error handling for unzip stage
