@@ -124,6 +124,12 @@ const createWindow = async () => {
         options.execPath = process.env.APPIMAGE;
         options.args.unshift('--appimage-extract-and-run');
       }
+
+      // Windows Portable
+      if (process.env.PORTABLE_EXECUTABLE_FILE) {
+        options.execPath = process.env.PORTABLE_EXECUTABLE_FILE;
+      }
+
       app.relaunch(options);
       app.exit(0);
     }
