@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Upcoming changes ...
+
+### Added
+  - App distribution for Windows (.zip with .exe bundle)
+  - App distribution for macOS (.zip with .app bundle)
+
 ### Fixed
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
+
 ### Changed
 - Improved error handling for unzip stage
 - Upgraded scanoss.js SDK version to v0.28.1
