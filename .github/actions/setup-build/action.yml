@@ -5,15 +5,36 @@ inputs:
   token:
     description: 'GitHub token for accessing private repositories'
     required: true
+  crypto_rules_source_dir:
+    description: 'Repository containing crypto rules'
+    default: 'scanoss/platform-deployment'
+  crypto_rules_path:
+    description: 'Path to crypto rules within the repository'
+    default: 'platform-deployment/datasets/cryptography'
+  target_dir:
+    description: 'Target directory for crypto rules'
+    default: 'assets/data'
+  crypto_libraries_source:
+    description: 'Source filename for crypto libraries'
+    default: 'scanoss-crypto-libraries.json'
+  crypto_libraries_target:
+    description: 'Target filename for crypto libraries'
+    default: 'scanoss-crypto-library-rules.json'
+  crypto_algorithms_source:
+    description: 'Source filename for crypto algorithms'
+    default: 'scanoss-crypto-algorithms.json'
+  crypto_algorithms_target:
+    description: 'Target filename for crypto algorithms'
+    default: 'scanoss-crypto-algorithm-rules.json'
 
 runs:
   using: "composite"
   steps:
 
     - name: Get crypto rules
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
       with:
-        repository: ${{env.CRYPTO_RULES_SOURCE_DIR }}
+        repository: ${{ inputs.crypto_rules_source_dir }}
         path: platform-deployment
         token: ${{ inputs.token }}
         ref: main
@@ -21,11 +42,11 @@ runs:
     - name: Copy crypto rules
       shell: bash
       run: |
-        cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_LIBRARIES_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_LIBRARIES_TARGET }}
-        cp ${{ env.CRYPTO_RULES_PATH }}/${{ env.CRYPTO_ALGORITHMS_SOURCE }} ${{ env.TARGET_DIR }}/${{ env.CRYPTO_ALGORITHMS_TARGET }}
+        cp ${{ inputs.crypto_rules_path }}/${{ inputs.crypto_libraries_source }} ${{ inputs.target_dir }}/${{ inputs.crypto_libraries_target }}
+        cp ${{ inputs.crypto_rules_path }}/${{ inputs.crypto_algorithms_source }} ${{ inputs.target_dir }}/${{ inputs.crypto_algorithms_target }}
 
     - name: Install Node and NPM
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v6
       with:
         node-version: 22
         cache: npm

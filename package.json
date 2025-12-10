@@ -269,6 +269,7 @@
       "gatekeeperAssess": false
     },
     "dmg": {
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-installer.${ext}",
       "contents": [
         {
           "x": 130,
@@ -295,10 +296,10 @@
       ]
     },
     "portable": {
-      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
+      "artifactName": "sbom-workbench-${version}-win-${arch}-app.${ext}"
     },
-    "zip": {
-      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
+    "nsis": {
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-installer.${ext}"
     },
     "linux": {
       "target": {
@@ -308,6 +309,9 @@
         ]
       },
       "category": "Development"
+    },
+    "appImage": {
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
     },
     "directories": {
       "app": "release/app",

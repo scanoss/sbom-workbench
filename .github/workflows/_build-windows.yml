@@ -1,0 +1,45 @@
+name: Build Windows
+
+on:
+  workflow_call:
+    inputs:
+      filename_prefix:
+        description: 'Filename prefix for matching files'
+        type: string
+        default: 'sbom-workbench'
+    secrets:
+      SC_GH_TAG_TOKEN:
+        required: true
+
+jobs:
+  build:
+    name: "Build for Windows"
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v6
+
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
+        with:
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+
+      - name: Build binaries for Windows
+        run: |
+          npm exec -- electron-builder build --win
+
+      - name: List build artifacts
+        shell: bash
+        run: ls -la release/build/
+
+      - name: Upload unsigned artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: artifact_w_unsigned
+          path: |
+            release/build/${{ inputs.filename_prefix }}*-installer.exe
+            release/build/${{ inputs.filename_prefix }}*-app.exe
+            release/build/latest.yml
+            release/build/*exe.blockmap
+          retention-days: 2

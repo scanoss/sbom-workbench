@@ -1,0 +1,68 @@
+name: Build macOS
+
+on:
+  workflow_call:
+    inputs:
+      filename_prefix:
+        description: 'Filename prefix for matching files'
+        type: string
+        default: 'sbom-workbench'
+    secrets:
+      SC_GH_TAG_TOKEN:
+        required: true
+      APPLE_ID:
+        required: true
+      APPLE_ID_PASS:
+        required: true
+      APPLE_TEAM_ID:
+        required: true
+      CSC_LINK:
+        required: true
+      CSC_KEY_PASSWORD:
+        required: true
+
+jobs:
+  build:
+    name: "Build for macOS"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
+        with:
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+
+      - name: Build Binaries for macOS
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        run: |
+          npm exec -- electron-builder build --mac
+
+      # Rename zip files produced by electron-builder's "zip" target (see package.json mac.target)
+      - name: Rename zip files to portable
+        working-directory: release/build
+        run: |
+          for f in *.zip; do
+            mv "$f" "${f%.zip}-portable.zip"
+          done
+
+      - name: List build artifacts
+        run: ls -la release/build/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: artifact_m
+          path: |
+            release/build/${{ inputs.filename_prefix }}*-installer.dmg
+            release/build/${{ inputs.filename_prefix }}*-portable.zip
+            release/build/latest-mac.yml
+            release/build/*dmg.blockmap
+          retention-days: 2

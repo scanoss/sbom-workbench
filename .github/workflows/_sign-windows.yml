@@ -1,0 +1,76 @@
+name: Sign Windows Artifacts
+
+on:
+  workflow_call:
+    inputs:
+      filename_prefix:
+        description: 'Filename prefix for matching files'
+        type: string
+        default: 'sbom-workbench'
+    secrets:
+      ES_USERNAME:
+        required: true
+      ES_PASSWORD:
+        required: true
+      CREDENTIAL_ID:
+        required: true
+      ES_TOTP_SECRET:
+        required: true
+
+jobs:
+  sign:
+    name: "Sign Windows Artifacts"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download unsigned artifacts
+        uses: actions/download-artifact@v6
+        with:
+          name: artifact_w_unsigned
+
+      - name: List downloaded artifacts
+        run: ls -la
+
+      - name: Find artifact filenames
+        run: |
+          echo "installer_exe=$(ls ${{ inputs.filename_prefix }}*-installer.exe)" >> "$GITHUB_ENV"
+          echo "portable_exe=$(ls ${{ inputs.filename_prefix }}*-app.exe)" >> "$GITHUB_ENV"
+
+      - name: Sign installer exe
+        uses: SSLcom/esigner-codesign@v1.3.1
+        with:
+          command: sign
+          username: ${{ secrets.ES_USERNAME }}
+          password: ${{ secrets.ES_PASSWORD }}
+          credential_id: ${{ secrets.CREDENTIAL_ID }}
+          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
+          file_path: ${{ github.workspace }}/${{ env.installer_exe }}
+          override: true
+
+      - name: Sign portable exe
+        uses: SSLcom/esigner-codesign@v1.3.1
+        with:
+          command: sign
+          username: ${{ secrets.ES_USERNAME }}
+          password: ${{ secrets.ES_PASSWORD }}
+          credential_id: ${{ secrets.CREDENTIAL_ID }}
+          totp_secret: ${{ secrets.ES_TOTP_SECRET }}
+          file_path: ${{ github.workspace }}/${{ env.portable_exe }}
+          override: true
+
+      - name: Create portable zip
+        run: zip "${portable_exe%.exe}.zip" "$portable_exe"
+
+      - name: List signed artifacts
+        run: ls -la
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: artifact_w
+          path: |
+            ${{ inputs.filename_prefix }}*-installer.exe
+            ${{ inputs.filename_prefix }}*-app.zip
+            latest.yml
+            *.blockmap
+          retention-days: 2
