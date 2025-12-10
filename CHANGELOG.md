@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Upcoming changes ...
+### Changed
+- Use requirement as fallback version when dependency scanner returns no version
+- Updated scanoss.js SDK to v0.28.0
 
 ### Fixed
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
