@@ -12,8 +12,8 @@ class DependencyHelper {
       file.dependenciesList.forEach((depList) => {
         const auxDep = new Dep();
         auxDep.fileId = files[file.file];
-        auxDep.version = depList.version;
-        auxDep.originalVersion = depList.version;
+        auxDep.version = depList.version || depList.requirement || null;
+        auxDep.originalVersion = depList.version || depList.requirement || null;
         auxDep.purl = depList.purl;
         auxDep.component = depList.component;
         auxDep.scope = depList.scope ? depList.scope : null;

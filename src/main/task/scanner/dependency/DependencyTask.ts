@@ -9,6 +9,7 @@ import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
+import { IDependencyResponse } from 'scanoss';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   protected project: Project;
@@ -58,7 +59,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
 
   private async addDependencies(): Promise<void> {
     try {
-      const dependencies = JSON.parse(await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8'));
+      const dependencies: IDependencyResponse = JSON.parse(await fs.promises.readFile(`${this.project.metadata.getMyPath()}/dependencies.json`, 'utf8'));
       this.project.tree.addDependencies(dependencies);
       // Clean table
       await modelProvider.model.dependency.deleteAll();
