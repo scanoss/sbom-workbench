@@ -105,14 +105,16 @@ class DependencyService {
         await modelProvider.model.component.deleteByID(componentIds);
       }
 
-      // Restore dependencies
-      const restore = restoreDependencies.map((d) => {
-        return { ...d,
-          ...{ rejectedAt: null,
-            version: d.originalVersion,
-          },
-        };
-      });
+      // Map to model entity to be updated in database
+      const restore = restoreDependencies.map((d) => ({
+        dependencyId: d.dependencyId,
+        purl: d.purl,
+        version: d.originalVersion,
+        scope: d.scope,
+        rejectedAt: null,
+        licenses: d.originalLicense || [],
+      }));
+
       await modelProvider.model.dependency.updateBulk(restore);
 
       restoreDependencies.forEach((d) => {
@@ -273,21 +275,32 @@ class DependencyService {
   }
 
   public async rejectAllByIds(dependencyIds: Array<number>): Promise<Array<Dependency>> {
-    const dependencyCatalog = (await this.getAll(null));
+    const dependencyCatalog = await this.getAll(null);
     const idsMapper = new Set<Number>(dependencyIds);
     const dependenciesToReject = dependencyCatalog.filter((d) => idsMapper.has(d.dependencyId));
 
-    const rejectedDependencies = dependenciesToReject.map((d) => {
-      return { ...d,
-        ...{ rejectedAt: new Date().toISOString(),
-          status: FileStatusType.ORIGINAL as FileStatusType.ORIGINAL,
-        },
-      };
-    });
+    const rejectedAt = new Date().toISOString();
 
-    await modelProvider.model.dependency.updateBulk(rejectedDependencies);
+    const updatePayload = dependenciesToReject.map((d) => ({
+      dependencyId: d.dependencyId,
+      fileId: d.fileId,
+      purl: d.purl,
+      version: d.version,
+      scope: d.scope,
+      rejectedAt,
+      licenses: d.licenses || [],
+      component: d.componentName || '',
+      originalVersion: d.originalVersion,
+      originalLicense: d.originalLicense || [],
+    }));
 
-    return rejectedDependencies;
+    await modelProvider.model.dependency.updateBulk(updatePayload);
+
+    return dependenciesToReject.map((d) => ({
+      ...d,
+      rejectedAt,
+      status: FileStatusType.ORIGINAL as FileStatusType.ORIGINAL,
+    }));
   }
 
   public async rejectAllByPath(path: string): Promise<Array<Dependency>> {
