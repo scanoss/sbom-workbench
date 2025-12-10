@@ -20,7 +20,7 @@ export class DecompressTask implements Scanner.IPipelineTask {
     return {
       name: ScannerStage.UNZIP,
       label: 'Decompressing files',
-      isCritical: false,
+      isCritical: true,
     };
   }
 
@@ -42,8 +42,13 @@ export class DecompressTask implements Scanner.IPipelineTask {
    return new Promise((resolve, reject) => {
      child.on('message', (data) => {
        log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data.toString());
-       if (data.event === 'success') resolve(true);
-       else reject(new Error('Decompress task failed'));
+       if (data.event === 'success'){
+         resolve(true);
+       }
+       if(data.event === 'error'){
+         reject(new Error(data.error));
+       }
+       reject(new Error(`Decompress task failed`));
        child.kill();
      });
    });

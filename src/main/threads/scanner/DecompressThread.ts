@@ -43,17 +43,11 @@ export class DecompressThread {
   }
 
   public async run(): Promise<boolean> {
-    try {
       const filesToDecompress = this.getFilesToDecompress(
         this.projectScanRoot,
         this.decompressionManager.getSupportedFormats()
       );
       await this.decompressionManager.decompress(filesToDecompress);
       return true;
-    } catch (error: any) {
-      console.log(error);
-      return false;
     }
-  }
-
 }
