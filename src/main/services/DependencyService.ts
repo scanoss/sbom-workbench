@@ -10,7 +10,6 @@ import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from './ModelProvider';
 import { ComponentSource } from '../model/entity/ComponentVersion';
 import { workspace } from '../workspace/Workspace';
-import { QueryBuilder } from '../model/queryBuilder/QueryBuilder';
 
 class DependencyService {
   public async insert(dependencies: IDependencyResponse): Promise<void> {
@@ -41,8 +40,7 @@ class DependencyService {
       const queryBuilderDepInv = QueryBuilderCreator.create({ inventoryUsage: 'dependency' });
       const inventory: any = await modelProvider.model.inventory.getAll(queryBuilderDepInv);
       const component: any = await modelProvider.model.component.getAll();
-      dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);
-      return dependencies;
+      return dependencyHelper.mergeInventoryComponentToDependency(dependencies, inventory, component);
     } catch (err: any) {
       log.error(err);
       throw err;

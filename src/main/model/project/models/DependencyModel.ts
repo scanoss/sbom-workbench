@@ -9,6 +9,7 @@ import { Model } from '../../Model';
 import { After } from '../../hooks/after/afterHook';
 import { declaredComponentsAdapter } from '../../adapters/dependency/declaredComponentAdapter';
 
+
 export class DependencyModel extends Model {
   private connection: sqlite3.Database;
 
@@ -28,17 +29,16 @@ export class DependencyModel extends Model {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
-
         dependencies.forEach((d) => {
           this.connection.run(
             queries.SQL_DEPENDENCIES_INSERT,
             d.fileId,
             d.purl ? d.purl : null,
-            d.version ? d.version : null,
+            d.version,
             d.scope ? d.scope : null,
             d.licenses.length > 0 ? d.licenses.join(',') : null,
             d.component,
-            d.version ? d.version : null,
+            d.originalVersion,
             d.originalLicense.length > 0 ? d.originalLicense.join(',') : null,
           );
         });
