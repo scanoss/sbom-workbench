@@ -46,11 +46,11 @@ jobs:
           npm exec -- electron-builder build --mac
 
       # Rename zip files produced by electron-builder's "zip" target (see package.json mac.target)
-      - name: Rename zip files to portable
+      - name: Rename zip files to app
         working-directory: release/build
         run: |
           for f in *.zip; do
-            mv "$f" "${f%.zip}-portable.zip"
+            mv "$f" "${f%.zip}-app.zip"
           done
 
       - name: List build artifacts
@@ -62,7 +62,7 @@ jobs:
           name: artifact_m
           path: |
             release/build/${{ inputs.filename_prefix }}*-installer.dmg
-            release/build/${{ inputs.filename_prefix }}*-portable.zip
+            release/build/${{ inputs.filename_prefix }}*-app.zip
             release/build/latest-mac.yml
             release/build/*dmg.blockmap
           retention-days: 2

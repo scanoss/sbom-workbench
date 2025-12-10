@@ -311,7 +311,7 @@
       "category": "Development"
     },
     "appImage": {
-      "artifactName": "sbom-workbench-${version}-${os}-${arch}-portable.${ext}"
+      "artifactName": "sbom-workbench-${version}-${os}-${arch}-app.${ext}"
     },
     "directories": {
       "app": "release/app",
