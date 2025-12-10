@@ -16,11 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
 - Workspace configuration not persisting when clicking "Switch to default workspace" (#855, #856)
 
-
 ### Changed
 - Improved error handling for unzip stage
 - Upgraded scanoss.js SDK version to v0.28.1
 - Use requirement as fallback version when dependency scanner returns no version
+- Upgraded @cyclonedx/cyclonedx-library to v9.4.1 to fix critical libxmljs2 vulnerability (GHSA-78h3-pg4x-j8cv)
 
 
 ## [1.26.1] - 2025-11-20
