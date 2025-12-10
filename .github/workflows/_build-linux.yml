@@ -1,0 +1,42 @@
+name: Build Linux
+
+on:
+  workflow_call:
+    inputs:
+      filename_prefix:
+        description: 'Filename prefix for matching files'
+        type: string
+        default: 'sbom-workbench'
+    secrets:
+      SC_GH_TAG_TOKEN:
+        required: true
+
+jobs:
+  build:
+    name: "Build for Linux"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v6
+
+      - name: Setup environment and build dependencies
+        uses: ./.github/actions/setup-build
+        with:
+          token: ${{ secrets.SC_GH_TAG_TOKEN }}
+
+      - name: Build binaries for Linux
+        run: |
+          npm exec -- electron-builder build --linux
+
+      - name: List build artifacts
+        run: ls -la release/build/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: artifact_l
+          path: |
+            release/build/${{ inputs.filename_prefix }}*.AppImage
+            release/build/latest-linux.yml
+          retention-days: 2
