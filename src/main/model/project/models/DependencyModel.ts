@@ -1,10 +1,9 @@
 import util from 'util';
-import { Dependency } from '@api/types';
 import sqlite3 from 'sqlite3';
 import { ReportComponent } from 'main/services/ReportService';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { queries } from '../../querys_db';
-import { Dependency as Dep } from '../../entity/Dependency';
+import { Dependency } from '../../entity/Dependency';
 import { Model } from '../../Model';
 import { After } from '../../hooks/after/afterHook';
 import { declaredComponentsAdapter } from '../../adapters/dependency/declaredComponentAdapter';
@@ -25,7 +24,7 @@ export class DependencyModel extends Model {
     this.connection = conn;
   }
 
-  public async insertAll(dependencies: Array<Dep>) {
+  public async insertAll(dependencies: Array<Dependency>) {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
@@ -100,7 +99,6 @@ export class DependencyModel extends Model {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
-
         dependencies.forEach((d) => {
           this.connection.run(
             'UPDATE dependencies SET rejectedAt=?,scope=?,purl=?,version=?,licenses=? WHERE dependencyId=?;',
@@ -108,11 +106,10 @@ export class DependencyModel extends Model {
             d.scope ? d.scope : null,
             d.purl,
             d.version ? d.version : null,
-            d.originalLicense ? d.originalLicense.join(',').toString() : null,
+            d.licenses ? d.licenses?.join(',').toString() : null,
             d.dependencyId,
           );
         });
-
         this.connection.run('commit', (err: any) => {
           if (!err) resolve();
           reject(err);
