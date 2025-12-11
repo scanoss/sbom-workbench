@@ -56,14 +56,17 @@ export function isCli(): boolean {
   return args.some((arg) => commandNames.includes(arg) || GLOBAL_CLI_FLAGS.includes(arg));
 }
 
+let cliExecuted = false;
 /**
  * Runs the CLI and handles commands
  */
 export async function runCli(): Promise<void> {
+  if (cliExecuted) return;
+    cliExecuted = true;
   const prog = getProgram();
 
   try {
-    await prog.parseAsync(process.argv);
+    await prog.parse();
   } catch (error: any) {
     console.error(`[SCANOSS ERROR] ${error.message}`);
     app.exit(1);

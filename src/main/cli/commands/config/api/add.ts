@@ -1,13 +1,13 @@
 import { Command } from 'commander';
 import { app } from 'electron';
 import { userSettingService } from '../../../../services/UserSettingService';
-import { normalizeUrl } from '../../../utils';
+import { validateURL } from '../../../utils';
 
 export function addCommand(): Command {
   return new Command('add')
     .description('Add an API configuration')
     .requiredOption('--url <url>', 'API URL')
-    .option('--api-key <key>', 'API key', '')
+    .option('--key <key>', 'API key', '')
     .option('--default', 'Set as default API')
     .action(async (options) => {
       if (!userSettingService.configExists()) {
@@ -18,9 +18,16 @@ export function addCommand(): Command {
 
       await userSettingService.read();
       const settings = userSettingService.get();
-      const normalizedUrl = normalizeUrl(options.url);
 
-      settings.APIS.push({ URL: normalizedUrl, API_KEY: options.apiKey });
+      try {
+        validateURL(options.url);
+      } catch (e: any){
+        console.error(`[SCANOSS]: ${e.message}`);
+        app.exit(1);
+        return;
+      }
+
+      settings.APIS.push({ URL: options.url, API_KEY: options.key });
 
       if (options.default) {
         settings.DEFAULT_API_INDEX = settings.APIS.length - 1;
@@ -28,7 +35,7 @@ export function addCommand(): Command {
 
       userSettingService.set(settings);
       await userSettingService.save();
-      console.log(`[SCANOSS] Added API: ${normalizedUrl}`);
+      console.log(`[SCANOSS] Added API: ${options.url}`);
       app.quit();
     });
 }
