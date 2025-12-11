@@ -16,12 +16,11 @@ export function listCommand(): Command {
       const settings = userSettingService.get();
 
       console.log('Configured APIs:');
-      settings.APIS.forEach((api: { URL: string; API_KEY: string }, index: number) => {
+      (settings.APIS as Array<{ URL: string; API_KEY: string }>).forEach((api, index: number) => {
         const isDefault = index === settings.DEFAULT_API_INDEX ? ' (default)' : '';
         const key = api.API_KEY ? ' [key set]' : '';
-        console.log(`  [${index}] ${api.URL}${key}${isDefault}`);
+        console.log(`[${index}] ${api.URL}${key}${isDefault}`);
       });
-
       app.quit();
     });
 }

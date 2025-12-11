@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { app } from 'electron';
 import { userSettingService } from '../../../../services/UserSettingService';
+import { isValidApiIndex } from '../../../utils';
 
 export function defaultCommand(): Command {
   return new Command('default')
@@ -16,13 +17,13 @@ export function defaultCommand(): Command {
       await userSettingService.read();
       const settings = userSettingService.get();
       const index = parseInt(options.index, 10);
-
-      if (index < 0 || index >= settings.APIS.length) {
-        console.error(`[SCANOSS] Invalid index: ${index}`);
+      try{
+        isValidApiIndex(index,settings.APIS.length)
+      }catch (e: any){
+        console.error(e.message);
         app.exit(1);
         return;
       }
-
       settings.DEFAULT_API_INDEX = index;
       userSettingService.set(settings);
       await userSettingService.save();

@@ -3,32 +3,29 @@
  */
 
 /**
- * Normalizes a URL by ensuring it has a scheme and extracting only the origin
- * @param url - The URL to normalize
- * @returns The normalized URL (scheme + host)
- */
-export function normalizeUrl(url: string): string {
-  let normalized = url;
-
-  // Add https:// if no scheme provided
-  if (!normalized.startsWith('http')) {
-    normalized = `https://${normalized}`;
-  }
-
-  const parsed = new URL(normalized);
-  return `${parsed.protocol}//${parsed.host}`;
-}
-
-/**
  * Validates if a URL is properly formatted
  * @param url - The URL to validate
  * @returns True if valid, false otherwise
  */
-export function isValidUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-  } catch {
-    return false;
+export function validateURL(url: string): void {
+  const parsed = new URL(url);
+  if (parsed.pathname !== '/' && parsed.pathname !== '') {
+    throw new Error(
+      `The entered URL "${url}" contains a pathname "${parsed.pathname}", which is not supported. Please remove the pathname.`
+    );
+  }
+
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('Invalid protocol. Supported protocols are http and https.');
+  }
+}
+
+export function isValidApiIndex(index: number, apis: number) {
+  if (isNaN(index)) {
+    throw new Error('[SCANOSS] --index must be a number');
+  }
+
+  if (index < 0 || index >= apis) {
+    throw new Error(`[SCANOSS] Invalid index: ${index}`);
   }
 }
