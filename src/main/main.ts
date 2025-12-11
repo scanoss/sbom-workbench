@@ -12,7 +12,8 @@ if (isCli()) {
       app.exit(1);
       return;
     });
+}else{
+  // Otherwise, run the app
+  runApp();
 }
-// Otherwise, run the app
-runApp();
 
