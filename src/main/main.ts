@@ -13,7 +13,6 @@ import { app, BrowserWindow, shell, ipcMain, dialog, RelaunchOptions } from 'ele
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import i18next from 'i18next';
-import { execFile } from 'child_process';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { workspace } from './workspace/Workspace';
@@ -26,6 +25,7 @@ import '../api/index';
 import { broadcastManager } from './broadcastManager/BroadcastManager';
 import AppConfig from '../config/AppConfigModule';
 import { modelProvider } from './services/ModelProvider';
+import { isCli, runCli } from './cli';
 
 class AppUpdater {
   constructor() {
@@ -166,23 +166,28 @@ app.on('window-all-closed', async () => {
   app.quit();
 });
 
-app
-  .whenReady()
-  .then(async () => {
-    await init();
-    createWindow();
-    app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
-      if (mainWindow === null) createWindow();
+if (isCli()) {
+  app
+    .whenReady()
+    .then(() => runCli())
+    .catch((error) => {
+      console.error(`[SCANOSS ERROR] ${error.message}`);
+      app.exit(1);
     });
-  })
-  .catch(console.log);
-
-
-async function init() {
-  await userSettingService.read();
-  const settings = userSettingService.get();
-  const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH;
-  await workspace.read(defaultWorkspacePath);
+} else {
+  app
+    .whenReady()
+    .then(async () => {
+      await userSettingService.read();
+      const settings = userSettingService.get();
+      const defaultWorkspacePath = settings.WORKSPACES[settings.DEFAULT_WORKSPACE_INDEX].PATH;
+      await workspace.read(defaultWorkspacePath);
+      createWindow();
+      app.on('activate', () => {
+        // On macOS it's common to re-create a window in the app when the
+        // dock icon is clicked and there are no other windows open.
+        if (mainWindow === null) createWindow();
+      });
+    })
+    .catch(console.log);
 }
