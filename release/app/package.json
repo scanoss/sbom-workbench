@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^6.10.0",
+    "commander": "^14.0.2",
     "flexsearch": "^0.8.151",
     "sqlite3": "^5.1.6"
   }
