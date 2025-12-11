@@ -160,6 +160,11 @@ class UserSettingService {
   public setMyPath(path: string) {
     this.myPath = path;
   }
+
+  public configExists(): boolean {
+    const settingsPath = path.join(os.homedir(), AppConfig.DEFAULT_SETTING_NAME, this.name);
+    return fs.existsSync(settingsPath);
+  }
 }
 
 export const userSettingService = new UserSettingService();

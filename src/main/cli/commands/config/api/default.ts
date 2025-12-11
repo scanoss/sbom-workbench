@@ -1,0 +1,32 @@
+import { Command } from 'commander';
+import { app } from 'electron';
+import { userSettingService } from '../../../../services/UserSettingService';
+
+export function defaultCommand(): Command {
+  return new Command('default')
+    .description('Set default API')
+    .requiredOption('--index <index>', 'API index to set as default')
+    .action(async (options) => {
+      if (!userSettingService.configExists()) {
+        console.error('[SCANOSS] No config found. Run "config init" first');
+        app.exit(1);
+        return;
+      }
+
+      await userSettingService.read();
+      const settings = userSettingService.get();
+      const index = parseInt(options.index, 10);
+
+      if (index < 0 || index >= settings.APIS.length) {
+        console.error(`[SCANOSS] Invalid index: ${index}`);
+        app.exit(1);
+        return;
+      }
+
+      settings.DEFAULT_API_INDEX = index;
+      userSettingService.set(settings);
+      await userSettingService.save();
+      console.log(`[SCANOSS] Default API set to: ${settings.APIS[index].URL}`);
+      app.quit();
+    });
+}
