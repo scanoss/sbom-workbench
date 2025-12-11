@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded scanoss.js SDK version to v0.28.1
 - Use requirement as fallback version when dependency scanner returns no version
 - Upgraded @cyclonedx/cyclonedx-library to v9.4.1 to fix critical libxmljs2 vulnerability (GHSA-78h3-pg4x-j8cv)
+- Improved workspace error handling with better dialog options for missing or inaccessible workspace folders
 
 
 ## [1.26.1] - 2025-11-20

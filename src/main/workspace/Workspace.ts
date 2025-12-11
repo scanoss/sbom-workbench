@@ -9,11 +9,21 @@ import { licenses } from '../../../assets/data/licenses';
 import { ProjectFilter } from './filters/ProjectFilter';
 import { userSettingService } from '../services/UserSettingService';
 import { modelProvider } from '../services/ModelProvider';
+import AppConfig from '../../config/AppConfigModule';
+import path from 'path';
+import os from 'os';
 
 export class Workspace {
   private projectList: Array<Project>;
 
   private wsPath: string;
+
+  private readonly DIALOG_RESPONSES = {
+    EXIT: 0,
+    SWITCH_TO_DEFAULT: 1,
+    CREATE_OR_RETRY: 2,
+    TRY_AGAIN: 3,
+  } as const;
 
   constructor() {
     this.projectList = [];
@@ -133,41 +143,94 @@ export class Workspace {
     return this.projectList.length - 1;
   }
 
-  private async initWorkspaceFileSystem() {
-    try {
-      if (!fs.existsSync(`${this.wsPath}`)) fs.mkdirSync(this.wsPath);
-      await fs.promises.access(this.getMyPath(), fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK);
-    } catch (e: any) {
-      log.error(e);
+  private async switchToDefaultWorkspace() {
+    this.wsPath = this.getDefaultWorkspacePath();
+    const userSettings = userSettingService.get();
+    userSettings.DEFAULT_WORKSPACE_INDEX = 0;
+    userSettingService.set(userSettings);
+    await userSettingService.save();
+  }
 
-      const { response } = await dialog.showMessageBox(null, {
-        buttons: ['Try again', 'Switch to default workspace', 'Exit'],
-        message: 'Could not access the selected folder for the workspace. What would you like to do?',
-        title: 'Workspace Folder Access Error',
-      });
+  private getDefaultWorkspacePath(){
+    return path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME);
+  }
 
-      if (response === 1) {
-        // Get user settings
-        const userSettings = userSettingService.get();
+  private async handleMissingWorkspace(): Promise<void> {
+    const { response } = await dialog.showMessageBox(null, {
+      type: 'question',
+      buttons: ['Exit', 'Switch to default workspace', 'Create workspace folder', 'Try Again'],
+      defaultId: 1,
+      cancelId: 0,
+      message: `The selected workspace folder "${this.wsPath}" doesn't exist. What would you like to do?`,
+      title: 'Workspace Folder Not Found',
+    });
 
-        // Override with the default workspace
-        userSettings.WORKSPACES[0] = userSettingService.getDefault().WORKSPACES[0];
-        userSettings.DEFAULT_WORKSPACE_INDEX = 0;
-
-        // Reload attribute workspace path
-        this.wsPath = userSettings.WORKSPACES[0].PATH;
-
-        // Save user settings
-        userSettingService.set(userSettings);
-        await userSettingService.save();
-      }
-
-      if (response === 0 || response === 1) { await this.initWorkspaceFileSystem(); }
-
-      if (response === 2) {
+    switch (response) {
+      case this.DIALOG_RESPONSES.EXIT:
         app.exit(0);
+        break;
+      case this.DIALOG_RESPONSES.SWITCH_TO_DEFAULT:
+        await this.switchToDefaultWorkspace();
+        await this.initWorkspaceFileSystem();
+        break;
+      case this.DIALOG_RESPONSES.CREATE_OR_RETRY:
+        fs.mkdirSync(this.wsPath, { recursive: true });
+        break;
+      case this.DIALOG_RESPONSES.TRY_AGAIN:
+        await this.initWorkspaceFileSystem();
+        break;
+      default:
+        await this.initWorkspaceFileSystem();
+    }
+  }
+
+  private async verifyWorkspaceAccess(): Promise<void> {
+    try {
+      await fs.promises.access(
+        this.getMyPath(),
+        fs.constants.R_OK | fs.constants.W_OK | fs.constants.X_OK
+      );
+    } catch (e: any) {
+      log.error('Workspace access error:', e);
+      await this.handleAccessError(e);
+    }
+  }
+
+  private async handleAccessError(error: Error): Promise<void> {
+    const { response } = await dialog.showMessageBox(null, {
+      buttons: ['Exit', 'Switch to default workspace', 'Try again'],
+      defaultId: 1,
+      cancelId: 0,
+      message: `Could not access the workspace folder "${this.wsPath}". ${error.message}`,
+      title: 'Workspace Folder Access Error',
+    });
+
+    switch (response) {
+      case this.DIALOG_RESPONSES.EXIT:
+        app.exit(0);
+        break;
+      case this.DIALOG_RESPONSES.SWITCH_TO_DEFAULT:
+        await this.switchToDefaultWorkspace();
+        await this.initWorkspaceFileSystem();
+        break;
+      case this.DIALOG_RESPONSES.CREATE_OR_RETRY:
+        await this.initWorkspaceFileSystem();
+        break;
+    }
+  }
+
+  private async initWorkspaceFileSystem(): Promise<void> {
+    const workspaceExists = fs.existsSync(this.wsPath);
+    const isDefaultWorkspace = this.wsPath === this.getDefaultWorkspacePath();
+
+    if (!workspaceExists) {
+      if (isDefaultWorkspace) {
+        fs.mkdirSync(this.wsPath, { recursive: true });
+      } else {
+        await this.handleMissingWorkspace();
       }
     }
+    await this.verifyWorkspaceAccess();
   }
 
   private async getAllProjectsPaths() {
