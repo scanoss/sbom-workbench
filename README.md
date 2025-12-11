@@ -271,6 +271,84 @@ Usage
 You can add your 'scanoss.json' on the root of your project
 
 
+# Command Line Interface (CLI)
+
+SBOM Workbench includes a CLI for managing configuration without launching the graphical interface. This is useful for automation, scripting, and headless environments.
+
+## Getting Help
+
+```bash
+# Show all available commands
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage --help
+
+# Show version
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage --version
+```
+
+## Configuration Commands
+
+### Initialize Configuration
+
+Creates the default configuration file at `~/.scanoss/sbom-workbench-settings.json`:
+
+```bash
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config init
+```
+
+> **Note:** This command will fail if a configuration file already exists.
+
+### API Management
+
+The CLI allows you to manage multiple API configurations for connecting to different SCANOSS servers.
+
+#### List Configured APIs
+
+Display all configured APIs with their indices:
+
+```bash
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api list
+```
+
+**Example output:**
+```
+Configured APIs:
+[0] https://api.scanoss.com [key set] (default)
+[1] https://custom.scanoss-server.com
+```
+
+#### Add an API
+
+Add a new API configuration:
+
+```bash
+# Add API with URL only (public SCANOSS API)
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api add --url https://api.scanoss.com
+
+# Add API with URL and API key
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api add --url https://api.scanoss.com --key YOUR_API_KEY
+
+# Add API and set it as the default
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api add --url https://custom.server.com --key YOUR_KEY --default
+```
+
+#### Remove an API
+
+Remove an API configuration by its index:
+
+```bash
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api rm --index 1
+```
+
+> **Note:** If you remove the default API, the default will automatically be adjusted to the last available API.
+
+#### Set Default API
+
+Change which API is used by default:
+
+```bash
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api default --index 0
+```
+
 ## [Collaborative Workspace](COLLAB_WORKSPACE.md)
 
 The SBOM Workbench includes support for a collaborative workspace, a feature designed to enhance teamwork. View more details [here](COLLAB_WORKSPACE.md).
