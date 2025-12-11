@@ -44,7 +44,9 @@ function getProgram(): Command {
  * Uses commander's registered commands for detection
  */
 export function isCli(): boolean {
-  const args = process.argv.slice(2);
+  const args = app.isPackaged
+    ? process.argv.slice(1)
+    : process.argv.slice(2);
   const prog = getProgram();
 
   // Get command names from commander

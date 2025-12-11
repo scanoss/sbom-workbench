@@ -40,7 +40,7 @@
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
     "test": "jest",
     "cli": "npx electron release/app/dist/main/main.js",
-    "cli:build": "npm run build:main && npm run cli"
+    "cli:build": "npm run build:main"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [

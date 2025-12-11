@@ -6,8 +6,6 @@ import { IAppConfig } from './IAppConfig';
 
 let conf = AppConfigDefault;
 let overrideConf = {};
-
-console.info('%c[ CONFIGMODULE ]: Applying config override', 'color: yellow');
 try {
   overrideConf = require('./override.json');
 } catch (e) {
