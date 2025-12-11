@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
   - App distribution for Windows (.zip with .exe bundle)
   - App distribution for macOS (.zip with .app bundle)
+  - Added CLI support for API management (`config init`, `config api list/add/rm/default`)
 
 ### Fixed
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
