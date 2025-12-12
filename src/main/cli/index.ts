@@ -44,9 +44,7 @@ function getProgram(): Command {
  * Uses commander's registered commands for detection
  */
 export function isCli(): boolean {
-  const args = app.isPackaged
-    ? process.argv.slice(1)
-    : process.argv.slice(2);
+  const args = process.argv;
   const prog = getProgram();
 
   // Get command names from commander
@@ -56,15 +54,11 @@ export function isCli(): boolean {
   return args.some((arg) => commandNames.includes(arg) || GLOBAL_CLI_FLAGS.includes(arg));
 }
 
-let cliExecuted = false;
 /**
  * Runs the CLI and handles commands
  */
 export async function runCli(): Promise<void> {
-  if (cliExecuted) return;
-    cliExecuted = true;
   const prog = getProgram();
-
   try {
     await prog.parse();
   } catch (error: any) {
