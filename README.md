@@ -280,9 +280,53 @@ SBOM Workbench includes a CLI for managing configuration without launching the g
 ```bash
 # Show all available commands
 ./sbom-workbench-1.27.0-linux-x86_64-app.AppImage --help
+```
 
-# Show version
-./sbom-workbench-1.27.0-linux-x86_64-app.AppImage --version
+## Platform Notes
+
+### Windows
+
+On Windows, Electron applications run as GUI processes without a console attached by default. This means:
+
+- **Commands that modify configuration work correctly** (`config init`, `config api add`, `config api rm`, `config api default`)
+- **Commands that display output won't show results** (`--help`, `--version`, `config api list`) - there is no visible output in cmd.exe or PowerShell
+
+**Windows examples:**
+```cmd
+:: Initialize configuration
+sbom-workbench-1.27.0-win-x64-app.exe config init
+
+:: Add an API
+sbom-workbench-1.27.0-win-x64-app.exe config api add --url=https://api.scanoss.com --key=YOUR_API_KEY --default
+
+:: Remove an API by index
+sbom-workbench-1.27.0-win-x64-app.exe config api rm --index=1
+
+:: Set default API
+sbom-workbench-1.27.0-win-x64-app.exe config api default --index=0
+```
+
+> **Tip:** To view your configured APIs on Windows, open `%USERPROFILE%\.scanoss\sbom-workbench-settings.json` in a text editor.
+
+### Linux / macOS
+
+On Linux and macOS, CLI output displays normally in the terminal. Both parameter syntaxes work:
+
+```bash
+# Space syntax
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api add --url https://api.scanoss.com --key YOUR_API_KEY
+
+# Equals syntax (also works)
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config api add --url=https://api.scanoss.com --key=YOUR_API_KEY
+```
+
+#### Ubuntu 24.04+
+
+On Ubuntu 24.04 and newer, the AppImage sandbox may not work due to kernel restrictions. If you encounter sandbox errors, disable it by setting the environment variable:
+
+```bash
+export ELECTRON_DISABLE_SANDBOX=1
+./sbom-workbench-1.27.0-linux-x86_64-app.AppImage config init
 ```
 
 ## Configuration Commands
