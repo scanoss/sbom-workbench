@@ -8,16 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 - Upcoming changes ...
 
+## [1.27.0] - 2025-12-12
 ### Added
   - App distribution for Windows (.zip with .exe bundle)
   - App distribution for macOS (.zip with .app bundle)
   - Added CLI support for API management (`config init`, `config api list/add/rm/default`)
   - Added CLI documentation
-
 ### Fixed
 - Fixed malformed PURLs in crypto exports when version contains special characters like `@`
 - Workspace configuration not persisting when clicking "Switch to default workspace" (#855, #856)
-
 ### Changed
 - Improved error handling for unzip stage
 - Upgraded scanoss.js SDK version to v0.28.1
@@ -71,4 +70,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.25.0]: https://github.com/scanoss/sbom-workbench/compare/v1.24.0...v1.25.0
 [1.26.0]: https://github.com/scanoss/sbom-workbench/compare/v1.25.0...v1.26.0
 [1.26.1]: https://github.com/scanoss/sbom-workbench/compare/v1.26.0...v1.26.1
+[1.27.0]: https://github.com/scanoss/sbom-workbench/compare/v1.26.1...v1.27.0
 
