@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Autocomplete, Box,
   Checkbox,
@@ -6,12 +6,6 @@ import {
   IconButton,
   Paper,
   Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tabs,
   TextField
 } from '@mui/material';
@@ -25,6 +19,8 @@ import { CryptographyResponseDTO } from '@api/types';
 import { CryptographicItem } from '../../../../../../../main/model/entity/Cryptography';
 import { CryptoChart } from './components/CryptoChart';
 import { LocalCryptographyTable } from './components/LocalCryptographyTable';
+import { ComponentCryptographyTable } from './components/ComponentCryptographyTable';
+import SearchBox from '@components/SearchBox/SearchBox';
 
 // icons
 import SearchIcon from '@mui/icons-material/Search';
@@ -34,6 +30,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 interface ICryptographyFilter {
   algorithm?: string[];
   types?: string[];
+  searchQuery?: string;
 }
 
 const CryptographyReport = () => {
@@ -63,37 +60,77 @@ const CryptographyReport = () => {
     setFilter({ ...filter, ...newFilter });
   };
 
-  // filter items
-  useEffect(() => {
-    const getFilteredItems = (cryptography: Array<CryptographicItem>) => {
-      if (filter && filter?.algorithm?.length <= 0 && filter?.types?.length <= 0) return cryptography;
+  // Memoized filter function to avoid memory issues with large datasets
+  const getFilteredItems = useMemo(() => {
+    return (cryptography: Array<CryptographicItem>) => {
+      if (!cryptography) return [];
+
+      // Cache lowercase search query once
+      const searchQueryLower = filter?.searchQuery?.toLowerCase() || '';
+      const hasSearchQuery = searchQueryLower.length > 0;
+      const hasTypes = filter?.types?.length > 0;
+      const hasAlgorithms = filter?.algorithm?.length > 0;
+
+      // No filters active - return original array without creating a new one
+      if (!hasSearchQuery && !hasTypes && !hasAlgorithms) {
+        return cryptography;
+      }
+
+      let result = cryptography;
+
+      // Filter by search query (file/component name)
+      if (hasSearchQuery) {
+        result = result.filter((c) => c.name.toLowerCase().includes(searchQueryLower));
+      }
 
       // Filter by type and algorithm
-      if (filter?.types?.length > 0 && filter?.algorithm?.length > 0) {
-        const c =  cryptography.filter((c) => {
-          return c.values.some((i) => filter?.types.includes(c.type))
-        });
+      if (hasTypes && hasAlgorithms) {
+        const c = result.filter((c) => filter.types.includes(c.type));
         return filterCryptoByAlgorithms(c, filter.algorithm);
       }
-      // Filter by algorithm
-      if (filter?.algorithm?.length > 0) {
-        return filterCryptoByAlgorithms(cryptography, filter.algorithm);
+
+      // Filter by algorithm only
+      if (hasAlgorithms) {
+        return filterCryptoByAlgorithms(result, filter.algorithm);
       }
 
-      // Filter by type
-      if (filter?.types?.length > 0) return cryptography.filter((c) => filter?.types.includes(c.type));
+      // Filter by type only
+      if (hasTypes) {
+        return result.filter((c) => filter.types.includes(c.type));
+      }
 
-      return cryptography;
+      return result;
     };
+  }, [filter?.searchQuery, filter?.types, filter?.algorithm]);
 
+  // Apply filters when filter changes
+  useEffect(() => {
     if (!data.current) return;
-
-    const newItems = { ...filteredItems,
-      files: getFilteredItems(data.current?.files),
+    setFilteredItems({
+      ...data.current,
+      files: getFilteredItems(data.current.files),
       components: getFilteredItems(data.current.components),
-    };
-    setFilteredItems(newItems);
-  }, [filter]);
+    });
+  }, [getFilteredItems]);
+
+  // Memoize counts to avoid expensive flatMap on every render
+  const filesCount = useMemo(() => {
+    if (!filteredItems?.files) return 0;
+    let count = 0;
+    for (const file of filteredItems.files) {
+      count += file.values?.length || 0;
+    }
+    return count;
+  }, [filteredItems?.files]);
+
+  const componentsCount = useMemo(() => {
+    if (!filteredItems?.components) return 0;
+    let count = 0;
+    for (const component of filteredItems.components) {
+      count += component.values?.length || 0;
+    }
+    return count;
+  }, [filteredItems?.components]);
 
   const handleTab = (value: string)=>  {
     setTab(value);
@@ -146,7 +183,7 @@ const CryptographyReport = () => {
           <IconButton onClick={() => navigate(-1)} component="span">
             <ArrowBackIcon />
           </IconButton>
-          Reports
+          {t('Title:Reports')}
         </h4>
         <h1 className="header-title">
           {type === SourceType.detected ? t('Title:DetectedCryptography') : t('Title:IdentifiedCryptography')}
@@ -166,16 +203,25 @@ const CryptographyReport = () => {
             >
               <Tab
                 value="local"
-                label={`${t('Title:Local')} (${filteredItems?.files?.flatMap((file) => file.values || []).length})`}
+                label={`${t('Title:Local')} (${filesCount})`}
               />
               <Tab
                 value="component"
-                label={`${t('Title:Components')} (${filteredItems?.components?.flatMap((c) => c.values || []).length})`}
+                label={`${t('Title:Components')} (${componentsCount})`}
               />
             </Tabs>
           </nav>
           <form className="default-form">
             <div className="form-row filter">
+              <div className="form-group filter-search">
+                <Paper>
+                  <SearchBox
+                    placeholder={t('Common:SearchByFileNameOrPurl')}
+                    responseDelay={500}
+                    onChange={(value) => onFilterHandler({ ...filter, searchQuery: value })}
+                  />
+                </Paper>
+              </div>
               <div className="form-group filter-algorithm">
                 <Paper>
                   <Autocomplete
@@ -206,7 +252,7 @@ const CryptographyReport = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder="Types"
+                        placeholder={t('Common:Types')}
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
@@ -253,7 +299,7 @@ const CryptographyReport = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        placeholder="Detections"
+                        placeholder={t('Common:Detections')}
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
@@ -280,45 +326,7 @@ const CryptographyReport = () => {
       )}
 
       {tab === 'component' && (
-        <TableContainer
-          style={{
-            minHeight: '300px', // Set your desired height here
-            overflow: 'auto',
-            marginBottom: '50px',
-          }}
-          component={Paper}
-        >
-          <Table stickyHeader aria-label="cryptography table" size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('Table:Header:Component')}</TableCell>
-                <TableCell>{t('Table:Header:Type')}</TableCell>
-                <TableCell>{t('Table:Header:Detected')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredItems?.components.map((item, itemIndex) =>
-                item.values.map((algorithm, algIndex) => (
-                  <TableRow key={`${itemIndex}-${algIndex}`}>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.type}</TableCell>
-                    <TableCell className="detections">
-                      <span className="tag">{algorithm}</span>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-
-              {(!filteredItems || filteredItems.components.length === 0) && (
-                <TableRow>
-                  <TableCell colSpan={3} align="center" className="pt-4 pb-4">
-                    {!filteredItems ? t('Loading') : t('NoDataFound')}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <ComponentCryptographyTable data={filteredItems} />
       )}
     </section>
   );

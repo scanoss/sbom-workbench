@@ -110,5 +110,8 @@
   "LegacyConfigFileDetected": "Archivo de configuración deprecado detectado: <1>{{fileName}}</1>. Considere migrar al nuevo formato <2>scanoss.json</2> para obtener una mejor funcionalidad. <3>Ver documentación</3>",
   "ScanossSettingsFileFound": "Se encontró un archivo de configuración SCANOSS (<1>{{fileName}}</1>). Se utilizará para mejorar los resultados del escaneo.",
   "UseLeftPanelForSearchCryptography": "Use el panel de la izquierda para criptografía dentro de los ficheros",
-  "LoadingComponents": "Cargando Componentes..."
+  "LoadingComponents": "Cargando Componentes...",
+  "SearchByFileNameOrPurl": "Buscar por nombre de archivo o purl...",
+  "Types": "Tipos",
+  "Detections": "Detecciones"
 }

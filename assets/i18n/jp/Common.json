@@ -105,5 +105,8 @@
   "ScanossSettingsFileFound": "SCANOSS設定ファイルが見つかりました (<1>{{fileName}}</1>)。スキャン結果の向上に使用されます。",
   "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files",
   "NoDataFound": "データが見つかりません",
-  "LoadingComponents": "コンポーネントを読み込み中..."
+  "LoadingComponents": "コンポーネントを読み込み中...",
+  "SearchByFileNameOrPurl": "ファイル名またはpurlで検索...",
+  "Types": "タイプ",
+  "Detections": "検出"
 }

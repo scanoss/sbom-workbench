@@ -81,5 +81,7 @@
   "ProxyWhitelistExample_other": "への接続 localhost, 127.0.0.1/8 and ::1 プロキシされることはありません",
   "Port": "ポート",
   "NoProxy": "プロキシなし",
-  "IgnoreCertificateErrors": "認証局エラーを無視する"
+  "IgnoreCertificateErrors": "認証局エラーを無視する",
+  "Local": "ローカル",
+  "Components": "コンポーネント"
 }
