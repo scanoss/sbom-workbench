@@ -15,7 +15,7 @@ export class CryptographyModel extends Model {
     this.connection = conn;
   }
 
-  public async createBatch(cryptography: Array<{ purl: string, version: string, algorithms: Algorithms[], hints: Hint[] }>): Promise<void> {
+  public async createBatch(cryptography: Array<{ purl: string, version: string, requirement: string, algorithms: Algorithms[], hints: Hint[] }>): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
@@ -23,7 +23,7 @@ export class CryptographyModel extends Model {
           this.connection.run(
             'INSERT OR IGNORE INTO cryptography (purl, version, algorithms, hints) VALUES(?,?,?,?);',
             c.purl,
-            c.version,
+            c.requirement,
             JSON.stringify(c.algorithms),
             JSON.stringify(c.hints),
           );

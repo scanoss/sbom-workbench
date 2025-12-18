@@ -4,21 +4,40 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
+// Pre-compute row indices to avoid creating objects for each row
+interface RowIndex {
+  fileIndex: number;
+  valueIndex: number;
+}
+
 export const LocalCryptographyTable = ({data}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const rows = useMemo(() => {
-    if (!data || !data.files) return [];
-    return data.files.flatMap((item, itemIndex) =>
-      item.values.map((algorithm, algIndex) => ({
-        key: `${itemIndex}-${algIndex}`,
-        id: algIndex,
-        fileName: item.name,
-        type: item.type,
-        algorithm,
-      }))
-    );
+
+  // Only store indices, not full row objects
+  const { rowIndices, totalRows } = useMemo(() => {
+    if (!data?.files) return { rowIndices: [] as RowIndex[], totalRows: 0 };
+
+    const indices: RowIndex[] = [];
+    for (let fileIndex = 0; fileIndex < data.files.length; fileIndex++) {
+      const file = data.files[fileIndex];
+      for (let valueIndex = 0; valueIndex < file.values.length; valueIndex++) {
+        indices.push({ fileIndex, valueIndex });
+      }
+    }
+    return { rowIndices: indices, totalRows: indices.length };
   }, [data]);
+
+  // Get row data on-demand instead of pre-computing all rows
+  const getRowData = (index: number) => {
+    const { fileIndex, valueIndex } = rowIndices[index];
+    const file = data.files[fileIndex];
+    return {
+      fileName: file.name,
+      type: file.type,
+      algorithm: file.values[valueIndex],
+    };
+  };
 
   const onSelectFile = async (e, filePath:string) => {
     e.preventDefault();
@@ -40,10 +59,10 @@ export const LocalCryptographyTable = ({data}) => {
   };
 
   const rowRenderer = ({ key, index, style }) => {
-    const row = rows[index];
+    const row = getRowData(index);
     return (
-      <div key={key} style={{...style, display: 'flex'}}>
-        <TableCell style={{width: '70%', display: 'flex',alignItems: 'center', justifyContent: 'flex-start', padding:0 , paddingRight:80}}>
+      <div key={key} style={{...style, display: 'flex', userSelect: 'text'}}>
+        <TableCell style={{width: '70%', display: 'flex',alignItems: 'center', justifyContent: 'flex-start', padding:0 , paddingRight:80, userSelect: 'text'}}>
           <Link
             href="#"
             underline="hover"
@@ -101,7 +120,7 @@ export const LocalCryptographyTable = ({data}) => {
                     {({ height, width }) => (
                       <List
                         height={height}
-                        rowCount={rows.length}
+                        rowCount={totalRows}
                         rowHeight={30} // Adjust based on your row height
                         rowRenderer={rowRenderer}
                         width={width}
