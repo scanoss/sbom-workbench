@@ -113,5 +113,8 @@
   "LegacyConfigFileDetected": "Legacy configuration file detected: <1>{{fileName}}</1>. Consider migrating to the new <2>scanoss.json</2> format for better functionality. <3>View documentation</3>",
   "ScanossSettingsFileFound": "A SCANOSS settings file was found (<1>{{fileName}}</1>). It will be used to enhance the scan results.",
   "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files",
-  "LoadingComponents": "Loading Components..."
+  "LoadingComponents": "Loading Components...",
+  "SearchByFileNameOrPurl": "Search by file name or purl...",
+  "Types": "Types",
+  "Detections": "Detections"
 }

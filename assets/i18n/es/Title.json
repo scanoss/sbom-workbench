@@ -85,5 +85,7 @@
   "ProxyWhitelistExample_other": "Conexiones a localhost, 127.0.0.1/8 and ::1 nunca son proxy.",
   "Port": "Puerto",
   "NoProxy": "Sin Proxy",
-  "IgnoreCertificateErrors": "Ignorar errores de autoridad del certificado"
+  "IgnoreCertificateErrors": "Ignorar errores de autoridad del certificado",
+  "Local": "Local",
+  "Components": "Componentes"
 }

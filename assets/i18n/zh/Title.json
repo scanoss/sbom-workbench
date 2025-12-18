@@ -75,5 +75,7 @@
   "ProxyWhitelistExample_other": "連接至 localhost, 127.0.0.1/8 and ::1 從未被代理.",
   "Port": "港口",
   "NoProxy": "無代理",
-  "IgnoreCertificateErrors": "忽略證書頒發機構錯誤"
+  "IgnoreCertificateErrors": "忽略證書頒發機構錯誤",
+  "Local": "本地",
+  "Components": "组件"
 }

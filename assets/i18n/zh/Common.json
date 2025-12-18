@@ -91,5 +91,8 @@
   "ScanossSettingsFileFound": "找到 SCANOSS 设置文件 (<1>{{fileName}}</1>)。它将用于增强扫描结果。",
   "UseLeftPanelForSearchCryptography": "Use left panel for searching cryptography in files",
   "NoDataFound": "未找到数据",
-  "LoadingComponents": "正在加载组件..."
+  "LoadingComponents": "正在加载组件...",
+  "SearchByFileNameOrPurl": "按文件名或purl搜索...",
+  "Types": "类型",
+  "Detections": "检测"
 }

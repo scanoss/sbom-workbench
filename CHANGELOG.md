@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upcoming changes ...
 ### Added
 - Added read/write stream support to read scan raw results
+- Added virtualization in cryptography viewer component
+- Added search bar to cryptography viewer component
+- Improved cryptography viewer component performance
 ### Fixed
 - Fixed pre selected license in inventory dialog
 
