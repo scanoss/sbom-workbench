@@ -37,7 +37,7 @@ class ResultService {
     return results;
   }
 
-  public async  insertFromFile(resultPath: string, files: any) {
+  public async insertFromFile(resultPath: string, files: any) {
     await modelProvider.model.result.insertFromFile(resultPath, files);
   }
 }
