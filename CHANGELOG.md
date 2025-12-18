@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upcoming changes ...
 ### Added
 - Added read/write stream support to read scan raw results
+### Fixed
+- Fixed pre selected license in inventory dialog
 
 ## [1.27.0] - 2025-12-12
 ### Added

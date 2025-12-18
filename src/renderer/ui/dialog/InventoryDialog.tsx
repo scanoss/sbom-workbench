@@ -34,7 +34,6 @@ import { useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close'
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 
-
 function PaperComponent(props: PaperProps) {
   return (
     <Draggable
@@ -47,7 +46,9 @@ function PaperComponent(props: PaperProps) {
   );
 }
 
-const filter = createFilterOptions<any>();
+const filter = createFilterOptions<any>({
+  stringify: (option) => `${option.name || ''} ${option.purl || ''}`,
+});
 
 interface InventoryDialogProps {
   open: boolean;
@@ -215,14 +216,26 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
    * Adds the matched license for purl+version to the list of licenses.
    */
   const setMatchedLicenses = (components, form, all): any[] => {
-    const licenses = components
+    const version = components
       .find((item) => item?.purl === form?.purl)
-      ?.versions.find((item) => item.version === form.version)
-      ?.licenses.map((item) => ({
-        spdxid: item.spdxid,
-        name: item.name,
-        type: 'Matched',
-      }));
+      ?.versions.find((item) => item.version === form.version);
+
+    const licenses = version?.licenses
+      .map((item) => {
+        return {
+          spdxid: item.spdxid,
+          name: item.name,
+          type: 'Matched',
+        };
+      })
+      .sort((a, b) => {
+        if (version.reliableLicense) {
+          if (a.spdxid === version.reliableLicense) return -1;
+          if (b.spdxid === version.reliableLicense) return 1;
+        }
+        return 0;
+      });
+
 
     if (licenses) {
       setLicenses([...licenses, ...all]);
@@ -365,7 +378,7 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
 
                     const { inputValue } = params;
                     // Suggest the search option
-                    if (inputValue !== '') {
+                    if (inputValue !== '' && (!inputValue.startsWith('pkg:'))) {
                       filtered.push({
                         inputValue,
                         search: true,
