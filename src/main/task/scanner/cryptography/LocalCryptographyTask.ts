@@ -7,13 +7,21 @@ import { Project } from '../../../workspace/Project';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.adapter';
-import { NodeStatus } from '../../../workspace/tree/Node';
 import { cryptographyService } from '../../../services/CryptographyService';
+import appConfigModule from '../../../../config/AppConfigModule';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
  */
 export class LocalCryptographyTask implements Scanner.IPipelineTask {
+  private readonly CRYPTO_BLACKLIST_FILES = [
+    appConfigModule.SCANOSS_CRYPTO_LIBRARY_RULES_FILE_NAME,
+    appConfigModule.SCANOSS_CRYPTO_ALGORITHM_RULES_FILENAME,
+    'scanoss.json',
+    'scanoss-ignore.json',
+    'scanoss-identify.json',
+  ];
+
   private project: Project;
 
   private readonly THREADS = 5;
@@ -53,15 +61,21 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       cryptoCfg.LIBRARY_RULES_PATH = await cryptographyService.getLibraryRulesPath();
       cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
+      const scanRoot = this.project.getScanRoot();
       const files = this.project.getTree().getRootFolder().getFiles();
-      // Filter binary files and filtered files
-      const filePaths: string[] = files
-        .filter((f) => !f.isBinaryFile && (f.type !== NodeStatus.FILTERED || f.isDependencyFile))
-        .map((f) => path.join(this.project.getScanRoot(), f.path));
+
+      // Build blacklist with full paths (only filters files at project root)
+      const blacklist = new Set(this.CRYPTO_BLACKLIST_FILES.map((f) => path.join(scanRoot, f)));
+
+      // Filter binary files and blacklisted files
+      const filePaths = files
+        .filter((f) => !f.isBinaryFile && !blacklist.has(path.join(scanRoot, f.path)))
+        .map((f) => path.join(scanRoot, f.path));
+
       // Create map to get fileId from absolute file path
       const dbFiles = await modelProvider.model.file.getAll(null);
       const dbFileMapper = new Map<string, number>();
-      dbFiles.forEach((f) => { dbFileMapper.set(path.join(this.project.getScanRoot(), f.path), f.id); });
+      dbFiles.forEach((f) => dbFileMapper.set(path.join(scanRoot, f.path), f.id));
 
       // Scan local cryptography
       const localCryptography = await cryptoScanner.scanFiles(filePaths);
