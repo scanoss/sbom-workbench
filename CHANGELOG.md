@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved cryptography viewer component performance
 ### Fixed
 - Fixed pre selected license in inventory dialog
+- Fixed local cryptography scanning to include all project files, excluding only configuration files at the project root
 
 ## [1.27.0] - 2025-12-12
 ### Added
