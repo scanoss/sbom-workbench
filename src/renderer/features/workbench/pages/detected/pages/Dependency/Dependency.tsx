@@ -76,7 +76,6 @@ const DependencyViewer = () => {
 
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
-      console.log('LOAD LOCAL FILE: ', path);
       setLocalFileContent({ content: null, error: false });
       const content = await workbenchController.fetchLocalFile(`${scanBasePath}/${path}`);
       if (content === FileType.BINARY) throw new Error(FileType.BINARY);

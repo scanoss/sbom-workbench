@@ -13,17 +13,17 @@ import { ScannerPipelineFactory } from '../task/scanner/scannerPipelineFactory/S
 import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKnowledgeExtractor';
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
-import ScannerType = Scanner.ScannerType;
+import ScannerType = Scanner.PipelineStage;
 
 class ProjectService {
   private setCryptographyScanType(p: Project): void {
     if (p.getApiKey()) {
-      const types = p.metadata.getScannerConfig().type;
+      const types = p.metadata.getScannerConfig().pipelineStages;
       types.push(ScannerType.CRYPTOGRAPHY);
       const uniqueTypes = new Set(types);
-      p.metadata.getScannerConfig().type = Array.from(uniqueTypes);
+      p.metadata.getScannerConfig().pipelineStages = Array.from(uniqueTypes);
     } else {
-      p.metadata.getScannerConfig().type.filter((t) => t !== ScannerType.CRYPTOGRAPHY);
+      p.metadata.getScannerConfig().pipelineStages.filter((t) => t !== ScannerType.CRYPTOGRAPHY);
     }
   }
 
@@ -91,8 +91,9 @@ class ProjectService {
   public async createProject(projectDTO: INewProject) {
     const p = await this.create(projectDTO);
     // Add crypto scanner config depending on API Key token
-    this.setCryptographyScanType(p);
+    // this.setCryptographyScanType(p);
     p.save();
+    console.log('Project created successfully', JSON.stringify(p, null, 2));
 
     await ScannerPipelineFactory.getScannerPipeline(projectDTO.scannerConfig.source).run(p);
   }
@@ -112,7 +113,7 @@ class ProjectService {
       const p = await workspace.getProject(new ProjectFilterPath(projectPath));
       p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
       // Add crypto scanner config depending on API Key token
-      this.setCryptographyScanType(p);
+      // this.setCryptographyScanType(p);
       // Save only metadata to avoid overwriting the filetree with an empty new one
       // Using p.save() would overwrite the entire project including the filetree
       p.metadata.save();

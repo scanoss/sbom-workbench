@@ -4,7 +4,7 @@ import fs from 'fs';
 import { modelProvider } from '../../services/ModelProvider';
 import { Queries } from '../../model/querys_db';
 import { Scanner } from '../../task/scanner/types';
-import ScannerType = Scanner.ScannerType;
+import ScannerType = Scanner.PipelineStage;
 import { userSettingService } from '../../services/UserSettingService';
 
 export async function migration140(projectPath: string): Promise<void> {
@@ -27,7 +27,7 @@ async function metadataMigration(projectPath: string) {
   const m = await fs.promises.readFile(`${projectPath}/metadata.json`, 'utf8');
   const metadata = JSON.parse(m);
 
-  metadata.scannerConfig = { mode: Scanner.ScannerMode.SCAN, source: metadata.source === 'IMPORTED' ? Scanner.ScannerSource.IMPORTED : Scanner.ScannerSource.CODE, type: [Scanner.ScannerType.CODE, ScannerType.DEPENDENCIES, Scanner.ScannerType.VULNERABILITIES] };
+  metadata.scannerConfig = { mode: Scanner.ScannerMode.SCAN, source: metadata.source === 'IMPORTED' ? Scanner.ScannerSource.IMPORTED : Scanner.ScannerSource.CODE, type: [Scanner.PipelineStage.CODE, ScannerType.DEPENDENCIES, Scanner.PipelineStage.VULNERABILITIES] };
   await fs.promises.writeFile(`${projectPath}/metadata.json`, JSON.stringify(metadata), 'utf-8');
 }
 

@@ -113,5 +113,13 @@
   "LoadingComponents": "Cargando Componentes...",
   "SearchByFileNameOrPurl": "Buscar por nombre de archivo o purl...",
   "Types": "Tipos",
-  "Detections": "Detecciones"
+  "Detections": "Detecciones",
+  "PipelineStageDependencies": "Dependencias",
+  "PipelineStageVulnerabilities": "Vulnerabilidades",
+  "PipelineStageCryptography": "Criptografía",
+  "PipelineStageSearchIndex": "Índice de Búsqueda",
+  "PipelineStageDependenciesHint": "Analizar y detectar dependencias declaradas en archivos de gestores de paquetes",
+  "PipelineStageVulnerabilitiesHint": "Buscar vulnerabilidades conocidas en los componentes detectados",
+  "PipelineStageCryptographyHint": "Escanear algoritmos e implementaciones criptográficas en el código fuente",
+  "PipelineStageSearchIndexHint": "Crear un índice de búsqueda para buscar palabras clave dentro de los ficheros del proyecto"
 }
