@@ -12,6 +12,12 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 64px;
+
+      .settings-right-column {
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
+      }
     }
 
     .form-container {
@@ -100,6 +106,7 @@
     }
   }
 
+
   .button-container {
     display: flex;
     justify-content: flex-end;
@@ -107,6 +114,7 @@
     position: fixed;
     bottom: 16px;
     right: 60px;
+
 
     .btn {
       padding: 12px 24px;
@@ -121,6 +129,11 @@
     }
   }
 
+  @media screen and (max-width: 1400px) {
+    .button-container {
+      position: inherit;
+    }
+  }
 
   .input-label {
     font-weight: 600;

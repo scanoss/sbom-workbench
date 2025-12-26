@@ -116,5 +116,13 @@
   "LoadingComponents": "Loading Components...",
   "SearchByFileNameOrPurl": "Search by file name or purl...",
   "Types": "Types",
-  "Detections": "Detections"
+  "Detections": "Detections",
+  "PipelineStageDependencies": "Dependencies",
+  "PipelineStageVulnerabilities": "Vulnerabilities",
+  "PipelineStageCryptography": "Cryptography",
+  "PipelineStageSearchIndex": "Search Index",
+  "PipelineStageDependenciesHint": "Analyze and detect declared dependencies from package manager files",
+  "PipelineStageVulnerabilitiesHint": "Search for known vulnerabilities in detected components",
+  "PipelineStageCryptographyHint": "Scan for cryptographic algorithms and implementations in source code",
+  "PipelineStageSearchIndexHint": "Create a search index for keyword searching within project files"
 }

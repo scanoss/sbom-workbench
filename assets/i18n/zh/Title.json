@@ -77,5 +77,6 @@
   "NoProxy": "無代理",
   "IgnoreCertificateErrors": "忽略證書頒發機構錯誤",
   "Local": "本地",
-  "Components": "组件"
+  "Components": "组件",
+  "PipelineStages": "管道阶段"
 }

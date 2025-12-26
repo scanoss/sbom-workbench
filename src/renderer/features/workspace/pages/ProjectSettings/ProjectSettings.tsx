@@ -30,7 +30,8 @@ import FormGroup from '@mui/material/FormGroup';
 import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
-import ScannerType = Scanner.ScannerType;
+import ScannerType = Scanner.PipelineStage;
+import PipelineStage = Scanner.PipelineStage;
 
 const ProjectSettings = () => {
   const navigate = useNavigate();
@@ -45,7 +46,7 @@ const ProjectSettings = () => {
   const [licenses, setLicenses] = useState([]);
   const [apis, setApis] = useState([]);
   const [settingsFileInfo, setSettingsFileInfo] = useState<SettingsFileInfo>({ type: 'none', fileName: null, legacyType: null });
-
+  const [hasApiKey, setHasApiKey] = useState(false);
   const [projectSettings, setProjectSettings] = useState<INewProject>({
     name: '',
     scan_root: '',
@@ -58,10 +59,11 @@ const ProjectSettings = () => {
     scannerConfig: {
       mode: Scanner.ScannerMode.SCAN,
       source: scanPath?.source || ScannerSource.CODE,
-      type: [
+      pipelineStages: [
         ScannerType.CODE,
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
+        ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
       ],
       obfuscate: false,
     },
@@ -89,11 +91,25 @@ const ProjectSettings = () => {
 
     if (projectName.endsWith('.wfp')) { projectName = projectName.replace('.wfp', ''); }
 
+    const defaultApiKey = !!apiUrlKey.APIS?.[apiUrlKey.DEFAULT_API_INDEX]?.API_KEY;
+    setHasApiKey(defaultApiKey);
+    const defaultTypes = [
+      ScannerType.CODE,
+      ScannerType.DEPENDENCIES,
+      ScannerType.VULNERABILITIES,
+      ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
+      ...(defaultApiKey ? [ScannerType.CRYPTOGRAPHY] : []),
+    ];
+
     setProjectSettings({
       ...projectSettings,
       scan_root: path,
       sourceCodePath: scanPath?.source === ScannerSource.CODE ? path : scanPath.sourceCodePath,
       name: projectName,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        pipelineStages: defaultTypes,
+      },
     });
   };
 
@@ -142,7 +158,6 @@ const ProjectSettings = () => {
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
-    console.log("SCAN PATH:", scanPath);
     dispatch(setScanPath({ ...scanPath, projectName: projectSettings.name }));
     dispatch(setNewProject(projectSettings));
     navigate('/workspace/new/scan');
@@ -172,13 +187,13 @@ const ProjectSettings = () => {
   };
 
   const onDecompressHandler = (checked: boolean) => {
-    const newType = projectSettings.scannerConfig.type.filter((t) => t !== ScannerType.UNZIP);
-    if (checked) newType.push(ScannerType.UNZIP);
+    const newType: Array<ScannerType> = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== PipelineStage.UNZIP);
+    if (checked) newType.push(PipelineStage.UNZIP);
     setProjectSettings({
       ...projectSettings,
       scannerConfig: {
         ...projectSettings.scannerConfig,
-        type: newType,
+        pipelineStages: newType,
       },
     });
   };
@@ -199,6 +214,18 @@ const ProjectSettings = () => {
       scannerConfig: {
         ...projectSettings.scannerConfig,
         hpsm: checked,
+      },
+    });
+  };
+
+  const onPipelineStageHandler = (type: ScannerType, checked: boolean) => {
+    const newType = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== type);
+    if (checked) newType.push(type);
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        pipelineStages: newType,
       },
     });
   };
@@ -301,10 +328,26 @@ const ProjectSettings = () => {
                           <Select
                             size="small"
                             onChange={(e: any) => {
+                              const selectedApiKey = e.target?.value === 0
+                                ? !!apis?.[settings.DEFAULT_API_INDEX]?.API_KEY
+                                : !!e.target?.value.API_KEY;
+                              setHasApiKey(selectedApiKey);
+
+                              const updatedStages: Array<PipelineStage> = projectSettings.scannerConfig.pipelineStages.filter(
+                                (t) => t !== PipelineStage.CRYPTOGRAPHY,
+                              );
+                              if (selectedApiKey) {
+                                updatedStages.push(PipelineStage.CRYPTOGRAPHY);
+                              }
+
                               setProjectSettings({
                                 ...projectSettings,
                                 api: e.target?.value.URL,
                                 api_key: e.target?.value.API_KEY,
+                                scannerConfig: {
+                                  ...projectSettings.scannerConfig,
+                                  pipelineStages: updatedStages,
+                                },
                               });
                             }}
                             defaultValue={0}
@@ -395,8 +438,70 @@ const ProjectSettings = () => {
                   </FormGroup>
                 </div>
               )}
+
             </div>
-            <div className="grid-item">
+            <div className="grid-item settings-right-column">
+              <div>
+                <label className="input-label">{t('Title:PipelineStages')}</label>
+                <FormGroup>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.DEPENDENCIES)}
+                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.DEPENDENCIES, checked)}
+                      />
+                    )}
+                    label={t('PipelineStageDependencies')}
+                  />
+                  <FormHelperText className="helper">
+                    {t('PipelineStageDependenciesHint')}
+                  </FormHelperText>
+                </FormGroup>
+                <FormGroup>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.VULNERABILITIES)}
+                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.VULNERABILITIES, checked)}
+                      />
+                    )}
+                    label={t('PipelineStageVulnerabilities')}
+                  />
+                  <FormHelperText className="helper">
+                    {t('PipelineStageVulnerabilitiesHint')}
+                  </FormHelperText>
+                </FormGroup>
+                <FormGroup>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        disabled={!hasApiKey}
+                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CRYPTOGRAPHY)}
+                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.CRYPTOGRAPHY, checked)}
+                      />
+                    )}
+                    label={t('PipelineStageCryptography')}
+                  />
+                  <FormHelperText className="helper">
+                    {t('PipelineStageCryptographyHint')}
+                  </FormHelperText>
+                </FormGroup>
+                <FormGroup>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        disabled={scanPath?.source !== ScannerSource.CODE}
+                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.SEARCH_INDEX)}
+                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.SEARCH_INDEX, checked)}
+                      />
+                    )}
+                    label={t('PipelineStageSearchIndex')}
+                  />
+                  <FormHelperText className="helper">
+                    {t('PipelineStageSearchIndexHint')}
+                  </FormHelperText>
+                </FormGroup>
+              </div>
               <div className="context-files-info">
                 { showConfigurationOptions && settingsFileInfo.type === 'none' && (
                   <Alert

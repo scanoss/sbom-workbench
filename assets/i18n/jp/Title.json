@@ -83,5 +83,6 @@
   "NoProxy": "プロキシなし",
   "IgnoreCertificateErrors": "認証局エラーを無視する",
   "Local": "ローカル",
-  "Components": "コンポーネント"
+  "Components": "コンポーネント",
+  "PipelineStages": "パイプラインステージ"
 }

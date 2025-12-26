@@ -96,5 +96,6 @@
   "NoProxy": "No Proxy",
   "IgnoreCertificateErrors": "Ignore certificate authority errors",
   "Local": "Local",
-  "Components": "Components"
+  "Components": "Components",
+  "PipelineStages": "Pipeline Stages"
 }

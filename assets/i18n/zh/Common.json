@@ -94,5 +94,13 @@
   "LoadingComponents": "正在加载组件...",
   "SearchByFileNameOrPurl": "按文件名或purl搜索...",
   "Types": "类型",
-  "Detections": "检测"
+  "Detections": "检测",
+  "PipelineStageDependencies": "依赖项",
+  "PipelineStageVulnerabilities": "漏洞",
+  "PipelineStageCryptography": "加密",
+  "PipelineStageSearchIndex": "搜索索引",
+  "PipelineStageDependenciesHint": "分析并检测包管理器文件中声明的依赖项",
+  "PipelineStageVulnerabilitiesHint": "搜索已检测组件中的已知漏洞",
+  "PipelineStageCryptographyHint": "扫描源代码中的加密算法和实现",
+  "PipelineStageSearchIndexHint": "创建搜索索引以在项目文件中搜索关键字"
 }

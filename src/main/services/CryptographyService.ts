@@ -11,6 +11,8 @@ import { fileExists } from '../utils/utils';
 import fs from 'fs';
 import { CryptographicItem } from '../model/entity/Cryptography';
 import AppConfig from '../../config/AppConfigModule';
+import { Scanner } from '../task/scanner/types';
+import PipelineStage = Scanner.PipelineStage;
 
 /**
  * Interface for algorithm rule structure from JSON
@@ -239,7 +241,7 @@ class CryptographyService {
   public async update():Promise<void> {
     try {
       const p = workspace.getOpenProject();
-
+      if (!p.metadata.getScannerConfig().pipelineStages.includes(PipelineStage.CRYPTOGRAPHY)) return;
       if (!p.getApiKey()) return;
 
       // Component Crypto
