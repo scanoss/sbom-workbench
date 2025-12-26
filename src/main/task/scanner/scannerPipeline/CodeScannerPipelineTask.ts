@@ -12,7 +12,7 @@ import { ScannerPipeline } from './ScannerPipeline';
 import { CodeIndexTreeTask } from '../../IndexTreeTask/CodeIndexTreeTask';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { IDispatch } from '../dispatcher/IDispatch';
-import ScannerType = Scanner.ScannerType;
+import ScannerType = Scanner.PipelineStage;
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { LocalCryptographyTask } from '../cryptography/LocalCryptographyTask';
 import { ReScanDependencyTask } from '../dependency/ReScanDependencyTask';
@@ -25,7 +25,7 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
     const forceDataReset = metadata.getScannerConfig().mode === Scanner.ScannerMode.RESCAN;
 
     // decompress
-    if (metadata.getScannerConfig().type.includes(ScannerType.UNZIP)) this.queue.push(new DecompressTask(project));
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.UNZIP)) this.queue.push(new DecompressTask(project));
 
     // index
     if (
@@ -40,28 +40,33 @@ export class CodeScannerPipelineTask extends ScannerPipeline {
         ? new ResumeScanTask(project)
         : new CodeReScanTask(project);
 
-    if (metadata.getScannerConfig().type.includes(ScannerType.CODE)) {
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.CODE)) {
       this.queue.push(scanTask);
     }
 
     // dependencies
-    const dependencyTask: DependencyTask = metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
-      ? new DependencyTask(project) : new ReScanDependencyTask(project);
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.DEPENDENCIES)){
+      const dependencyTask: DependencyTask =
+        metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+          ? new DependencyTask(project)
+          : new ReScanDependencyTask(project);
+      this.queue.push(dependencyTask);
+    }
 
-    this.queue.push(dependencyTask);
 
     // vulnerabilities
-    if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
 
     // Cryptography
-    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
+    if (metadata.getScannerConfig().pipelineStages.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
       this.queue.push(new CryptographyTask(project, forceDataReset));
       this.queue.push(new LocalCryptographyTask(project));
     }
 
     // search index
-    this.queue.push(new IndexTask(project));
-
+    if (metadata.getScannerConfig().pipelineStages.includes((ScannerType.SEARCH_INDEX))) {
+      this.queue.push(new IndexTask(project));
+    }
     for await (const [index, task] of this.queue.entries()) {
       const success = await this.executeTask(task, index);
       if (!success) {

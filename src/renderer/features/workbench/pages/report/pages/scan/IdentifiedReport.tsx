@@ -36,7 +36,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
   const [tab, setTab] = useState<string>('matches');
 
-  const layers = useRef<Set<Scanner.ScannerType>>(new Set(projectScannerConfig?.type));
+  const layers = useRef<Set<Scanner.PipelineStage>>(new Set(projectScannerConfig?.pipelineStages));
   const obligations = useRef<any[]>([]);
 
   const [licenseSelected, setLicenseSelected] = useState<any>(null);
@@ -138,18 +138,18 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
         )}
       </Card>
 
-      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.ScannerType.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card className={`report-item dependencies more-details ${layers.current.has(Scanner.PipelineStage.DEPENDENCIES) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="declared" replace className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:IdentifiedDependencies')}</span>
           </div>
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          { layers.current.has(Scanner.PipelineStage.DEPENDENCIES)
             ? <DependenciesCard data={data.dependencies} />
             : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
       </Card>
 
-      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.ScannerType.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
+      <Card className={`report-item vulnerabilities ${layers.current.has(Scanner.PipelineStage.VULNERABILITIES) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="../../vulnerabilities?type=identified" disabled={false} className="w-100 no-underline">
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Vulnerabilities')}</span>
@@ -157,13 +157,13 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          { layers.current.has(Scanner.ScannerType.VULNERABILITIES)
+          { layers.current.has(Scanner.PipelineStage.VULNERABILITIES)
             ? <VulnerabilitiesCard data={data.vulnerabilities} />
             : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
       </Card>
 
-      <Card className={`report-item cryptography ${layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
+      <Card className={`report-item cryptography ${layers.current.has(Scanner.PipelineStage.CRYPTOGRAPHY) ? 'no-blocked' : 'blocked'}`}>
         <ConditionalLink to="../../cryptographies?type=identified" className="w-100 no-underline" disabled={false}>
           <div className="report-title d-flex space-between align-center">
             <span>{t('Title:Cryptography')}</span>
@@ -171,7 +171,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
               <ArrowForwardOutlinedIcon fontSize="inherit" />
             </div>
           </div>
-          { layers.current.has(Scanner.ScannerType.CRYPTOGRAPHY)
+          { layers.current.has(Scanner.PipelineStage.CRYPTOGRAPHY)
             ? <CryptographyCard data={data.cryptographies} />
             : <p className="text-center mb-5 mt-5">{t('NotScanned')}</p>}
         </ConditionalLink>
@@ -180,7 +180,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
       <nav className="tabs-navigator">
         <Tabs value={tab}>
           <Tab value="matches" label={`${t('Title:IdentifiedMatchedTab')} (${componentsMatched.length})`} component={Link} to="matches" replace />
-          { layers.current.has(Scanner.ScannerType.DEPENDENCIES)
+          { layers.current.has(Scanner.PipelineStage.DEPENDENCIES)
           && <Tab value="declared" label={`${t('Title:IdentifiedDependenciesTab')} (${componentsDeclared.length})`} component={Link} to="declared" replace />}
           <Tab value="obligations" label={`${t('Title:ObligationsTab')} (${obligationsFiltered.length})`} component={Link} to="obligations" replace />
           <Tab value="identified" hidden /> {/* fallback value */}
