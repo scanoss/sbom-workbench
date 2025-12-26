@@ -12,6 +12,12 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 64px;
+
+      .settings-right-column {
+        display: flex;
+        flex-flow: column;
+        justify-content: space-between;
+      }
     }
 
     .form-container {

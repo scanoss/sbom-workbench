@@ -26,6 +26,10 @@ import CheckCircleOutlineOutlinedIcon from '@mui/icons-material/CheckCircleOutli
 import { useSelector } from 'react-redux';
 import { selectIsReadOnly, selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { useTranslation } from 'react-i18next';
+import { Scanner } from '../../../../../main/task/scanner/types';
+import PipelineStage = Scanner.PipelineStage;
+import ScannerSource = Scanner.ScannerSource;
+
 
 const Navigation = () => {
   const navigate = useNavigate();
@@ -43,9 +47,9 @@ const Navigation = () => {
 };
 
 const AppMenu = () => {
-  const { wfp } = useSelector(selectWorkbench);
-  const { t } = useTranslation();
+  const { projectScannerConfig , sourceCodePath } = useSelector(selectWorkbench);
 
+  const { t } = useTranslation();
   return (
     <section id="AppMenu">
       <NavLink
@@ -62,7 +66,7 @@ const AppMenu = () => {
 
       <NavLink
         to="/workbench/search"
-        className={({ isActive }) => `nav-link ${wfp ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
+        className={({ isActive }) => `nav-link ${!projectScannerConfig?.pipelineStages?.includes(PipelineStage.SEARCH_INDEX) || projectScannerConfig?.source !== ScannerSource.CODE ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
         <Tooltip title={t('Tooltip:SearchKeywords')} enterDelay={650}>
@@ -74,7 +78,7 @@ const AppMenu = () => {
 
       <NavLink
         to="/workbench/crypto-search"
-        className={({ isActive }) => `nav-link ${wfp ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
+        className={({ isActive }) => `nav-link ${!projectScannerConfig?.pipelineStages?.includes(PipelineStage.CRYPTOGRAPHY) || projectScannerConfig?.source !== ScannerSource.CODE ? 'disabled' : ''} ${isActive ? 'active' : ''}`}
         tabIndex={-1}
       >
         <Tooltip title={'Crypto Search'} enterDelay={650}>

@@ -9,12 +9,13 @@ export namespace Scanner {
     RESUME,
   }
 
-  export enum ScannerType {
+  export enum PipelineStage {
     CODE,
     DEPENDENCIES,
     VULNERABILITIES,
     UNZIP,
     CRYPTOGRAPHY,
+    SEARCH_INDEX,
   }
 
   export enum ScannerSource {
@@ -26,7 +27,7 @@ export namespace Scanner {
 
   export interface ScannerConfig {
     mode?: ScannerMode;
-    type?: ScannerType[];
+    pipelineStages?: PipelineStage[];
     source?: ScannerSource;
     obfuscate?: boolean;
     hpsm?: boolean;

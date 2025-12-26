@@ -52,9 +52,9 @@ export class IndexTask implements Scanner.IPipelineTask {
   private fileAdapter(modelFiles: any): Array<IIndexer> {
     const filesToIndex = [];
     const p = workspace.getOpenProject();
-    const scanRoot = p.metadata.getScanRoot();
+    const sourceCodePath = p.metadata.getSourceCodePath();
     modelFiles.forEach((file: any) => {
-      filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
+      filesToIndex.push({ fileId: file.id, path: `${sourceCodePath}${file.path}` });
     });
     return filesToIndex;
   }

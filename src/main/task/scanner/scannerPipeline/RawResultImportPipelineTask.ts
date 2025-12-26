@@ -5,11 +5,12 @@ import log from 'electron-log';
 import { VulnerabilitiesTask } from '../vulnerability/VulnerabilitiesTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { Scanner } from '../types';
-import ScannerType = Scanner.ScannerType;
+import ScannerType = Scanner.PipelineStage;
 import { ImportTask } from '../../import/ImportTask';
 import { RawResultSetupTask } from '../../rawImportResult/RawResultSetupTask';
 import { RawResultFileTreeTask } from '../../rawImportResult/RawResultFileTreeTask';
 import { RawResultDependencyImportTask } from '../../rawImportResult/RawResultDependencyImportTask';
+import { IndexTask } from '../../search/indexTask/IndexTask';
 
 export class RawResultImportPipelineTask extends ScannerPipeline {
 
@@ -29,13 +30,18 @@ export class RawResultImportPipelineTask extends ScannerPipeline {
     this.queue.push(new RawResultDependencyImportTask(project));
 
     // Vulnerabilities
-    if (metadata.getScannerConfig().type.includes(ScannerType.VULNERABILITIES)) {
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.VULNERABILITIES)) {
        this.queue.push(new VulnerabilitiesTask(project));
     }
 
     // Cryptography
-    if (metadata.getScannerConfig().type.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
+    if (metadata.getScannerConfig().pipelineStages.includes((ScannerType.CRYPTOGRAPHY)) && project.getApiKey()) {
        this.queue.push(new CryptographyTask(project));
+    }
+
+    // search index
+    if (metadata.getScannerConfig().pipelineStages.includes((ScannerType.SEARCH_INDEX))) {
+      this.queue.push(new IndexTask(project));
     }
 
     for await (const [index, task] of this.queue.entries()) {
