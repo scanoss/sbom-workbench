@@ -5,6 +5,7 @@
     "TotalFiles": "全部文件",
     "Component": "组件",
     "Severity": "严重程度",
+    "CVSSSeverity": "CVSS严重程度",
     "CVE": "CVE",
     "Source": "来源",
     "Published": "已发布",

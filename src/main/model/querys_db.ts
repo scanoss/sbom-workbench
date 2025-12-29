@@ -35,6 +35,9 @@ export class Queries {
     cve text NOT NULL,
     source text NOT NULL,
     severity text NOT NULL,
+    cvss_severity text DEFAULT '',
+    cvss_score text DEFAULT '',
+    cvss text DEFAULT '',
     published text NOT NULL,
     modified text NOT NULL,
     summary text NOT NULL,
@@ -314,12 +317,12 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   // VULNERABILITIES
 
-  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT v.external_id, v.cve, v.source as vsource, v.published, v.modified, v.severity, v.summary, compv.purl, compv.version, compv.rejectAt, cv.name, cv.description, cv.source, cv.reliableLicense, cv.id FROM vulnerability v
+  SQL_GET_ALL_IDENTIFIED_VULNERABILITIES = `SELECT v.external_id, v.cve, v.source as vsource, v.published, v.modified, v.severity, v.cvss_severity, v.cvss_score, v.cvss, v.summary, compv.purl, compv.version, compv.rejectAt, cv.name, cv.description, cv.source, cv.reliableLicense, cv.id FROM vulnerability v
   INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
   WHERE cv.id IN (SELECT cvid FROM inventories);`;
 
-  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT v.external_id, v.cve, v.source as vsource , v.severity, v.published, v.modified, v.summary, compv.purl, compv.version, compv.rejectAt FROM vulnerability v
+  SQL_GET_ALL_VULNERABILITIES_DETECTED = `SELECT v.external_id, v.cve, v.source as vsource , v.severity, v.cvss_severity, v.cvss_score, v.cvss, v.published, v.modified, v.summary, compv.purl, compv.version, compv.rejectAt FROM vulnerability v
   INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
   WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
   OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)`;
@@ -333,17 +336,27 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     )
     WHERE purl ||'@'|| version IN (#COMPONENTS);`;
 
-  SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
-  INNER JOIN component_versions cv ON (cv.purl = compv.purl AND cv.version = compv.version)
+  SQL_GET_VULNERABILITIES_IDENTIFIED_REPORT = `SELECT (CASE WHEN v.severity != 'MODERATE' THEN v.severity ELSE 'MEDIUM' END) AS severity,
+  COUNT(*) AS count
+  FROM vulnerability v
+  INNER JOIN component_vulnerability compv
+  ON v.external_id = compv.vulnerability_external_id
+  AND v.source = compv.vulnerability_source
+  INNER JOIN component_versions cv
+  ON cv.purl = compv.purl
+  AND cv.version = compv.version
   WHERE cv.id IN (SELECT cvid FROM inventories)
-  GROUP BY v.severity;`;
+  GROUP BY 1;`;
 
-  SQL_GET_VULNERABILITIES_DETECTED_REPORT = `SELECT v.severity, count(v.severity) as count FROM vulnerability v
-  INNER JOIN component_vulnerability compv ON v.external_id = compv.vulnerability_external_id AND v.source = compv.vulnerability_source
-  WHERE (compv.version,compv.purl) IN (SELECT version,purl FROM component_versions cv WHERE cv.source='engine')
-  OR (compv.version,compv.purl) IN (SELECT version,purl FROM dependencies)
-  GROUP BY v.severity;`;
+  SQL_GET_VULNERABILITIES_DETECTED_REPORT = `SELECT (CASE WHEN v.severity != 'MODERATE' THEN v.severity ELSE 'MEDIUM' END) AS severity,
+  COUNT(*) AS count
+  FROM vulnerability v
+  INNER JOIN component_vulnerability compv
+  ON v.external_id = compv.vulnerability_external_id
+  AND v.source = compv.vulnerability_source
+  WHERE (compv.version, compv.purl) IN (SELECT version, purl FROM component_versions cv WHERE cv.source = 'engine')
+  OR (compv.version, compv.purl) IN (SELECT version, purl FROM dependencies)
+  GROUP BY 1;`;
 
   SQL_VULNERABILITY_DELETE_ALL = 'DELETE FROM vulnerability;';
 

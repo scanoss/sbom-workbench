@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Autocomplete,
@@ -39,30 +39,31 @@ const VulnerabilitiesReport = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const type = useSearchParams().get('type');
-  const data = useRef<ComponentVulnerability[]>(null);
 
-  const [items, setItems] = useState<ComponentVulnerability[]>([]);
+  const [data, setData] = useState<ComponentVulnerability[]>([]);
   const [components, setComponent] = useState<any[]>([]);
-  const [filter, setFilter] = useState<IVulnerabilitiesFilter>(null);
+  const [filter, setFilter] = useState<IVulnerabilitiesFilter>({ component: null, severity: null});
   const [popoverContent, setPopoverContent] = useState<string>(null);
 
   const [anchorElPopover, setAnchorElPopover] = React.useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorElPopover);
 
+  // Compute filtered items from data and filter
+  const items = React.useMemo(() => {
+    return data
+      .filter((item) => !filter.component || item.componentVersion.name === filter.component)
+      .filter((item) => {
+        if (!filter.severity || filter.severity.length === 0) return true;
+        return filter.severity.includes(item.vulnerability.severity.toLowerCase()) || filter.severity.includes(item.vulnerability.cvss_severity.toLowerCase());
+      });
+  }, [data, filter]);
+
   const init = async () => {
     const source = type === SourceType.identified ? SourceType.identified : SourceType.detected;
     const response = await vulnerabilityService.getAll({ type: source });
-    data.current = response;
-
-    setItems(data.current);
-    setComponent(Array.from(new Set(data.current.map((item) => item.componentVersion.name))));
+    setData(response);
+    setComponent(Array.from(new Set(response.map((item) => item.componentVersion.name))));
   };
-
-  const filterItems = (items: ComponentVulnerability[]) => (filter
-    ? items
-      .filter((item) => !filter.component || item.componentVersion.name === filter.component)
-      .filter((item) => !filter.severity || filter.severity.length === 0 || filter.severity.includes(item.vulnerability.severity?.toLowerCase()))
-    : items);
 
   const onSeeDescriptionClickHandler = (e, item: ComponentVulnerability) => {
     setPopoverContent(item.vulnerability.summary);
@@ -70,13 +71,8 @@ const VulnerabilitiesReport = () => {
   };
 
   const onFilterHandler = (newFilter: IVulnerabilitiesFilter) => {
-    setFilter({ ...filter, ...newFilter });
+    setFilter((prevFilter) => ({ ...prevFilter, ...newFilter }));
   };
-
-  // filter items
-  useEffect(() => {
-    setItems(filterItems(data.current));
-  }, [filter]);
 
   // on mounted
   useEffect(() => {
@@ -123,13 +119,13 @@ const VulnerabilitiesReport = () => {
                   <label>{t('Title:Severity')}</label>
                   <Paper>
                     <Autocomplete
-                      options={['critical', 'high', 'medium', 'low']}
+                      options={['critical', 'high', 'medium', 'moderate', 'low']}
                       size="small"
                       disablePortal
                       multiple
                       forcePopupIcon
                       disableCloseOnSelect
-                      onChange={(e_, value) => onFilterHandler({ ...filter, severity: value })}
+                      onChange={(e_, value) => onFilterHandler({severity: value})}
                       renderOption={(props, option, { selected }) => (
                         <li {...props}>
                           <Checkbox style={{ marginRight: 8 }} checked={selected} />
@@ -173,17 +169,18 @@ const VulnerabilitiesReport = () => {
                 <TableRow>
                   <TableCell>id</TableCell>
                   <TableCell>{t('Table:Header:Component')}</TableCell>
-                  <TableCell>{t('Table:Header:Severity')}</TableCell>
                   <TableCell>{t('Table:Header:CVE')}</TableCell>
+                  <TableCell>{t('Table:Header:Severity')}</TableCell>
+                  <TableCell>{t('Table:Header:CVSSSeverity')}</TableCell>
                   <TableCell>{t('Table:Header:Source')}</TableCell>
                   <TableCell>{t('Table:Header:Published')}</TableCell>
                   <TableCell>{t('Table:Header:Modified')}</TableCell>
-                  <TableCell width={70} />
+                  <TableCell width={40} />
                 </TableRow>
               </TableHead>
               <TableBody>
-                {items?.map((item) => (
-                  <TableRow key={item.purl + item.version + item.vulnerability.cve}>
+                {items?.map((item, index) => (
+                  <TableRow key={`${item.purl}-${item.version}-${item.vulnerability.cve}-${index}`}>
                     <TableCell>
                       {item.vulnerability.external_id}
                     </TableCell>
@@ -193,9 +190,6 @@ const VulnerabilitiesReport = () => {
                         secondary={`${item.componentVersion.purl}@${item.componentVersion.version}`}
                       />
                     </TableCell>
-                    <TableCell>
-                      <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
-                    </TableCell>
                     <TableCell><Link
                       className="d-flex align-center"
                       href={`https://nvd.nist.gov/vuln/detail/${item.vulnerability.cve}`}
@@ -204,6 +198,12 @@ const VulnerabilitiesReport = () => {
                     >
                       {item.vulnerability.cve}  <OpenInNewOutlinedIcon className="external-link" fontSize="small" />
                     </Link>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`tag tag-${item.vulnerability.severity?.toLowerCase()}`}>{item.vulnerability.severity}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`tag tag-${item.vulnerability.cvss_severity?.toLowerCase()}`}>{item.vulnerability.cvss_severity}</span>
                     </TableCell>
                     <TableCell>{item.vulnerability.source}</TableCell>
                     <TableCell>{item.vulnerability.published}</TableCell>

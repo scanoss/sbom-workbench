@@ -23,7 +23,8 @@
     "Dependencies ": "Dependencies",
     "Cryptography": "Cryptography",
     "Type": "Type",
-    "Detected": "Detected"
+    "Detected": "Detected",
+    "CVSSSeverity": "CVSS Severity"
   },
   "Version": "Version",
   "License": "License"
