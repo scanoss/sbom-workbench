@@ -5,6 +5,7 @@
     "TotalFiles": "全ファイル",
     "Component": "コンポーネント",
     "Severity": "深刻度合",
+    "CVSSSeverity": "CVSS深刻度",
     "CVE": "CVE",
     "Source": "ソース",
     "Published": "Published",

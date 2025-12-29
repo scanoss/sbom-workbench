@@ -6,10 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-upcoming changes...
-
+- Upcoming changes ...
+- 
 ## [1.29.0] - 2025-12-29
 ### Added
+- Added CVSS vulnerability data to detected/identified reports
+upcoming changes...
 - Added configurable pipeline stages in project settings (Dependencies, Vulnerabilities, Cryptography, Search Index)
 
 ## [1.28.0] - 2025-12-22

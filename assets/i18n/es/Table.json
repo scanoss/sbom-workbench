@@ -5,6 +5,7 @@
     "TotalFiles": "Cantidad de ficheros",
     "Component": "Componente",
     "Severity": "Severidad",
+    "CVSSSeverity": "Severidad CVSS",
     "CVE": "CVE",
     "Source": "Fuente",
     "Published": "Publicado",
