@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Upcoming changes ...
-- 
-## [1.29.0] - 2025-12-29
+
+## [1.29.0] - 2025-12-02
 ### Added
-- Added CVSS vulnerability data to detected/identified reports
-upcoming changes...
 - Added configurable pipeline stages in project settings (Dependencies, Vulnerabilities, Cryptography, Search Index)
+### Changed
+- Enhanced vulnerability reports with CVSS severity scores and metrics
 
 ## [1.28.0] - 2025-12-22
 ### Added
