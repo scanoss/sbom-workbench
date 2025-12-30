@@ -1,21 +1,28 @@
 import { PackageURL } from 'packageurl-js';
 import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerability';
-import { AffectedComponent, VulnerabilityExportData } from '../../../model/interfaces/report/VulnerabilityExportData';
+import { VulnerabilityExportData } from '../../../model/interfaces/report/VulnerabilityExportData';
 import { licenseHelper } from '../../../helpers/LicenseHelper';
 import { ExportComponentData } from '../../../model/interfaces/report/ExportComponentData';
 
+/**
+ * Transforms a flat array of component-vulnerability relationships into a grouped structure
+ * where each vulnerability contains its affected components and versions.
+ *
+ * @param componentVulnerabilities - Array of individual component-vulnerability relationships
+ * @returns Array of vulnerabilities, each with aggregated affected components and their versions
+ */
 export function toVulnerabilityExportData(componentVulnerabilities: Array<ComponentVulnerability>): Array<VulnerabilityExportData> {
   const vulnerabilityMapper = new Map<string, VulnerabilityExportData & {
-    components: Map<string, AffectedComponent>
+    components: Map<string, Set<string>>
   }>();
   componentVulnerabilities.forEach((cv) => {
-    let { cve, source, summary, published, severity, modified } = cv.vulnerability;
+    let { cve, source, summary, published, severity, modified, cvss_severity, cvss, cvss_score } = cv.vulnerability;
     const { purl, version, rejectAt } = cv;
     if (!vulnerabilityMapper.has(cve)) {
-      const componentMapper = new Map<string, { purl: string, versions: Array<string> }>();
-      componentMapper.set(purl, { purl, versions: [version] });
+      const componentMapper = new Map<string, Set<string>>();
+      componentMapper.set(purl, new Set([version]));
 
-      // WORKAROUND: OSV has a bug in the severity mapping
+      // WORKAROUND: Map Github Advisories to CVSS
       if (severity && severity === 'MODERATE')
         severity = 'MEDIUM';
 
@@ -25,25 +32,35 @@ export function toVulnerabilityExportData(componentVulnerabilities: Array<Compon
         summary,
         published,
         severity,
+        cvss_severity,
+        cvss,
+        cvss_score,
         rejectAt,
         modified,
-        affectedComponents: undefined,
+        affectedComponents: [],
         components: componentMapper,
       });
       // vulnerability already exists in Map. Just check the purl and version
     } else {
       const vulnerability = vulnerabilityMapper.get(cve)!;
       const { components } = vulnerability;
-      components.set(purl, components.has(purl)
-        ? { purl, versions: [...components.get(purl)!.versions, version] }
-        : { purl, versions: [version] });
+      if (components.has(purl)) {
+        components.get(purl)!.add(version);
+      } else {
+        components.set(purl, new Set([version]));
+      }
     }
   });
-  return Array.from(vulnerabilityMapper.values()).flatMap(((v) => {
-    const vulnerability = { ...v, affectedComponents: Array.from(v.components.values()) as Array<AffectedComponent> };
-    delete vulnerability.components;
-    return vulnerability;
-  }));
+  return Array.from(vulnerabilityMapper.values()).map((v) => {
+    const { components, ...rest } = v;
+    return {
+      ...rest,
+      affectedComponents: Array.from(components.entries()).map(([purl, versions]) => ({
+        purl,
+        versions: Array.from(versions),
+      })),
+    };
+  });
 }
 
 export function removeRepeatedLicenses(licenses: string): string {
