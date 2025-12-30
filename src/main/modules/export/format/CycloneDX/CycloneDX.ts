@@ -121,7 +121,14 @@ export abstract class CycloneDX extends Format {
     vulnerabilities.forEach((v) => {
       const ratingRepository = new CDX.Models.Vulnerability.RatingRepository();
       if(v.severity)
-        ratingRepository.add(new CDX.Models.Vulnerability.Rating({ severity: v.severity.toLowerCase() as any }));
+        ratingRepository.add(new CDX.Models.Vulnerability.Rating(
+          {
+            severity: v.severity.toLowerCase() as any,
+            ...(v.cvss_score && { score: Number(v.cvss_score) }),
+            ...(v.cvss && { vector: v.cvss }),
+          },
+        ));
+
       const affectedRepository = new CDX.Models.Vulnerability.AffectRepository();
       v.affectedComponents.forEach((c:any) => {
         const bomRef = new CDX.Models.BomRef(c.purl);
