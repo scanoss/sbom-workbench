@@ -19,10 +19,23 @@ export const loadProject = createAsyncThunk('workbench/loadProject', async (payl
   return response;
 });
 
-export const loadProjectSettings = createAsyncThunk('workbench/loadProjectSettings', async () => {
-  const response = await workbenchController.loadSettings();
-  return response;
-});
+export const loadProjectSettings = createAsyncThunk(
+  'workbench/loadProjectSettings',
+  async () => {
+    try{
+      const response = await workbenchController.loadSettings();
+      return response;
+    } catch (e: any){
+      return null;
+    }
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+      return state.workbench.loaded;
+    },
+  }
+);
 
 export const setTree = createAsyncThunk('workbench/setTree', async (tree: any, thunkAPI) => {
   const state = thunkAPI.getState() as RootState;
@@ -34,6 +47,10 @@ export const setTree = createAsyncThunk('workbench/setTree', async (tree: any, t
 
 export const closeProject = createAsyncThunk('workbench/closeProject', async (_, thunkAPI) => {
   thunkAPI.dispatch(reset());
-  workbenchController.closeCurrentScan().catch(e => console.log(e));
+  try {
+    await workbenchController.closeCurrentScan();
+  } catch (e) {
+    console.error(e);
+  }
   return true;
 });

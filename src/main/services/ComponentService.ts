@@ -47,7 +47,7 @@ class ComponentService {
 
   public async getAll(params: IWorkbenchFilterParams) {
     try {
-      const filter = workspace.getOpenedProjects()[0].getFilter(params);
+      const filter = workspace.getOpenedProjects()[0]?.getFilter(params);
       const queryBuilder: QueryBuilder = QueryBuilderCreator.create(filter);
       const queryBuilderSummary: QueryBuilder = QueryBuilderCreator.create({
         ...filter,
@@ -62,7 +62,7 @@ class ComponentService {
       return comp;
     } catch (error: any) {
       log.error(error);
-      throw error;
+      return [];
     }
   }
 

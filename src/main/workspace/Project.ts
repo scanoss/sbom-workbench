@@ -95,10 +95,16 @@ export class Project {
   }
 
   public async close() {
+    if (this.state === ProjectState.CLOSED) {
+      log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} is already closed, skipping`, 'color: green');
+      return;
+    }
     log.info(`%c[ PROJECT ]: Closing project ${this.metadata.getName()}`, 'color: green');
     log.info('%c[ PROJECT ]: Closing Database', 'color: green');
-    await modelProvider.model.destroy();
     this.state = ProjectState.CLOSED;
+    if (modelProvider.model) {
+      await modelProvider.model.destroy();
+    }
     this.logical_tree = null;
     this.tree = null;
     this.store = null;

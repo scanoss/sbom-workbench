@@ -6,16 +6,35 @@ import {
   RejectAllDependeciesDTO,
   RestoreAllDependenciesDTO,
 } from '@api/dto';
+import { RootState } from '@store/rootReducer';
 
-export const getAll = createAsyncThunk('dependency/fetchAll', async (path: string) => {
-  const response = await dependencyService.getAll({ path });
-  return response;
-});
+export const getAll = createAsyncThunk(
+  'dependency/fetchAll',
+  async (path: string) => {
+    const response = await dependencyService.getAll({ path });
+    return response;
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+      return state.workbench.loaded;
+    },
+  }
+);
 
-export const getAllManifestFiles = createAsyncThunk('dependency/fetchAllManifestFiles', async () => {
-  const response = await dependencyService.getManifestFileSummary();
-  return response;
-});
+export const getAllManifestFiles = createAsyncThunk(
+  'dependency/fetchAllManifestFiles',
+  async () => {
+    const response = await dependencyService.getManifestFileSummary();
+    return response;
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+      return state.workbench.loaded;
+    },
+  }
+);
 
 export const accept = createAsyncThunk('dependency/accept', async (dependencyDTO: NewDependencyDTO) => {
   const response = await dependencyService.accept(dependencyDTO);
