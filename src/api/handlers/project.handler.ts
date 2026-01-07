@@ -146,8 +146,12 @@ api.handle(IpcChannels.PROJECT_SET_FILTER, async (event, filter: IWorkbenchFilte
 api.handle(IpcChannels.PROJECT_SET_FILE_TREE_VIEW_MODE, async (event, mode: FileTreeViewMode) => {
   try {
     const p = workspace.getOpenedProjects()[0];
+    if (!p){
+      log.info("[PROJECT_SET_FILE_TREE_VIEW_MODE]:  No project open");
+      return Response.ok({ message: 'Filter no set, no opened project exists', data: false });
+    }
     p.setFileTreeViewMode(mode);
-    return Response.ok({ message: 'Filter setted successfully', data: true });
+    return Response.ok({ message: 'Filter set successfully', data: true });
   } catch (e: any) {
     return Response.fail({ message: e.message });
   }

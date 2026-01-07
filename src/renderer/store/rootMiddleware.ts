@@ -44,6 +44,9 @@ rootMiddleware.startListening({
   effect: async (action, listenerApi) => {
     const state: RootState = listenerApi.getState() as RootState;
 
+    // Don't proceed if project is not loaded
+    if (!state.workbench.loaded) return;
+
     const summary = await reportService.getSummary();
     listenerApi.dispatch(setProgress(summary));
 
@@ -51,7 +54,6 @@ rootMiddleware.startListening({
     if (state.component.component) {
       listenerApi.dispatch(fetchComponent(state.component.component.purl));
     }
-  
   },
 });
 
@@ -76,6 +78,9 @@ rootMiddleware.startListening({
     load, // this is a workaround for the fact that still has setFilter on WorkbenchContext
   ),
   effect: async (action, listenerApi) => {
+    const state: RootState = listenerApi.getState() as RootState;
+    if (!state.workbench.loaded) return;
+
     listenerApi.dispatch(getAllManifestFiles());
   },
 });
@@ -89,6 +94,9 @@ rootMiddleware.startListening({
     rejectAll.fulfilled,
   ),
   effect: async (action, listenerApi) => {
+    const state: RootState = listenerApi.getState() as RootState;
+    if (!state.workbench.loaded) return;
+
     const summary = await reportService.getSummary();
     listenerApi.dispatch(setProgress(summary));
     listenerApi.dispatch(getAllManifestFiles());

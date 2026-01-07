@@ -18,6 +18,10 @@ class ProjectService {
 
   public async close(): Promise<IProject> {
     const p = workspace.getOpenProject();
+    if (!p) {
+      log.info('[ProjectService.close]: No project open, skipping close');
+      return null;
+    }
     const dto = p.getDto();
     await p.close();
     return dto;

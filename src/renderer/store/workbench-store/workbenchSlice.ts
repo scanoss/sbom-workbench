@@ -119,6 +119,7 @@ export const workbenchSlice = createSlice({
       state.tree = action.payload;
     });
     builder.addCase(loadProjectSettings.fulfilled, (state, action) => {
+      if (!action.payload) return;
       const { api_url, api_key } = action.payload;
       state.settings = {
         api_key,

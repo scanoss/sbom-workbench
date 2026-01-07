@@ -33,13 +33,14 @@ import ScannerSource = Scanner.ScannerSource;
 
 const Navigation = () => {
   const navigate = useNavigate();
+  const { loaded } = useSelector(selectWorkbench);
 
   return (
     <section id="Navigation">
-      <IconButton onClick={() => navigate(-1)} size="large">
+      <IconButton onClick={() => navigate(-1)} size="large" disabled={!loaded}>
         <ArrowBackIcon />
       </IconButton>
-      <IconButton onClick={() => navigate(1)} size="large">
+      <IconButton onClick={() => navigate(1)} size="large" disabled={!loaded}>
         <ArrowForwardIcon />
       </IconButton>
     </section>
@@ -237,7 +238,14 @@ const AppBar = ({ exp }) => {
       <Toolbar>
         <div className="slot start">
           <Tooltip title={t('Tooltip:BackToProjects')}>
-            <IconButton onClick={onBackPressed} edge="start" color="inherit" aria-label="menu" size="large">
+            <IconButton
+              onClick={onBackPressed}
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              size="large"
+              disabled={!state.loaded}
+            >
               <HomeOutlinedIcon />
             </IconButton>
           </Tooltip>

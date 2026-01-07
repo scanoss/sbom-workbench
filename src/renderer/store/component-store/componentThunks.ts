@@ -6,22 +6,41 @@ import {ComponentResultDTO, NewLicenseDTO} from '@api/dto';
 import { IComponentResult } from '../../../main/task/componentCatalog/iComponentCatalog/IComponentResult';
 import { workbenchController } from '../../controllers/workbench-controller';
 
-export const fetchComponent = createAsyncThunk('workbench/loadComponent', async (purl: string, thunkAPI) => {
-  const response = await workbenchController.getComponent(purl);
+export const fetchComponent = createAsyncThunk(
+  'workbench/loadComponent',
+  async (purl: string, thunkAPI) => {
+    const response = await workbenchController.getComponent(purl);
 
-  // TODO: remove this block after backend changes.
-  if (!response) {
-    const state = thunkAPI.getState() as RootState;
-    return state.component.component;
+    // TODO: remove this block after backend changes.
+    if (!response) {
+      const state = thunkAPI.getState() as RootState;
+      return state.component.component;
+    }
+
+    return response;
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+      return state.workbench.loaded;
+    },
   }
+);
 
-  return response;
-});
-
-export const fetchComponents = createAsyncThunk('workbench/loadComponents', async () => {
-  const response = await workbenchController.getComponents();
-  return response;
-});
+export const fetchComponents = createAsyncThunk(
+  'workbench/loadComponents',
+  async () => {
+    const response = await workbenchController.getComponents();
+    return response;
+  },
+  {
+    condition: (_, { getState }) => {
+      const state = getState() as RootState;
+      // Don't fetch if project is not loaded
+      return state.workbench.loaded;
+    },
+  }
+);
 
 export const importGlobalComponent = createAsyncThunk(
   'workbench/importGlobalComponent',
