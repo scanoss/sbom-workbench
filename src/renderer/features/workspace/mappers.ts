@@ -2,22 +2,29 @@ import { IWorkspaceCfg } from '@api/types';
 import { GlobalSettingsFormValues, ProxyMode } from './domain';
 
 const extractHostAndPort = (url: string): [string, string] | [null, null] => {
-  try {
-    const urlObj = new URL(url);
+  if (!url) {
+    return [null, null];
+  }
 
-    const { username, password, port, protocol, hostname } = urlObj;
+  try {
+    let normalizedUrl = url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      normalizedUrl = `http://${url}`;
+    }
+
+    const urlObj = new URL(normalizedUrl);
+
+    const { username, password, port, hostname } = urlObj;
 
     if (!hostname) {
       return [null, null];
     }
 
     if (!username && !password) {
-      const host = `${protocol ? `${protocol}//` : ''}${hostname}`;
-
-      return [host, port];
+      return [hostname, port];
     }
 
-    const host = `${protocol ?? ''}//${username ?? ''}${password ? `:${password}` : ''}@${hostname}`;
+    const host = `${username ?? ''}${password ? `:${password}` : ''}@${hostname}`;
 
     return [host, urlObj.port];
   } catch (error) {
