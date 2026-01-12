@@ -25,7 +25,7 @@ export class Queries {
     'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
   DEPENDENCY_TABLE =
-    'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
+    'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,url TEXT DEFAULT "",originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
 
   RESULT_LICENSE =
     'CREATE TABLE IF NOT EXISTS result_license (resultLicenseId INTEGER PRIMARY KEY,resultId integer NOT NULL ,spdxid varchar(90) NOT NULL, source varchar(45) NOT NULL ,patent_hints varchar(10),copyLeft varchar(10), osadl_updated datetime,incompatible_with text, checklist_url varchar(150),FOREIGN KEY (resultId) REFERENCES results(id) ON DELETE CASCADE, UNIQUE(resultId,source,spdxid));';
@@ -232,7 +232,7 @@ export class Queries {
   INNER JOIN inventories i ON i.id=fi.inventoryid INNER JOIN component_versions  cv ON i.cvid=cv.id ORDER BY r.purl;`;
 
   SQL_DEPENDENCIES_INSERT =
-    'INSERT OR IGNORE INTO dependencies (fileId, purl, version, scope, licenses, component,originalVersion,originalLicense) VALUES (?,?,?,?,?,?,?,?);';
+    'INSERT OR IGNORE INTO dependencies (fileId, purl, version, url, scope, licenses, component,originalVersion,originalLicense) VALUES (?,?,?,?,?,?,?,?,?);';
 
   SQL_GET_ALL_DEPENDENCIES = `SELECT f.path, d.dependencyId, d.component AS componentName, d.purl, d.version, d.licenses, d.component, d.scope, i.id AS inventory,cv.id AS compid,d.rejectedAt,(CASE WHEN i.id IS NOT NULL AND d.rejectedAt IS NULL THEN '${FileStatusType.IDENTIFIED}' WHEN d.rejectedAt IS NOT NULL THEN '${FileStatusType.ORIGINAL}' ELSE '${FileStatusType.PENDING}' END) AS status,(CASE WHEN d.purl IS NOT NULL AND d.version IS NOT NULL AND licenses IS NOT NULL THEN true ELSE false END) AS valid,d.originalVersion,d.originalLicense, d.fileId FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId
