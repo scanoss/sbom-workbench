@@ -874,8 +874,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
          '' as latest_version,
          REPLACE(d.originalLicense, ',', '|') as detected_license,
          i.spdxid as concluded_license,
-         '' as detected_url,
-         '' as concluded_url,
+         d.url as detected_url,
+         d.url as concluded_url,
          '' as comment
   FROM dependencies d
   INNER JOIN files f ON d.fileId = f.fileId
@@ -903,8 +903,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     UNION
     SELECT '' as inventory_id, f.path, 'dependency' as usage, d.component as detected_component, '' as concluded_component,
     d.purl as detected_purl, '' as concluded_purl, d.originalVersion as detected_version , '' as concluded_version, '' as latest_version,
-    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, '' as detected_url,
-      '' as concluded_url, '' as comment
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license, '' as concluded_license, d.url as detected_url,
+    '' as concluded_url, '' as comment
     FROM dependencies d
     INNER JOIN files f ON f.fileId = d.fileId
     GROUP BY d.dependencyId) as detected
