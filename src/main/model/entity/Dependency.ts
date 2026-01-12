@@ -18,6 +18,8 @@ export class Dependency {
   originalVersion: string;
 
   originalLicense: Array<string>;
+
+  url: string;
 }
 
 export interface ModelDependencyManifest {

@@ -34,6 +34,7 @@ export class DependencyModel extends Model {
             d.fileId,
             d.purl ? d.purl : null,
             d.version,
+            d.url,
             d.scope ? d.scope : null,
             d.licenses.length > 0 ? d.licenses.join(',') : null,
             d.component,
