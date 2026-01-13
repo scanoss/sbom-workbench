@@ -21,6 +21,7 @@ export class DependencyDataProvider extends BaseDataProvider implements DataProv
         purl: item.purl,
         component: item.component,
         version: item.version,
+        url: item.url,
         licenses,
       });
     });

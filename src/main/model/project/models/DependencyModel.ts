@@ -57,6 +57,7 @@ export class DependencyModel extends Model {
       file: string;
       component: string;
       purl: string;
+      url:string;
       version: string;
       licenses: string;
     }>;
@@ -70,6 +71,7 @@ export class DependencyModel extends Model {
       file: string;
       component: string;
       purl: string;
+      url: string;
       version: string;
       licenses: string;
     }>;

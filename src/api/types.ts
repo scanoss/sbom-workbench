@@ -317,6 +317,7 @@ export interface Dependency {
   purl: string;
   version: string;
   scope: string;
+  url: string;
   componentName: string;
   component: Component;
   status: FileStatusType.IDENTIFIED | FileStatusType.ORIGINAL | FileStatusType.PENDING;

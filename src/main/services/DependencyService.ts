@@ -225,7 +225,7 @@ class DependencyService {
             purl: d.purl,
             version: d.version,
             description: 'n/a',
-            url: '',
+            url: d.url,
             source: ComponentSource.MANUAL,
             vendor: '',
             licenses: licenseIds, // Set new licenses ids to be attached
