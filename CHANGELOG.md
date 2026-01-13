@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added component URL to dependency data
 - Included dependency component URL in detected/identified reports
+- Added URL column to dependency table in HTML report
 ### Fixed
 - Fixed proxy configuration not being loaded in settings modal
 - Fixed errors when closing a project while async operations are in-flight

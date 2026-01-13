@@ -196,7 +196,7 @@ export class ComponentModel extends Model {
         LEFT JOIN licenses l ON l.spdxid=i.spdxid
 		    LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
 		    LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
-		    WHERE c.source = 'engine' OR c.source='manual';`) as Array<{
+		    WHERE c.source = 'engine' OR ( c.source='manual' AND i.usage != 'dependency');`) as Array<{
       purl: string;
       name: string;
       vendor: string;
@@ -370,10 +370,10 @@ export class ComponentModel extends Model {
     LEFT JOIN licenses l ON l.spdxid=i.spdxid
     LEFT JOIN results r ON r.version = c.version AND r.purl = c.purl
     LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
-    WHERE c.source = 'engine' OR c.source='manual' AND i.source = 'detected'			
-    UNION 
+    WHERE c.source = 'engine' OR c.source='manual' AND i.source = 'detected'
+    UNION
     SELECT d.purl, d.purl as name,'' as vendor ,'' as url,d.version ,i.spdxid as license,i.spdxid,'' as algorithms, i.source,  f.path as file
-    FROM dependencies d 
+    FROM dependencies d
     INNER JOIN component_versions cv ON d.purl = cv.purl AND d.version = cv.version
     INNER JOIN files f ON d.fileId = f.fileId
     INNER JOIN inventories i ON cv.id = i.cvid
@@ -397,7 +397,7 @@ export class ComponentModel extends Model {
  * This method queries the database to get the count of files for each component version, grouped by the package URL (purl) and version.
  * It combines data from detected results and declared dependencies.
  *
- * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} -
  * A promise that resolves to an array of objects, each containing:
  *   - `purl` (string): The package URL of the component.
  *   - `version` (string): The version of the component.
@@ -408,11 +408,11 @@ export class ComponentModel extends Model {
  */
   public async getDetectedComponentFileCount():Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-    const componentsFileCount = await call(`SELECT r.purl,r.version, COUNT(*) as fileCount, 'detected' as source FROM results r 
+    const componentsFileCount = await call(`SELECT r.purl,r.version, COUNT(*) as fileCount, 'detected' as source FROM results r
     GROUP BY r.version, r.purl
     UNION
     SELECT d.purl, d.version, COUNT(*) as fileCount,'declared' as source FROM dependencies d
-    GROUP by d.purl,d.version;`); 
+    GROUP by d.purl,d.version;`);
     return componentsFileCount;
   }
 
@@ -425,7 +425,7 @@ export class ComponentModel extends Model {
  * it retrieves all components.
  *
  * @param {string} [spdxid] - The SPDX identifier to filter the results. If not provided, retrieves all licenses.
- * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} - 
+ * @returns {Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>>} -
  * A promise that resolves to an array of objects, each containing:
  *   - `purl` (string): The package URL of the component.
  *   - `version` (string): The version of the component.
@@ -434,10 +434,10 @@ export class ComponentModel extends Model {
  *
  * @throws {Error} - Throws an error if the database query fails.
  */
-  
+
   public async getIdentifiedComponentFileCount(spdxid?: string):Promise<Array<{ purl: string, version: string, fileCount: number, source: string }>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
-    const componentsFileCount = await call(`SELECT cv.purl, cv.version, count(*) as fileCount, i.source FROM inventories i 
+    const componentsFileCount = await call(`SELECT cv.purl, cv.version, count(*) as fileCount, i.source FROM inventories i
     INNER JOIN component_versions cv ON cv.id = i.cvid
     LEFT JOIN file_inventories fi ON fi.inventoryid = i.id
     WHERE i.source = 'detected'
@@ -447,7 +447,7 @@ export class ComponentModel extends Model {
     INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
     INNER JOIN inventories i ON i.cvid = cv.id  AND instr(d.licenses, i.spdxid) > 0
     WHERE i.source = 'declared' AND (i.spdxid = ? OR ? IS NULL)
-    GROUP BY d.purl, d.version;`, [spdxid, spdxid]); 
+    GROUP BY d.purl, d.version;`, [spdxid, spdxid]);
     return componentsFileCount;
   }
 

@@ -15,7 +15,7 @@ class DependencyHelper {
         auxDep.version = depList.version || depList.requirement || null;
         auxDep.originalVersion = depList.version || depList.requirement || null;
         auxDep.purl = depList.purl;
-        auxDep.url = depList.url;
+        auxDep.url = depList.url || '';
         auxDep.component = depList.component;
         auxDep.scope = depList.scope ? depList.scope : null;
         auxDep.licenses = [];
