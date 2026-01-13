@@ -372,7 +372,7 @@ export class ComponentModel extends Model {
     LEFT JOIN cryptography crypt ON  crypt.purl = c.purl AND crypt.version = c.version
     WHERE c.source = 'engine' OR c.source='manual' AND i.source = 'detected'
     UNION
-    SELECT d.purl, d.purl as name,'' as vendor ,'' as url,d.version ,i.spdxid as license,i.spdxid,'' as algorithms, i.source,  f.path as file
+    SELECT d.purl, d.purl as name,'' as vendor ,d.url as url,d.version ,i.spdxid as license,i.spdxid,'' as algorithms, i.source,  f.path as file
     FROM dependencies d
     INNER JOIN component_versions cv ON d.purl = cv.purl AND d.version = cv.version
     INNER JOIN files f ON d.fileId = f.fileId

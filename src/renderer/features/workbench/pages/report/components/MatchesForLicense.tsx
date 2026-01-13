@@ -4,7 +4,8 @@ import { AutoSizer, Column, Table } from 'react-virtualized';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchComponent } from '@store/component-store/componentThunks';
-import { Link, Box, CircularProgress } from '@mui/material';
+import { IconButton, Link, Box, CircularProgress, Tooltip } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { styled } from '@mui/material/styles';
 
 /* icons  */
@@ -69,7 +70,7 @@ export default function MatchesForLicense({ components , mode, loading  }) {
               <Column
                 label={t('Table:Header:Component')}
                 dataKey="component"
-                width={500}
+                width={310}
                 flexGrow={2}
                 flexShrink={0}
                 cellRenderer={({ rowData }) => (
@@ -98,7 +99,7 @@ export default function MatchesForLicense({ components , mode, loading  }) {
                 )}
               />
 
-              <Column label="Files" dataKey="fileCount" width={100} flexGrow={1} flexShrink={0} />
+              <Column label="Files" dataKey="fileCount" width={2} flexGrow={1} flexShrink={0} />
 
               <Column
                 label={t('Table:Header:License')}
@@ -110,6 +111,27 @@ export default function MatchesForLicense({ components , mode, loading  }) {
                   const data = cellData.join(' - ');
                   return <span title={data}>{data}</span>;
                 }}
+              />
+              <Column
+                label="URL"
+                dataKey="url"
+                width={45}
+                flexShrink={0}
+                cellRenderer={({ cellData }) =>
+                  cellData ? (
+                    <Tooltip title={cellData}>
+                      <IconButton
+                        size="small"
+                        href={cellData}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        component="a"
+                      >
+                        <OpenInNewIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  ) : null
+                }
               />
             </StyledTable>
           )}

@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added component URL to dependency data
 - Included dependency component URL in detected/identified reports
 - Added URL column to dependency table in HTML report
+- Added external link icon with tooltip to dependency tree for opening component URL
+- Added URL column with external link icon to license matches report table
+- Made purl text selectable in dependency tree for copying
 ### Fixed
 - Fixed proxy configuration not being loaded in settings modal
 - Fixed errors when closing a project while async operations are in-flight
