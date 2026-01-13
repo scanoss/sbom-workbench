@@ -5,12 +5,13 @@ export interface DependencyComponentInput {
     file: string;
     component: string;
     purl: string;
+    url: string;
     version: string;
     licenses: string;
 }
 
 export class DeclaredComponentAdapter implements ModelAdapter<Array<DependencyComponentInput>,Array<ReportComponent>> {
-    async run (input: Array<DependencyComponentInput>) {        
+    async run (input: Array<DependencyComponentInput>) {
         const componentMapper = new Map<string, ReportComponent>();
         input.forEach((d)=>{
             const key = `${d.purl}@${d.version}`;
@@ -20,21 +21,21 @@ export class DeclaredComponentAdapter implements ModelAdapter<Array<DependencyCo
               if(licenses){
                 let aux:Array<string>;
                 if(d.licenses){
-                    aux = [...licenses, ...d.licenses.split(',')];                     
+                    aux = [...licenses, ...d.licenses.split(',')];
                 }else{
                     aux = ['unknown'];
                 }
-                component.licenses = Array.from(new Set(aux));                
-              }  
-              component.manifestFiles.push(d.file);          
+                component.licenses = Array.from(new Set(aux));
+              }
+              component.manifestFiles.push(d.file);
             }else {
                 const algorithms = []  as unknown as Array<CryptographyAlgorithms>;
                 const licenses = d.licenses ? d.licenses.split(',') : ['unknown'];
-                componentMapper.set(key,{...d ,licenses ,source:'declared', name: d.purl, manifestFiles: [d.file], vendor:'',url:'',  cryptography:algorithms })
+                componentMapper.set(key,{...d ,licenses ,source:'declared', name: d.purl, manifestFiles: [d.file], vendor:'',url:d.url,  cryptography:algorithms })
             }
         });
 
-        
+
         return Array.from(componentMapper.values());
     }
 }

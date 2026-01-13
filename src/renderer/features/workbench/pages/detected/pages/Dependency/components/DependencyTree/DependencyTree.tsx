@@ -1,10 +1,10 @@
 import React from 'react';
 import {
-  Card, IconButton, ListItem, ListItemIcon, ListItemText, Typography,
+  Card, IconButton, ListItem, ListItemIcon, ListItemText, Tooltip, Typography,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import BanIcon from '@mui/icons-material/NotInterested';
-import { RestoreOutlined } from '@mui/icons-material';
+import { OpenInNew, RestoreOutlined } from '@mui/icons-material';
 import { List, AutoSizer } from 'react-virtualized';
 import WarningOutlinedIcon from '@mui/icons-material/WarningOutlined';
 import { Dependency } from '@api/types';
@@ -55,8 +55,27 @@ const DependencyTree = ({
                     </ListItemIcon>
 
                     <ListItemText
-                      primary={item.component?.name || item.componentName || item.purl}
+                      primary={
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                          {item.component?.name || item.componentName || item.purl}
+                          {item?.url && (
+                            <Tooltip title={item.url}>
+                              <IconButton
+                                size="small"
+                                href={item.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                component="a"
+                                sx={{ padding: 0.25 }}
+                              >
+                                <OpenInNew sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </span>
+                      }
                       secondary={item.purl}
+                      slotProps={{ secondary: { sx: { userSelect: 'text', cursor: 'text' } } }}
                     />
 
                     <div className="info-container version">
