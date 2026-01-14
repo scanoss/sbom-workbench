@@ -61,7 +61,7 @@
   "NothingIdentifiedYetSubtitle": "Verify the scanner output before including them in your SBOM in order to confirm detections or even include your own manual identifications.",
   "NoLicensesFound": "No licenses found",
   "LoadingObligationsInfo": "Loading obligations info...",
-  "NScannedFiles": "{{count}} scanned files",
+  "NScannedFiles": "{{countScanned}} of {{totalFiles}} files scanned",
   "NTotalFiles": "{{count}} total files",
   "NDetectedFiles": "{{count}} detected files",
   "NeedApiKeyVulnerability": "You need an API key to review your vulnerabilities. <1>Get yours now.</1>",

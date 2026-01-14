@@ -103,7 +103,10 @@ const MatchesChart = ({ data }) => {
           </div>
           <div className="total-files-container">
             <span className="total-files-label">
-              {t('NScannedFiles', { count: data.summary.noMatchFiles + data.summary.matchFiles})}
+              {t('NScannedFiles', {
+                countScanned: (data.summary.noMatchFiles + data.summary.matchFiles),
+                totalFiles: data.summary.totalFiles
+              })}
             </span>
           </div>
         </>
