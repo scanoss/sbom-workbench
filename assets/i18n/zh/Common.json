@@ -57,7 +57,7 @@
   "NothingIdentifiedYetSubtitle": "在将扫描仪输出包含在您的 SBOM 中之前验证扫描仪输出，以确认检测或什至包含您自己的手动识别。",
   "NoLicensesFound": "未找到许可证",
   "LoadingObligationsInfo": "加载义务信息...",
-  "NScannedFiles": "{{count}} 已扫描的文件",
+  "NScannedFiles": "已扫描 {{countScanned}} / {{totalFiles}} 个文件",
   "NTotalFiles": "{{count}} 文件总数",
   "NDetectedFiles": "{{count}} 已检测的文件",
   "NeedApiKeyVulnerability": "您需要一个 API 密钥来检查您的漏洞。<1>立即得到。</1>",

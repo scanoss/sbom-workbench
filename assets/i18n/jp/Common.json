@@ -60,7 +60,7 @@
   "NothingIdentifiedYetSubtitle": "SBOMの中を検知、主導で確認する前にスキャナーの結果で確定させる.",
   "NoLicensesFound": "ライセンスが見つかりません",
   "LoadingObligationsInfo": "オブリゲーションをロード中...",
-  "NScannedFiles": "{{count}} ファイルをスキャン",
+  "NScannedFiles": "{{totalFiles}} ファイル中 {{countScanned}} ファイルをスキャン済み",
   "NTotalFiles": "{{count}} ファイル",
   "NDetectedFiles": "{{count}} 検出ファイル",
   "NeedApiKeyVulnerability": "脆弱性検索にAPI鍵が必要です. <1>Get yours now.</1>",
