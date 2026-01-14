@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Fixed proxy configuration not being loaded in settings modal
 - Fixed errors when closing a project while async operations are in-flight
 ### Changed
 - Improved error dialog layout for long messages (responsive width, word-break support)
