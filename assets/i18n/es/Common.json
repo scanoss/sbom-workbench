@@ -60,7 +60,7 @@
   "NothingIdentifiedYetSubtitle": "Verifique la salida del escáner antes de incluirlos en su SBOM para confirmar las detecciones o incluso incluir sus propias identificaciones manualmente.",
   "NoLicensesFound": "No se encontraron licencias",
   "LoadingObligationsInfo": "Cargando información de las obligaciones...",
-  "NScannedFiles": "{{count}} ficheros escaneados",
+  "NScannedFiles": "{{countScanned}} de {{totalFiles}} ficheros escaneados",
   "NTotalFiles": "{{count}} ficheros totales",
   "NDetectedFiles": "{{count}} ficheros detectados",
   "NeedApiKeyVulnerability": "Necesitas una API Key para ver tus vulnerabilidades. <1>Consigue la tuya ahora</1>",
