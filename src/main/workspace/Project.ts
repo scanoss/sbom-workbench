@@ -300,6 +300,5 @@ export class Project {
 
   public setTree(tree: Tree) {
     this.tree = tree;
-    this.metadata.setFileCounter(tree.getSummarize().include);
   }
 }

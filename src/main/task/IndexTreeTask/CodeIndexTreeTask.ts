@@ -83,7 +83,7 @@ export class CodeIndexTreeTask  extends IndexTreeTask {
     this.project.filesSummary = summary;
     this.project.filesNotScanned = {};
     this.project.processedFiles = 0;
-    this.project.metadata.setFileCounter(summary.include);
+    this.project.metadata.setFileCounter(summary.total);
     this.project.setTree(tree);
     this.project.save();
   }
