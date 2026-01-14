@@ -1,12 +1,12 @@
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
-import { FilesList } from 'scanoss';
 import { Dependency } from '../../api/types';
 import { Dependency as Dep } from '../model/entity/Dependency';
+import { IDependencyFile } from 'scanoss';
 
 class DependencyHelper {
-  public dependencyModelAdapter(fileList: Array<FilesList>, files: Record<string, number>): Array<Dep> {
+  public dependencyModelAdapter(fileList: Array<IDependencyFile>, files: Record<string, number>): Array<Dep> {
     const dependencies : Array<Dep> = [];
     fileList.forEach((file) => {
       file.dependenciesList.forEach((depList) => {
