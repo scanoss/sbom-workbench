@@ -920,7 +920,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
         INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
         UNION
     SELECT DISTINCT component, d.purl, d.originalVersion as detected_version ,null as vendor,
-      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, '' as url, NULL as url_hash, NULL as download_url
+      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, '' as concluded_licenses, d.url as url, NULL as url_hash, NULL as download_url
     FROM dependencies d;`;
 
   IDENTIFIED_REPORT_DATA = `SELECT coalesce(cv.name,'') as component, cv.purl,cv.version,r.vendor,
@@ -937,7 +937,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       GROUP BY cv.purl, cv.version, concluded_licenses
       UNION
       SELECT cv.name as component,cv.purl,d.version as concluded_version,null as vendor,
-      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, '' as url, NULL as url_hash, NULL as download_url
+      REPLACE(d.originalLicense, ',', ' AND ') as detected_licenses, i.spdxid as concluded_licenses, d.url as url, NULL as url_hash, NULL as download_url
       FROM dependencies d
       INNER JOIN component_versions cv ON cv.purl = d.purl and cv.version = d.version
       INNER JOIN inventories i ON cv.id = i.cvid
