@@ -33,7 +33,9 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
       open={open}
       sx={{
         '& .MuiDialog-paper': {
-          width: 400,
+          minWidth: 400,
+          maxWidth: 800,
+          width: 'auto',
         },
       }}
       onClose={handleCancel}
@@ -61,6 +63,7 @@ export const ConfirmDialog = (props: ConfirmDialogProps) => {
             fontSize: '20px',
             color: '#27272A !important',
             whiteSpace: 'pre-line',
+            wordBreak: 'break-word',
           }}
         >
           <span dangerouslySetInnerHTML={{ __html: message }} />
