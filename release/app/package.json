@@ -1,6 +1,6 @@
 {
   "name": "scanoss-workbench",
-  "version": "1.29.0",
+  "version": "1.30.0-rc3",
   "description": "Desktop version to use SCANOSS OSS in your projects",
   "license": "GPL-2.0-only",
   "author": {
