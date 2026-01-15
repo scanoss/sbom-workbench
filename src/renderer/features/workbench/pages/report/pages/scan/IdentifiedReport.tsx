@@ -29,13 +29,14 @@ import CryptographyCard from '../../components/CryptographyCard';
 Chart.register(...registerables);
 
 const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: any, onRefresh: () => void }) => {
-  const { projectScannerConfig } = useSelector(selectWorkbench);
+  const { projectScannerConfig, loaded } = useSelector(selectWorkbench);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const location = useLocation();
 
   const [tab, setTab] = useState<string>('matches');
 
+  const isMounted = useRef(true);
   const layers = useRef<Set<Scanner.PipelineStage>>(new Set(projectScannerConfig?.pipelineStages));
   const obligations = useRef<any[]>([]);
 
@@ -53,30 +54,43 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
     const licenses = data.licenses.map((license) => license.label);
 
     obligations.current = await obligationsService.getObligations(licenses);
+    if (!isMounted.current || !loaded) return;
     setObligationsFiltered(obligations.current);
 
     onLicenseClear();
   };
 
   const onLicenseSelected = async (license: string) => {
+    if (!loaded) return;
     const matchedLicense = data.licenses.find((item) => item.label === license);
 
-    const identified = await reportService.getIdentifiedComponents(license);
+    try {
+      const identified = await reportService.getIdentifiedComponents(license);
+      if (!isMounted.current || !loaded) return;
 
-    setComponentsMatched(identified.components);
-    setComponentsDeclared(identified.declaredComponents);
-    setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
-    setLicenseSelected(matchedLicense);
+      setComponentsMatched(identified.components);
+      setComponentsDeclared(identified.declaredComponents);
+      setObligationsFiltered(obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)));
+      setLicenseSelected(matchedLicense);
+    } catch (e) {
+      if (!isMounted.current || !loaded) return;
+      throw e;
+    }
   };
 
   const onLicenseClear = async () => {
-    const items = data.components;
-    const identified = await reportService.getIdentifiedComponents();
-    setComponentsMatched(identified.components);
-    setComponentsDeclared(identified.declaredComponents);
-    setObligationsFiltered(obligations.current);
-
-    setLicenseSelected(null);
+    if (!loaded) return;
+    try {
+      const identified = await reportService.getIdentifiedComponents();
+      if (!isMounted.current || !loaded) return;
+      setComponentsMatched(identified.components);
+      setComponentsDeclared(identified.declaredComponents);
+      setObligationsFiltered(obligations.current);
+      setLicenseSelected(null);
+    } catch (e) {
+      if (!isMounted.current || !loaded) return;
+      throw e;
+    }
   };
 
   useEffect(() => {
@@ -92,6 +106,9 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
 
   useEffect(() => {
     init();
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   // empty report

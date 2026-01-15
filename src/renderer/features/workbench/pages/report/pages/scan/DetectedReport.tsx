@@ -26,12 +26,13 @@ import { ReportComponent } from '../../../../../../../main/services/ReportServic
 Chart.register(...registerables);
 
 const DetectedReport = ({ data, summary, onRefresh }) => {
-  const { projectScannerConfig } = useSelector(selectWorkbench);
+  const { projectScannerConfig, loaded } = useSelector(selectWorkbench);
   const { t } = useTranslation();
   const location = useLocation();
 
   const [tab, setTab] = useState<string>('matches');
 
+  const isMounted = useRef(true);
   const layers = useRef<Set<Scanner.PipelineStage>>(new Set(projectScannerConfig?.pipelineStages));
   const obligations = useRef<any[]>([]);
 
@@ -47,29 +48,43 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
     const licenses = data.licenses.map((license) => license.label);
 
     obligations.current = await obligationsService.getObligations(licenses);
+    if (!isMounted.current || !loaded) return;
     setObligationsFiltered(obligations.current);
 
     await onLicenseClear();
   };
 
   const onLicenseSelected = async (license: string) => {
+    if (!loaded) return;
     const matchedLicense = data.licenses.find((item) => item.label === license);
-    // const filtered = data.components.filter((item) => item.licenses.includes(matchedLicense.label));
-    const detected = await reportService.getDetectedComponents(license);
-    setComponentsMatched(detected.components); // filtered.filter((item) => item.source === 'detected'));
-    setComponentsDeclared(detected.declaredComponents); // filtered.filter((item) => item.source === 'declared'));
-    setObligationsFiltered(
-      obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)),
-    );
-    setLicenseSelected(matchedLicense);
+    try {
+      const detected = await reportService.getDetectedComponents(license);
+      if (!isMounted.current || !loaded) return;
+      setComponentsMatched(detected.components);
+      setComponentsDeclared(detected.declaredComponents);
+      setObligationsFiltered(
+        obligations.current.filter((item) => item.label === license || item.incompatibles?.includes(license)),
+      );
+      setLicenseSelected(matchedLicense);
+    } catch (e) {
+      if (!isMounted.current || !loaded) return;
+      throw e;
+    }
   };
 
   const onLicenseClear = async () => {
-    const detected = await reportService.getDetectedComponents();
-    setComponentsDeclared(detected.declaredComponents);
-    setObligationsFiltered(obligations.current);
-    setComponentsMatched(detected.components);
-    setLicenseSelected(null);
+    if (!loaded) return;
+    try {
+      const detected = await reportService.getDetectedComponents();
+      if (!isMounted.current || !loaded) return;
+      setComponentsDeclared(detected.declaredComponents);
+      setObligationsFiltered(obligations.current);
+      setComponentsMatched(detected.components);
+      setLicenseSelected(null);
+    } catch (e) {
+      if (!isMounted.current || !loaded) return;
+      throw e;
+    }
   };
 
   useEffect(() => {
@@ -86,6 +101,9 @@ const DetectedReport = ({ data, summary, onRefresh }) => {
   useEffect(() => {
     console.log("DetectedReport useEffect, init");
     init();
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   return (

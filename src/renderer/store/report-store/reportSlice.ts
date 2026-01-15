@@ -29,6 +29,10 @@ export const reportSlice = createSlice({
   extraReducers: {
     [getReport.pending.type]: (state) => { state.isLoading = true; },
     [getReport.fulfilled.type]: (state, action: PayloadAction<any>) => {
+      if (!action.payload) {
+        state.isLoading = false;
+        return;
+      }
       const { summary, detected, identified } = action.payload;
       state.summary = summary;
       state.detected = {
