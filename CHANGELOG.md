@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.30.0] - 2026-01-15
 ### Added
 - Added keyboard shortcuts for code viewer zoom (Cmd/Ctrl + +/-, Cmd/Ctrl + 0 to reset)
 - Added mouse wheel zoom support in code viewer (Cmd/Ctrl + scroll)
@@ -107,4 +109,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.27.0]: https://github.com/scanoss/sbom-workbench/compare/v1.26.1...v1.27.0
 [1.28.0]: https://github.com/scanoss/sbom-workbench/compare/v1.27.0...v1.28.0
 [1.29.0]: https://github.com/scanoss/sbom-workbench/compare/v1.28.0...v1.29.0
+[1.30.0]: https://github.com/scanoss/sbom-workbench/compare/v1.29.0...v1.30.0
 
