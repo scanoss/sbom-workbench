@@ -59,7 +59,9 @@ const ScanReport = () => {
     const init = async () => {
       if (location.pathname.endsWith('scan')) { // only reload if user click in main item (avoid reload on back navigation)
         const { payload } = await dispatch<any>(getReport());
-        setTab(payload.identified);
+        if (payload) {
+          setTab(payload.identified);
+        }
       }
     };
     init();
