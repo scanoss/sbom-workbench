@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Added keyboard shortcuts for code viewer zoom (Cmd/Ctrl + +/-, Cmd/Ctrl + 0 to reset)
+- Added mouse wheel zoom support in code viewer (Cmd/Ctrl + scroll)
 - Added component URL to dependency data
 - Included dependency component URL in detected/identified reports
 - Added URL column to dependency table in HTML report

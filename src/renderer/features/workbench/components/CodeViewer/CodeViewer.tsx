@@ -44,6 +44,39 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
 
       // set editor in manager
       CodeViewerManagerInstance.set(id, editor.current);
+
+      // Add zoom actions (visible in F1 command palette)
+      editor.current.addAction({
+        id: 'editor.action.fontZoomIn',
+        label: 'Zoom In',
+        keybindings: [
+          monaco.KeyMod.CtrlCmd | monaco.KeyCode.Equal,
+          monaco.KeyMod.CtrlCmd | monaco.KeyCode.NumpadAdd
+        ],
+        run: (ed) => {
+          const currentSize = ed.getOption(monaco.editor.EditorOption.fontSize);
+          ed.updateOptions({ fontSize: Math.min(currentSize + 2, 40) });
+        }
+      });
+
+      editor.current.addAction({
+        id: 'editor.action.fontZoomOut',
+        label: 'Zoom Out',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Minus],
+        run: (ed) => {
+          const currentSize = ed.getOption(monaco.editor.EditorOption.fontSize);
+          ed.updateOptions({ fontSize: Math.max(currentSize - 2, 8) });
+        }
+      });
+
+      editor.current.addAction({
+        id: 'editor.action.fontZoomReset',
+        label: 'Reset Zoom',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit0],
+        run: (ed) => {
+          ed.updateOptions({ fontSize: 12 });
+        }
+      });
     }
   };
 
@@ -64,6 +97,7 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
     glyphMargin: highlight && highlight !== 'all',
     overviewRulerLanes: 3, // Enable overview ruler with 3 lanes
     overviewRulerBorder: false,
+    mouseWheelZoom: true,
     minimap: {
       enabled: true,
       showSlider: 'mouseover', // Show preview on hover
