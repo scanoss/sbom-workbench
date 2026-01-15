@@ -398,6 +398,18 @@ Change which API is used by default:
 The SBOM Workbench includes support for a collaborative workspace, a feature designed to enhance teamwork. View more details [here](COLLAB_WORKSPACE.md).
 
 
+## Code Viewer Keyboard Shortcuts
+
+The code viewer supports the following keyboard shortcuts for zooming:
+
+| Action | macOS | Windows/Linux |
+|--------|-------|---------------|
+| Zoom In | `Cmd + +` | `Ctrl + +` |
+| Zoom Out | `Cmd + -` | `Ctrl + -` |
+| Reset Zoom | `Cmd + 0` | `Ctrl + 0` |
+
+You can also zoom using `Ctrl/Cmd + Mouse Wheel`. Press `F1` to open the command palette and see all available commands.
+
 ## Contributing
 
 SBOM Workbench is an open source project, and we love to receive contributions from our community. There are many ways to contribute. For more information see the [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
