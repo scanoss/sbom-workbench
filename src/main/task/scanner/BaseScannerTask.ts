@@ -5,6 +5,9 @@ import {
   ScannerEvents,
   ScannerInput,
 } from 'scanoss';
+
+import {Scanoss} from '@scanoss_test/sdk'
+
 import log from 'electron-log';
 import fs from 'fs';
 import { ProjectSource, ScanState } from '../../../api/types';
@@ -26,6 +29,8 @@ import  { EOL } from 'os';
 export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> implements ScannerModule.IPipelineTask {
   protected scanner: Scanner;
 
+  protected scanoss: Scanoss;
+
   protected scannerState: ScanState;
 
   protected project: Project;
@@ -42,6 +47,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     this.project = project;
     this.dispatcher = dispatch;
     this.inputAdapter = inputAdapter;
+    this.scanoss = new Scanoss();
   }
 
   protected sendToUI(eventName, data: any) {
@@ -237,7 +243,36 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
   private async scan(): Promise<string | undefined> {
     const scanIn = await this.inputAdapter.adapterToScannerInput(this.project.filesToScan);
-    return this.scanner.scan(scanIn);
+
+      const {APIS, DEFAULT_API_INDEX} =  userSettingService.get();
+
+      const baseApi = this.project.getApi() || APIS[DEFAULT_API_INDEX].URL;
+
+      const r = await this.scanoss.scan({
+        batchSize: 10,
+        apiUrl: baseApi + "/scan/direct",
+        apiKey: this.project.getApiKey() || APIS[DEFAULT_API_INDEX].API_KEY,
+        path: this.project.getScanRoot(),
+        onProgress: (progress) => {
+          const p = (100 * progress.filesScanned) / progress.totalFiles;
+          log.info(p);
+          log.info("PROGRESS:" , p);
+          this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {processed: p });
+       }
+    })
+
+    const resultPath = `${this.project.getMyPath()}/result.json`;
+    const results = JSON.parse(r.rawJson)
+
+    const withPathFixedResults = {}
+    Object.keys(results).forEach(key => {
+      withPathFixedResults[`/${key}`] = results[key]
+    })
+
+    fs.writeFileSync(resultPath, JSON.stringify(withPathFixedResults, undefined, 2) );
+
+
+    return resultPath
   }
 
   public cleanWorkDirectory() {

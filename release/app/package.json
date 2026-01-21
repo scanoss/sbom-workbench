@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^9.4.1",
+    "@scanoss_test/sdk": "^2.0.12",
     "flexsearch": "^0.8.151",
     "sqlite3": "^5.1.6"
   }
