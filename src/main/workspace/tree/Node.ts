@@ -134,7 +134,7 @@ export default abstract class Node {
     this.isBinaryFile = isBinaryFile;
   }
 
-  public isBinaryDile():boolean {
+  public getIsBinaryFile():boolean {
     return this.isBinaryFile;
   }
 
