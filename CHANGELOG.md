@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fixed cryptography analysis blacklist logic to correctly exclude hidden files, binary files, and configuration files
 
 ## [1.30.0] - 2026-01-15
 ### Added
