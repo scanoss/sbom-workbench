@@ -9,6 +9,7 @@ import { ScannerStage } from '../../../../api/types';
 import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.adapter';
 import { cryptographyService } from '../../../services/CryptographyService';
 import appConfigModule from '../../../../config/AppConfigModule';
+import { BlackListCryptography } from '../../../workspace/tree/blackList/BlackListCrytography';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
@@ -62,14 +63,8 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const scanRoot = this.project.getScanRoot();
-      const files = this.project.getTree().getRootFolder().getFiles();
-
-      // Build blacklist with full paths (only filters files at project root)
-      const blacklist = new Set(this.CRYPTO_BLACKLIST_FILES.map((f) => path.join(scanRoot, f)));
-
-      // Filter binary files and blacklisted files
+      const files = this.project.getTree().getRootFolder().getFiles(new BlackListCryptography(scanRoot));
       const filePaths = files
-        .filter((f) => !f.isBinaryFile && !blacklist.has(path.join(scanRoot, f.path)))
         .map((f) => path.join(scanRoot, f.path));
 
       // Create map to get fileId from absolute file path
