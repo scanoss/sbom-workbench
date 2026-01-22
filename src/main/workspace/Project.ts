@@ -13,6 +13,8 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
+import { workspace } from './Workspace';
+import path from 'path';
 
 export class Project {
   work_root: string;
@@ -145,8 +147,8 @@ export class Project {
     this.metadata.setScannerConfig(value);
   }
 
-  public setScanPath(name: string) {
-    this.metadata.setScanRoot(name);
+  public setScanPath(scanRoot: string) {
+    this.metadata.setScanRoot(scanRoot);
   }
 
   public setLicense(license: string) {

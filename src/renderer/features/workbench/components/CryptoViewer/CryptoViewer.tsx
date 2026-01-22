@@ -10,6 +10,7 @@ import { selectWorkbench } from '@store/workbench-store/workbenchSlice';
 import { FileContent } from '../../pages/detected/pages/Editor/Editor';
 import { CodeViewerManager } from '../../pages/detected/pages/Editor/CodeViewerManager';
 import { cryptographyService } from '@api/services/cryptography.service';
+import { fileService } from '@api/services/file.service';
 import { getExtension } from '@shared/utils/utils';
 import { Card, useTheme, Collapse, IconButton, Snackbar, Alert } from '@mui/material';
 
@@ -55,8 +56,9 @@ const CryptoViewer = () => {
     }
   };
 
-  const copyFilePath = () => {
-    navigator.clipboard.writeText(`${sourceCodePath}/${file}`);
+  const copyFilePath = async () => {
+    const absolutePath = await fileService.getFilePath(`${sourceCodePath}/${file}`);
+    navigator.clipboard.writeText(absolutePath);
     setShowCopiedSnackbar(true);
   }
 

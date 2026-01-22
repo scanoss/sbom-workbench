@@ -24,5 +24,15 @@ class FileService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.FILE_GET_REMOTE_CONTENT, fileHash);
     return this.response(response);
   }
+
+  public async showItemInFolder(filePath: string): Promise<void> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.SHELL_SHOW_ITEM_IN_FOLDER, filePath);
+    return this.response(response);
+  }
+
+  public async getFilePath(filePath: string): Promise<string> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.SHELL_GET_FILE_PATH, filePath);
+    return this.response(response);
+  }
 }
 export const fileService = new FileService();

@@ -6,6 +6,8 @@ import packageJson from '../../../release/app/package.json';
 import { Scanner } from '../task/scanner/types';
 import * as ScannerCFG from '../task/scanner/types';
 import { workspace } from './Workspace';
+import path from 'path';
+import { userSettingService } from '../services/UserSettingService';
 
 export class Metadata {
   private appVersion: string;
@@ -84,6 +86,12 @@ export class Metadata {
   }
 
   public setScanRoot(scanRoot: string) {
+    const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
+    const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
+    if(scanRoot.includes(scanSources)){
+      this.scan_root = path.relative(scanSources, scanRoot);
+      return;
+    }
     this.scan_root = scanRoot;
   }
 
@@ -135,8 +143,11 @@ export class Metadata {
     return this.uuid;
   }
 
-  public getScanRoot() {
-    return this.scan_root;
+  public getScanRoot(): string {
+    const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
+    const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
+    const fromPath =  scanSources ? scanSources : workspace.getMyPath();
+    return path.resolve(fromPath,this.scan_root);
   }
 
   public getState() {
@@ -172,6 +183,12 @@ export class Metadata {
   }
 
   public setSourceCodePath(sourceCodePath: string) {
+    const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
+    const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
+    if(sourceCodePath.includes(scanSources)){
+      this.sourceCodePath = path.relative(scanSources, sourceCodePath);
+      return;
+    }
     this.sourceCodePath = sourceCodePath;
   }
 

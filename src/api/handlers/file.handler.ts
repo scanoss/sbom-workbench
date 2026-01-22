@@ -1,5 +1,6 @@
 import log from 'electron-log';
 import * as fs from 'fs';
+import { shell } from 'electron';
 import api from '../api';
 import { GetFileDTO } from '@api/dto';
 import { IpcChannels } from '../ipc-channels';
@@ -12,6 +13,7 @@ import { resultService } from '../../main/services/ResultService';
 import { fileService } from '../../main/services/FileService';
 import { Response, ResponseStatus } from '../Response';
 import { broadcastManager } from '../../main/broadcastManager/BroadcastManager';
+import { projectService } from '../../main/services/ProjectService';
 
 const path = require('path');
 const isBinaryPath = require('is-binary-path');
@@ -60,6 +62,8 @@ function isAllowed(filePath: string) {
 api.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
   const fileContent = { content: null };
   try {
+    const basePath = projectService.getSourceCodeBasePath()
+    filePath = fileService.normalizePath(path.join(basePath,filePath));
     if (!isAllowed(filePath)) {
       fileContent.content = FileType.BINARY;
     } else {
@@ -119,6 +123,31 @@ api.handle(IpcChannels.FILE_GET_REMOTE_CONTENT, async (_event, fileHash: string)
     return Response.ok({ message: 'Remote file content retrieve successfully', data });
   } catch (error: any) {
     log.error('[ REMOTE FILE CONTENT ]:', error, fileHash);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.SHELL_SHOW_ITEM_IN_FOLDER, async (_event, filePath: string) => {
+  try {
+    const basePath = projectService.getSourceCodeBasePath()
+    const absoluteFilePath = path.resolve(basePath, filePath);
+    const normalizedPath = fileService.normalizePath(absoluteFilePath);
+    shell.showItemInFolder(normalizedPath);
+    return Response.ok({ message: 'Item shown in folder' });
+  } catch (error: any) {
+    log.error('[ SHELL_SHOW_ITEM_IN_FOLDER ]:', error, filePath);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.SHELL_GET_FILE_PATH, async (_event, filePath: string) => {
+  try {
+    const basePath = projectService.getSourceCodeBasePath()
+    const absoluteFilePath = path.resolve(basePath, filePath);
+    const normalizedPath = fileService.normalizePath(absoluteFilePath);
+    return Response.ok({ message: 'File path retrieved', data: normalizedPath });
+  } catch (error: any) {
+    log.error('[ SHELL_GET_FILE_PATH ]:', error, filePath);
     return Response.fail({ message: error.message });
   }
 });

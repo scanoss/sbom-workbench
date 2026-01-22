@@ -2,6 +2,7 @@ import React from 'react';
 
 import {IconButton, ListItemText} from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { fileService } from '@api/services/file.service';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
 
@@ -30,6 +31,19 @@ interface IAction {
 const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) => {
   const { t } = useTranslation();
 
+  const handleCopyPath = async () => {
+    if (fullpath?.startsWith('http')) {
+      navigator.clipboard.writeText(fullpath);
+    } else {
+      const absolutePath = await fileService.getFilePath(fullpath);
+      navigator.clipboard.writeText(absolutePath);
+    }
+  };
+
+  const handleOpenInFolder = async () => {
+    await fileService.showItemInFolder(fullpath);
+  };
+
   const ACTIONS: IAction[] = [
     {
       id: ToolbarActions.FIND,
@@ -41,13 +55,13 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
       id: ToolbarActions.COPY_PATH,
       hint: t('Tooltip:CopyFilePath'),
       icon: <i className="ri-file-copy-line" />,
-      run: () => navigator.clipboard.writeText(fullpath),
+      run: () => handleCopyPath(),
     },
     {
       id: ToolbarActions.OPEN,
       hint: t('Tooltip:OpenFileInFolder'),
       icon: <i className="ri-share-box-line" />,
-      run: () => window.shell.showItemInFolder(fullpath),
+      run: () => handleOpenInFolder(),
     },
     {
       id: ToolbarActions.OPEN_IN_BROWSER,

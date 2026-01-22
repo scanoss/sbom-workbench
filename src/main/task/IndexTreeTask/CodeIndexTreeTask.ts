@@ -58,6 +58,7 @@ export class CodeIndexTreeTask  extends IndexTreeTask {
     };
 
     // Start scanning from root
+
     await scanDirectory(this.project.getScanRoot(), this.project.getScanRoot());
 
     // Process remaining files in the last chunk

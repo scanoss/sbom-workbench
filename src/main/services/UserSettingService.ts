@@ -33,6 +33,7 @@ class UserSettingService {
         NAME: 'My Workspace',
         PATH: path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME),
         DESCRIPTION: '',
+        SCAN_SOURCES: ''
       },
     ],
     SCAN_MODE: 'FULL_SCAN',
@@ -56,10 +57,26 @@ class UserSettingService {
     this.store = this.defaultStore;
   }
 
+  private createScanSourcesFolder(scanSourcesPath: string) {
+    try{
+      log.info('Creating scan sources folder: ', scanSourcesPath);
+      if (!fs.existsSync(scanSourcesPath)) {
+        fs.mkdirSync(scanSourcesPath, { recursive: true });
+      }
+    } catch(e: any) {
+      log.error('Error creating scan sources folder: ', scanSourcesPath, e.message);
+    }
+  }
+
   // WARNING: Despite accepting Partial<IWorkspaceCfg>, this method requires APIS and DEFAULT_API_INDEX
   // to be present to avoid runtime errors. Always pass the full settings object from get().
   public set(setting: Partial<IWorkspaceCfg>) {
     if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
+
+    const scanSourcesPath = setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES;
+    if(scanSourcesPath) {
+      this.createScanSourcesFolder(scanSourcesPath);
+    }
 
     if (setting.APIS.length <= 0) {
       throw new Error('At least one API URL must be provided');
