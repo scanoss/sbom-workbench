@@ -35,5 +35,6 @@
   "ImportProjectFromWFPPlaceHolder": "WFP file path",
   "ImportWorkbenchProjectTitle": "Import Workbench project",
   "ImportWorkbenchProjectPlaceHolder":"Workbench project zip file path",
-  "SelectSourceCodePath": "Select source code path (optional)"
+  "SelectSourceCodePath": "Select source code path (optional)",
+  "ScanSourceLocation": "スキャンソースの場所"
 }

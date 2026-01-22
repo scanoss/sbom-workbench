@@ -13,6 +13,7 @@ import { ScannerPipelineFactory } from '../task/scanner/scannerPipelineFactory/S
 import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKnowledgeExtractor';
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
+import path from 'path';
 
 class ProjectService {
 
@@ -164,6 +165,29 @@ class ProjectService {
   public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Array<Inventory>> {
     const inventories = await new ReuseIdentificationTask(param).run();
     return inventories;
+  }
+
+  private getBaseSourcePath(){
+    const scanSources = userSettingService.get().WORKSPACES[userSettingService.get().DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES;
+    const workspacePath = userSettingService.get().WORKSPACES[userSettingService.get().DEFAULT_WORKSPACE_INDEX].PATH;
+    if (scanSources){
+      return scanSources;
+    }
+    return workspacePath;
+  }
+
+  public getScanRootBasePath(): string{
+    const p = workspace.getOpenProject();
+    const scanPath = p.getScanRoot();
+    const baseSourcePath = this.getBaseSourcePath();
+    return path.resolve(baseSourcePath, scanPath);
+  }
+
+  public getSourceCodeBasePath(): string{
+    const p = workspace.getOpenProject();
+    const sourceCodePath = p.getSourceCodePath();
+    const baseSourcePath = this.getBaseSourcePath();
+    return path.resolve(baseSourcePath, sourceCodePath);
   }
 }
 

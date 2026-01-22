@@ -53,6 +53,7 @@ export interface WorkspaceData {
   NAME: string;
   PATH: string;
   DESCRIPTION: string;
+  SCAN_SOURCES: string;
 }
 
 export interface Node {

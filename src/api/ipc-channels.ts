@@ -90,6 +90,9 @@ export enum IpcChannels {
   FILE_GET = 'FILE_GET',
   FILE_GET_REMOTE_CONTENT = 'FILE_GET_REMOTE_CONTENT',
 
+  SHELL_SHOW_ITEM_IN_FOLDER = 'SHELL_SHOW_ITEM_IN_FOLDER',
+  SHELL_GET_FILE_PATH = 'SHELL_GET_FILE_PATH',
+
   RESULTS_GET = 'RESULTS_GET',
 
   EXPORT = 'EXPORT',
@@ -216,6 +219,8 @@ export const ipcRendererEvents = [
   IpcChannels.FILE_GET,
   IpcChannels.IGNORED_FILES,
   IpcChannels.FILE_GET_REMOTE_CONTENT,
+  IpcChannels.SHELL_SHOW_ITEM_IN_FOLDER,
+  IpcChannels.SHELL_GET_FILE_PATH,
 
   IpcChannels.RESULTS_GET,
 

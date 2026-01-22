@@ -41,5 +41,6 @@
   "ImportProjectFromWFPPlaceHolder": "Ruta al archivo WFP",
   "ImportWorkbenchProjectTitle": "Importar proyecto Workbench",
   "ImportWorkbenchProjectPlaceHolder":"Ruta al zip del proyecto Workbench",
-  "SelectSourceCodePath": "Seleccionar path del codigo fuente (opcional)"
+  "SelectSourceCodePath": "Seleccionar path del codigo fuente (opcional)",
+  "ScanSourceLocation": "Ubicación del código fuente"
 }

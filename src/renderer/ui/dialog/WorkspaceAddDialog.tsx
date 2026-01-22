@@ -13,6 +13,7 @@ const initial: WorkspaceData = {
   NAME: '',
   PATH: '',
   DESCRIPTION: '',
+  SCAN_SOURCES: '',
 };
 
 interface WorkspaceAddDialogProps {
@@ -34,9 +35,20 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
     if (paths && paths.length > 0) {
       const PATH = paths[0];
       const NAME = PATH.split(window.path.sep)[PATH.split(window.path.sep).length - 1];
-      setData({ ...data, NAME, PATH });
+      const SCAN_SOURCES = window.path.resolve(PATH,'scanoss-scan-sources');
+      setData({ ...data, NAME, PATH, SCAN_SOURCES });
     }
   };
+
+  const onSelectSourceHandler = async () => {
+    const paths = await dialogController.showOpenDialog({
+      properties: ['openDirectory', 'createDirectory'],
+    });
+    if (paths && paths.length > 0) {
+      const SCAN_SOURCES = paths[0];
+      setData({ ...data, SCAN_SOURCES });
+    }
+  }
 
   const isValid = (): boolean => {
     return data.NAME && data.PATH;
@@ -134,6 +146,49 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
               />
             </Paper>
           </div>
+
+          <Box
+            className="dialog-row"
+            sx={{
+              alignItems: 'end',
+              '& > .dialog-form-field:nth-child(2)': {
+                flex: '0 !important',
+              },
+            }}
+          >
+            <div className="dialog-form-field">
+              <label className="dialog-form-field-label"> {t('Dialog:ScanSourceLocation')}</label>
+              <Paper
+                className="dialog-form-field-control"
+                sx={{
+                  width: '400px',
+                }}
+              >
+                <TextField
+                  name="location"
+                  size="small"
+                  fullWidth
+                  value={data.SCAN_SOURCES || ''}
+                  autoFocus
+                  onChange={(e) => setData({ ...data, SCAN_SOURCES: e.target.value })}
+                />
+              </Paper>
+            </div>
+            <div className="dialog-form-field">
+              <Button
+                type="button"
+                variant="outlined"
+                color="primary"
+                sx={{
+                  height: '41px',
+                }}
+                startIcon={<SearchIcon />}
+                onClick={onSelectSourceHandler}
+              >
+                {t('Button:Choose')}
+              </Button>
+            </div>
+          </Box>
         </div>
         <DialogActions>
           <Button color="inherit" tabIndex={-1} onClick={onCancel}>
