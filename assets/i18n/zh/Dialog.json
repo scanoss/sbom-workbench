@@ -34,5 +34,6 @@
   "ImportWorkbenchProjectPlaceHolder":"Workbench project zip file path",
   "SelectSourceCodePath": "Select source code path (optional)",
   "ScanSourceLocation": "扫描源位置",
-  "ScanSourceCannotBeSameAsWorkspace": "扫描源文件夹不能与工作区文件夹相同"
+  "ScanSourceCannotBeSameAsWorkspace": "扫描源文件夹不能与工作区文件夹相同",
+  "WorkspacePathAlreadyExists": "此工作区路径已被注册"
 }

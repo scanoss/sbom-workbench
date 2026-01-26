@@ -21,11 +21,12 @@ interface WorkspaceAddDialogProps {
   open: boolean;
   onClose: (response: DialogResponse) => void;
   onCancel: () => void;
+  existingPaths?: string[];
 }
 
 const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
   const { t } = useTranslation();
-  const { open, onClose, onCancel } = props;
+  const { open, onClose, onCancel, existingPaths = [] } = props;
   const [data, setData] = useState<any>(initial);
 
   const onSelectPathHandler = async () => {
@@ -61,8 +62,14 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
     return normalizePath(data.SCAN_SOURCES) === normalizePath(data.PATH);
   };
 
+  const isPathAlreadyExists = (): boolean => {
+    if (!data.PATH) return false;
+    const normalizedPath = normalizePath(data.PATH);
+    return existingPaths.some((p) => normalizePath(p) === normalizedPath);
+  };
+
   const isValid = (): boolean => {
-    return data.NAME && data.PATH && !isScanSourcesSameAsPath();
+    return data.NAME && data.PATH && !isScanSourcesSameAsPath() && !isPathAlreadyExists();
   };
 
   const onSubmit = (e) => {
@@ -120,6 +127,13 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
                   value={data.PATH}
                   autoFocus
                   onChange={(e) => setData({ ...data, PATH: e.target.value })}
+                  error={isPathAlreadyExists()}
+                  helperText={isPathAlreadyExists() ? t('Dialog:WorkspacePathAlreadyExists') : ''}
+                  slotProps={{
+                    formHelperText: {
+                      sx: { color: 'red', fontSize: '12px' }
+                    }
+                  }}
                 />
               </Paper>
             </div>

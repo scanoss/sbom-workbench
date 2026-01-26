@@ -92,7 +92,8 @@ const Workspace = () => {
   };
 
   const onWorkspaceCreateHandler = async () => {
-    const { action, data } = await dialogCtrl.openWorkspaceAddDialog();
+    const existingPaths = settings?.WORKSPACES?.map((w) => w.PATH) || [];
+    const { action, data } = await dialogCtrl.openWorkspaceAddDialog(existingPaths);
     if (action !== DIALOG_ACTIONS.CANCEL) {
       await dispatch(setSettings({
         ...settings,

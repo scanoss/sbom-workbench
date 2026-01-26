@@ -43,5 +43,6 @@
   "ImportWorkbenchProjectPlaceHolder":"Ruta al zip del proyecto Workbench",
   "SelectSourceCodePath": "Seleccionar path del codigo fuente (opcional)",
   "ScanSourceLocation": "Ubicación del código fuente",
-  "ScanSourceCannotBeSameAsWorkspace": "La carpeta de código fuente no puede ser la misma que la carpeta del espacio de trabajo"
+  "ScanSourceCannotBeSameAsWorkspace": "La carpeta de código fuente no puede ser la misma que la carpeta del espacio de trabajo",
+  "WorkspacePathAlreadyExists": "Esta ruta de espacio de trabajo ya está registrada"
 }
