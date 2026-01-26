@@ -42,5 +42,6 @@
   "ImportWorkbenchProjectTitle": "Import Workbench project",
   "ImportWorkbenchProjectPlaceHolder":"Workbench project zip file path",
   "SelectSourceCodePath": "Select source code path (optional)",
-  "ScanSourceLocation": "Scan Source Location"
+  "ScanSourceLocation": "Scan Source Location",
+  "ScanSourceCannotBeSameAsWorkspace": "Scan source folder cannot be the same as the workspace folder"
 }

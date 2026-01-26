@@ -42,5 +42,6 @@
   "ImportWorkbenchProjectTitle": "Importar proyecto Workbench",
   "ImportWorkbenchProjectPlaceHolder":"Ruta al zip del proyecto Workbench",
   "SelectSourceCodePath": "Seleccionar path del codigo fuente (opcional)",
-  "ScanSourceLocation": "Ubicación del código fuente"
+  "ScanSourceLocation": "Ubicación del código fuente",
+  "ScanSourceCannotBeSameAsWorkspace": "La carpeta de código fuente no puede ser la misma que la carpeta del espacio de trabajo"
 }
