@@ -9,6 +9,7 @@ export const AppConfigDefault: IAppConfig = {
   DEFAULT_WORKSPACE_NAME: 'scanoss-workspace',
   ORGANIZATION_EMAIL: 'info@scanoss.com',
   SCANOSS_SETTINGS_DOCS_URL: 'https://github.com/scanoss/sbom-workbench/blob/main/README.md#scanoss-settings-file',
+  SCANOSS_SCAN_SOURCES_FOLDER_NAME: 'sources',
 
   // connection settings
   API_URL: 'https://api.osskb.org',

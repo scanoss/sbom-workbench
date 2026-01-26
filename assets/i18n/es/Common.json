@@ -7,6 +7,7 @@
   "LoadingProjects": "Cargando proyectos...",
   "ProjectNameAlreadyExists": "El nombre del proyecto ya existe",
   "ProjectNameInvalid": "El nombre del proyecto no es correcto",
+  "ProjectNameReserved": "Este nombre de proyecto está reservado y no puede ser utilizado",
   "Optional": "Opcional",
   "UseDefaultSettings": "Usar configuración por defecto",
   "NotResultsFoundWith": "No se encontraron resultados con \"{{searchQuery}}\"",

@@ -6,6 +6,7 @@ export interface IAppConfig {
   ORGANIZATION_URL: string;
   DEFAULT_WORKSPACE_NAME: string;
   ORGANIZATION_EMAIL: string;
+  SCANOSS_SCAN_SOURCES_FOLDER_NAME: string;
 
   ABOUT_MESSAGE: string;
   DEFAULT_SETTING_NAME: string;
