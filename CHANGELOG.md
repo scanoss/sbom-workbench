@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added multiplatform shared workspace support
+- Added migration to include scan sources in workspace configuration
+- Added validation to prevent creating duplicated workspaces
+- Added validation to prevent using 'sources' as a project name
+- Added validation to prevent workspace folder from being selected as source folder
+### Changed
+- Refactored search index to support multiplatform shared workspaces
 
 ## [1.30.1] - 2026-01-22
 ### Fixed
