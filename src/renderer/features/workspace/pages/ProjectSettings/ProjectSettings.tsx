@@ -32,6 +32,7 @@ import { Scanner } from '../../../../../main/task/scanner/types';
 import ScannerSource = Scanner.ScannerSource;
 import ScannerType = Scanner.PipelineStage;
 import PipelineStage = Scanner.PipelineStage;
+import appConfigModule from '@config/AppConfigModule';
 
 const ProjectSettings = () => {
   const navigate = useNavigate();
@@ -71,6 +72,7 @@ const ProjectSettings = () => {
 
   const [projectValidName, setProjectValidName] = useState(false);
   const [projectNameExists, setProjectNameExists] = useState(false);
+  const [projectNameReserved, setProjectNameReserved] = useState(false);
 
   useEffect(() => {
     init();
@@ -137,18 +139,16 @@ const ProjectSettings = () => {
 
   useEffect(() => {
     const found = projects.find(
-      (project) => project.name.trim().toLowerCase()
-        === projectSettings.name.trim().toLowerCase(),
+      (project) => project.name.trim().toLowerCase() === projectSettings.name.trim().toLowerCase(),
     );
+
+    const isReserved = projectSettings.name.trim().toLowerCase() === appConfigModule.SCANOSS_SCAN_SOURCES_FOLDER_NAME;
 
     // eslint-disable-next-line no-control-regex
     const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
-    if (found) {
-      setProjectNameExists(true);
-    } else {
-      setProjectNameExists(false);
-    }
+    setProjectNameExists(!!found);
+    setProjectNameReserved(isReserved);
 
     if (projectSettings.name.trim() !== '' && re.test(projectSettings.name)) {
       setProjectValidName(true);
@@ -257,7 +257,7 @@ const ProjectSettings = () => {
                   <Paper className="input-text-container project-name-container">
                     <TextField
                       spellCheck={false}
-                      error={projectNameExists || !projectValidName}
+                      error={projectNameExists || projectNameReserved || !projectValidName}
                       fullWidth
                       value={projectSettings.name}
                       InputProps={{ style: { fontSize: 20, fontWeight: 500 } }}
@@ -269,6 +269,7 @@ const ProjectSettings = () => {
                   </Paper>
                   <div className="error-message">
                     {projectNameExists && t('Common:ProjectNameAlreadyExists')}
+                    {projectNameReserved && t('Common:ProjectNameReserved')}
                     {!projectValidName && t('Common:ProjectNameInvalid')}
                   </div>
                 </div>
@@ -571,7 +572,7 @@ const ProjectSettings = () => {
               variant="contained"
               color="primary"
               type="submit"
-              disabled={!projectValidName || projectNameExists}
+              disabled={!projectValidName || projectNameExists || projectNameReserved}
             >
               {t('Button:Continue')}
             </Button>

@@ -8,6 +8,7 @@ import { dialogController } from 'renderer/controllers/dialog-controller';
 /* icons */
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
+import appConfigModule from '@config/AppConfigModule';
 
 const initial: WorkspaceData = {
   NAME: '',
@@ -35,7 +36,7 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
     if (paths && paths.length > 0) {
       const PATH = paths[0];
       const NAME = PATH.split(window.path.sep)[PATH.split(window.path.sep).length - 1];
-      const SCAN_SOURCES = window.path.resolve(PATH,'scanoss-scan-sources');
+      const SCAN_SOURCES = window.path.resolve(PATH, appConfigModule.SCANOSS_SCAN_SOURCES_FOLDER_NAME);
       setData({ ...data, NAME, PATH, SCAN_SOURCES });
     }
   };

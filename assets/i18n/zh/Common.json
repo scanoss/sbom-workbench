@@ -7,6 +7,7 @@
   "LoadingProjects": "加载项目……",
   "ProjectNameAlreadyExists": "项目名称已存在",
   "ProjectNameInvalid": "项目名称无效",
+  "ProjectNameReserved": "此项目名称为保留名称，不能使用",
   "Optional": "可选项",
   "UseDefaultSettings": "使用默认设置",
   "NotResultsFoundWith": "未找到结果 \"{{searchQuery}}\"",

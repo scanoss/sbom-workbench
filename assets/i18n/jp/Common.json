@@ -7,6 +7,7 @@
   "LoadingProjects": "プロジェクトロード中...",
   "ProjectNameAlreadyExists": "プロジェクトが既に存在します",
   "ProjectNameInvalid": "不正なプロジェクト名",
+  "ProjectNameReserved": "このプロジェクト名は予約されており、使用できません",
   "Optional": "オプション",
   "UseDefaultSettings": "デフォルト設定利用",
   "NotResultsFoundWith": "結果が見つかりません \"{{searchQuery}}\"",
