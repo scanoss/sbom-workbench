@@ -88,7 +88,7 @@ export class Metadata {
   public setScanRoot(scanRoot: string) {
     const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
     const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
-    if(scanRoot.includes(scanSources)){
+    if(scanSources && scanRoot.includes(scanSources)){
       this.scan_root = path.relative(scanSources, scanRoot);
       return;
     }
@@ -185,7 +185,7 @@ export class Metadata {
   public setSourceCodePath(sourceCodePath: string) {
     const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
     const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
-    if(sourceCodePath.includes(scanSources)){
+    if(scanSources && sourceCodePath.includes(scanSources)){
       this.sourceCodePath = path.relative(scanSources, sourceCodePath);
       return;
     }

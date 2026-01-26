@@ -7,7 +7,6 @@ import { userSettingService } from '../../main/services/UserSettingService';
 api.handle(IpcChannels.USER_SETTING_SET, async (event, conf: Partial<IWorkspaceCfg>) => {
   try {
     const settings = userSettingService.set(conf);
-    console.log("New Settings", JSON.stringify(settings, null, 2));
     await userSettingService.save();
     return Response.ok({ message: 'Node from path retrieve succesfully', data: settings });
   } catch (e: any) {
