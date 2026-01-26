@@ -50,8 +50,18 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
     }
   }
 
+  const normalizePath = (path: string): string => {
+    if (!path) return '';
+    return path.replace(/[/\\]+$/, '');
+  };
+
+  const isScanSourcesSameAsPath = (): boolean => {
+    if (!data.SCAN_SOURCES || !data.PATH) return false;
+    return normalizePath(data.SCAN_SOURCES) === normalizePath(data.PATH);
+  };
+
   const isValid = (): boolean => {
-    return data.NAME && data.PATH;
+    return data.NAME && data.PATH && !isScanSourcesSameAsPath();
   };
 
   const onSubmit = (e) => {
@@ -171,6 +181,13 @@ const WorkspaceAddDialog = (props: WorkspaceAddDialogProps) => {
                   value={data.SCAN_SOURCES || ''}
                   autoFocus
                   onChange={(e) => setData({ ...data, SCAN_SOURCES: e.target.value })}
+                  error={isScanSourcesSameAsPath()}
+                  helperText={isScanSourcesSameAsPath() ? t('Dialog:ScanSourceCannotBeSameAsWorkspace') : ''}
+                  slotProps={{
+                    formHelperText: {
+                      sx: { color: 'red', fontSize: '12px' }
+                    }
+                  }}
                 />
               </Paper>
             </div>
