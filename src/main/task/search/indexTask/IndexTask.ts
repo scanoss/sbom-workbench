@@ -9,6 +9,7 @@ import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackLi
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import { Project } from '../../../workspace/Project';
 import { ScannerStage } from '../../../../api/types';
+import path from 'path';
 
 export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -39,22 +40,20 @@ export class IndexTask implements Scanner.IPipelineTask {
     const files = await modelProvider.model.file.getAll(
       QueryBuilderCreator.create({ paths }),
     );
-
+    const projectPath = this.project.metadata.getMyPath();
+    const dictionaryPath = path.join(projectPath, 'dictionary');
     const indexer = new Indexer();
     const filesToIndex = this.fileAdapter(files);
     const index = await indexer.index(filesToIndex);
-    const projectPath = this.project.metadata.getMyPath();
-    await indexer.saveIndex(index, `${projectPath}/dictionary/`);
+    await indexer.saveIndex(index, dictionaryPath);
     this.project.save();
     return true;
   }
 
   private fileAdapter(modelFiles: any): Array<IIndexer> {
     const filesToIndex = [];
-    const p = workspace.getOpenProject();
-    const sourceCodePath = p.metadata.getSourceCodePath();
     modelFiles.forEach((file: any) => {
-      filesToIndex.push({ fileId: file.id, path: `${sourceCodePath}${file.path}` });
+      filesToIndex.push({ fileId: file.id, path: file.path });
     });
     return filesToIndex;
   }

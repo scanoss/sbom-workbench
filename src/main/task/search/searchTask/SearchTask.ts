@@ -6,16 +6,17 @@ import { ISearchTask } from './ISearchTask';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import { AppConfigDefault } from '../../../../config/AppConfigDefault';
 import { ISearchResult } from './ISearchResult';
+import path from 'path';
 
 export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
   private search = searcher;
 
-  private readonly DICTIONARY_FOLDER = '/dictionary/';
+  private readonly DICTIONARY_FOLDER = 'dictionary';
 
   private isFinished: boolean;
 
   constructor() {
-    this.search.loadIndex(`${workspace.getOpenProject().getMyPath()}${this.DICTIONARY_FOLDER}`);
+    this.search.loadIndex(path.join(workspace.getOpenProject().getMyPath(), this.DICTIONARY_FOLDER));
     this.isFinished = false;
   }
 

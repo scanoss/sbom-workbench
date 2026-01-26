@@ -46,7 +46,7 @@ const CryptoViewer = () => {
   const loadLocalFile = async (path: string): Promise<void> => {
     try {
       setLocalFileContent({ content: null, error: false, loading: true });
-      const content = await workbenchController.fetchLocalFile(`${sourceCodePath}/${path}`);
+      const content = await workbenchController.fetchLocalFile(path);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
 
       setLocalFileContent({ content, error: false, loading: false });

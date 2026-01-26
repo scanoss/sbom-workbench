@@ -5,6 +5,10 @@ import { IIndexer } from './IIndexer';
 import { IpcChannels } from '../../../../api/ipc-channels';
 import { getSearchConfig } from '../../../../shared/utils/search-utils';
 import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
+import { workspace } from '../../../workspace/Workspace';
+import path from 'path';
+import { projectService } from '../../../services/ProjectService';
+
 
 const { Index } = require('flexsearch');
 
@@ -30,6 +34,7 @@ export class Indexer {
   }
 
   public async index(files: Array<IIndexer>) {
+    const sourceCodeBasePath = projectService.getSourceCodeBasePath()
     const index = new Index(getSearchConfig());
     for (let i = 0; i < files.length; i += 1) {
       try {
@@ -38,9 +43,9 @@ export class Indexer {
             processed: i * 100 / files.length,
           });
         }
-
+        const absoluteFilePath = path.join(sourceCodeBasePath,files[i].path);
         // Check file size first
-        const fileSizeMB = await this.getFileSizeMB(files[i].path);
+        const fileSizeMB = await this.getFileSizeMB(absoluteFilePath);
         if (fileSizeMB > this.MAX_FILE_SIZE_MB) {
           console.warn(`Skipping large file: ${files[i].path} (${fileSizeMB.toFixed(2)}MB)`);
           // eslint-disable-next-line no-continue
@@ -50,7 +55,7 @@ export class Indexer {
         if (this.shouldStopIndexing()) {
           log.info('Skipping file indexing, maximum heap size exceeded');
         } else {
-          const fileContent = fs.readFileSync(files[i].path, 'utf-8');
+          const fileContent = fs.readFileSync(absoluteFilePath, 'utf-8');
           index.add(files[i].fileId, fileContent);
         }
       } catch (e) {
@@ -66,7 +71,7 @@ export class Indexer {
     }
     fs.mkdirSync(pathToDictionary);
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
-      fs.writeFile(`${pathToDictionary}${key}.json`, data !== undefined ? data : '', (err) => {
+      fs.writeFile(path.join(pathToDictionary, `${key}.json`), data !== undefined ? data : '', (err) => {
         if (err) console.log(err);
       });
     });
