@@ -40,7 +40,7 @@ export interface IDialogContext {
   createProgressDialog: (message: ReactNode) => Promise<LoaderController>;
   openDependencyDialog: (dependency: Dependency) => Promise<DialogResponse>;
   openProjectSelectorDialog: (params?: { folder?: string, md5File?: string }) => Promise<DialogResponse>;
-  openWorkspaceAddDialog: () => Promise<DialogResponse>;
+  openWorkspaceAddDialog: (existingPaths?: string[]) => Promise<DialogResponse>;
   openReportDialog: (invalidPurls: Array<string>) => Promise<DialogResponse>;
   openImportProjectSourceDialog: (dialogProperties: ImportProjectDialogProps) => Promise<DialogResponse>;
 }
@@ -351,14 +351,16 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
 
   const [workspaceAddDialog, setWorkspaceAddDialog] = useState<{
     open: boolean;
+    existingPaths?: string[];
     onClose?:(response: DialogResponse) => void;
     onCancel?: () => void;
   }>({ open: false });
 
-  const openWorkspaceAddDialog = () => {
+  const openWorkspaceAddDialog = (existingPaths: string[] = []) => {
     return new Promise<DialogResponse>((resolve) => {
       setWorkspaceAddDialog({
         open: true,
+        existingPaths,
         onCancel: () => {
           setWorkspaceAddDialog((dialog) => ({ ...dialog, open: false }));
           resolve({ action: DIALOG_ACTIONS.CANCEL });
@@ -580,6 +582,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
           open={workspaceAddDialog.open}
           onClose={(response) => workspaceAddDialog.onClose && workspaceAddDialog.onClose(response)}
           onCancel={() => workspaceAddDialog.onCancel && workspaceAddDialog.onCancel()}
+          existingPaths={workspaceAddDialog.existingPaths}
         />
       )}
 

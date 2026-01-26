@@ -37,5 +37,6 @@
   "ImportWorkbenchProjectPlaceHolder":"Workbench project zip file path",
   "SelectSourceCodePath": "Select source code path (optional)",
   "ScanSourceLocation": "スキャンソースの場所",
-  "ScanSourceCannotBeSameAsWorkspace": "スキャンソースフォルダーはワークスペースフォルダーと同じにすることはできません"
+  "ScanSourceCannotBeSameAsWorkspace": "スキャンソースフォルダーはワークスペースフォルダーと同じにすることはできません",
+  "WorkspacePathAlreadyExists": "このワークスペースパスは既に登録されています"
 }
