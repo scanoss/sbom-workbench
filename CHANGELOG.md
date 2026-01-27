@@ -12,11 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added validation to prevent creating duplicated workspaces
 - Added validation to prevent using 'sources' as a project name
 - Added validation to prevent workspace folder from being selected as source folder
+### Fixed
+- Fixed diff view synchronized scrolling between left and right editors
+- Fixed `null` licenses on detected report
 ### Changed
 - Refactored search index to support multiplatform shared workspaces
 - Upgraded scanoss.js SDK version to v0.30.1
-### Fixed
-- Fixed `null` licenses on detected report 
+
 
 ## [1.30.1] - 2026-01-22
 ### Fixed

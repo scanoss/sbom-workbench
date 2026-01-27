@@ -333,6 +333,7 @@ const Editor = () => {
                 language={getExtension(file)}
                 value={localFileContent?.content || ''}
                 highlight={ currentMatch?.lines || null}
+                syncScrollWith={isDiffView ? CodeViewerManager.RIGHT : undefined}
               />
             ) : (
               <div className="file-loader">{localFileContent?.content || t('LoadingLocalFile')}</div>
@@ -358,6 +359,7 @@ const Editor = () => {
                 language={getExtension(file)}
                 value={remoteFileContent.content || ''}
                 highlight={currentMatch.oss_lines || null}
+                syncScrollWith={CodeViewerManager.LEFT}
               />
             ) : (
               <div className="file-loader">
