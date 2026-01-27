@@ -35,13 +35,13 @@ const FileToolbar = ({ id, label, fullpath, file, actions }: FileToolbarProps) =
     if (fullpath?.startsWith('http')) {
       navigator.clipboard.writeText(fullpath);
     } else {
-      const absolutePath = await fileService.getFilePath(fullpath);
+      const absolutePath = await fileService.getFilePath(file);
       navigator.clipboard.writeText(absolutePath);
     }
   };
 
   const handleOpenInFolder = async () => {
-    await fileService.showItemInFolder(fullpath);
+    await fileService.showItemInFolder(file);
   };
 
   const ACTIONS: IAction[] = [

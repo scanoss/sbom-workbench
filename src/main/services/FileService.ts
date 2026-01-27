@@ -1,4 +1,3 @@
-import path from 'path';
 import { FileDTO, GetFileDTO } from '@api/dto';
 import { HttpClient } from 'scanoss';
 import log from 'electron-log';
@@ -8,15 +7,6 @@ import AppConfig from '../../config/AppConfigModule';
 import { getHttpConfig } from './utils/httpUtil';
 
 class FileService {
-  public normalizePath(filePath: string): string {
-    if (process.platform === 'win32') {
-      // On Windows, convert forward slashes to backslashes
-      return path.normalize(filePath.split('/').join('\\'));
-    }
-    // On macOS/Linux, convert backslashes to forward slashes
-    return path.normalize(filePath.split('\\').join('/'));
-  }
-
   public async insert(files: Array<any>) {
     await modelProvider.model.file.insertFiles(files);
   }

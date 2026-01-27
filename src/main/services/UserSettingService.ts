@@ -9,6 +9,7 @@ import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
 import { AppI18n } from '../../shared/i18n';
 import { AppMigration } from '../migration/AppMigration';
+import { toPosix } from '../utils/utils';
 
 class UserSettingService {
   private myPath: string;
@@ -31,7 +32,7 @@ class UserSettingService {
     WORKSPACES: [
       {
         NAME: 'My Workspace',
-        PATH: path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME),
+        PATH: toPosix(path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME)),
         DESCRIPTION: '',
         SCAN_SOURCES: ''
       },
@@ -68,10 +69,15 @@ class UserSettingService {
     }
   }
 
+
   // WARNING: Despite accepting Partial<IWorkspaceCfg>, this method requires APIS and DEFAULT_API_INDEX
   // to be present to avoid runtime errors. Always pass the full settings object from get().
   public set(setting: Partial<IWorkspaceCfg>) {
     if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
+
+    // Convert paths to posix format
+    setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH);
+    setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES);
 
     const scanSourcesPath = setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES;
     if(scanSourcesPath) {
