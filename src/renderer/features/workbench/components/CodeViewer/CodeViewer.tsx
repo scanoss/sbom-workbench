@@ -25,13 +25,16 @@ interface ICodeViewerProps {
   onHighlighted?: (matchedTerms: Array<HighLighted>) => void;
   highlightHoverMessage?: (term: string, line: number) => string; // Customize hover message
   options?: monaco.editor.IStandaloneEditorConstructionOptions;
+  syncScrollWith?: string; // id of the editor to sync scroll with
 }
 
-const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatchOptions, onHighlighted, highlightHoverMessage, options, scrollToLine }: ICodeViewerProps) => {
+const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatchOptions, onHighlighted, highlightHoverMessage, options, scrollToLine, syncScrollWith }: ICodeViewerProps) => {
   const editor = React.useRef<monaco.editor.IStandaloneCodeEditor>(null);
   const editorContainerRef = React.createRef<HTMLDivElement>();
   const scrollLineDecorations = React.useRef<string[]>([]);
   const highlightDecorations = React.useRef<string[]>([]);
+  const scrollDisposable = React.useRef<monaco.IDisposable>(null);
+  const isSyncingScroll = React.useRef(false);
   const initMonaco = () => {
     const ref = editorContainerRef.current;
     if (ref) {
@@ -258,6 +261,32 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
     initMonaco();
     return destroyMonaco;
   }, []);
+
+  useEffect(() => {
+    if (scrollDisposable.current) {
+      scrollDisposable.current.dispose();
+      scrollDisposable.current = null;
+    }
+
+    if (syncScrollWith && editor.current) {
+      scrollDisposable.current = editor.current.onDidScrollChange((e) => {
+        if (isSyncingScroll.current) return;
+        const target = CodeViewerManagerInstance.get(syncScrollWith);
+        if (target) {
+          isSyncingScroll.current = true;
+          target.setScrollTop(e.scrollTop);
+          isSyncingScroll.current = false;
+        }
+      });
+    }
+
+    return () => {
+      if (scrollDisposable.current) {
+        scrollDisposable.current.dispose();
+        scrollDisposable.current = null;
+      }
+    };
+  }, [syncScrollWith]);
 
   useEffect(() => {
     updateContent();
