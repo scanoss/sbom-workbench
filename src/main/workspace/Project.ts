@@ -13,8 +13,6 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
-import { workspace } from './Workspace';
-import path from 'path';
 
 export class Project {
   work_root: string;

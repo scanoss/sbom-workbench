@@ -1,3 +1,5 @@
+import path from 'path';
+
 const fs = require('fs').promises;
 
 export async function fileExists(filePath: string):Promise<boolean> {
@@ -7,4 +9,8 @@ export async function fileExists(filePath: string):Promise<boolean> {
   } catch (err) {
     return false;
   }
+}
+
+export function toPosix(filePath: string): string {
+  return filePath.replaceAll(path.sep, path.posix.sep);
 }

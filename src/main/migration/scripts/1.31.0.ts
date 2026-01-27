@@ -6,6 +6,8 @@ import AppConfig from '../../../config/AppConfigModule';
 import { IWorkspaceCfg } from '../../../api/types';
 import { userSettingService } from '../../services/UserSettingService';
 import appConfigModule from '../../../config/AppConfigModule';
+import { toPosix } from '../../utils/utils';
+import { Metadata } from '../../workspace/Metadata';
 
 export async function appMigration1310(projectPath: string): Promise<void> {
   try {
@@ -14,12 +16,13 @@ export async function appMigration1310(projectPath: string): Promise<void> {
     const wsConfig = await fs.promises.readFile(wsConfigPath, 'utf8');
     const config: IWorkspaceCfg = JSON.parse(wsConfig);
     for (const w of config.WORKSPACES) {
-      const scanSourcesPath = path.join(w.PATH, appConfigModule.SCANOSS_SCAN_SOURCES_FOLDER_NAME);
+      const scanSourcesPath = toPosix(path.join(w.PATH, appConfigModule.SCANOSS_SCAN_SOURCES_FOLDER_NAME));
       try{
         await fs.promises.mkdir(scanSourcesPath, { recursive: true });
       }catch(e: any){
         log.error(e.message);
       }
+      w.PATH = toPosix(w.PATH);
       w.SCAN_SOURCES = scanSourcesPath;
     }
     config.VERSION = '1.31.0';
@@ -32,5 +35,19 @@ export async function appMigration1310(projectPath: string): Promise<void> {
   }
 }
 
-async function addSourceToWorkspaceConfig(projectPath: string) {
+export async function projectMigration1310(projectPath: string): Promise<void> {
+  try {
+    log.info('%cProject Migration 1.31.0 in progress...', 'color:green');
+    const pMetadata = await Metadata.readFromPath(projectPath);
+    if (pMetadata.getSourceCodePath()){
+      pMetadata.setSourceCodePath(pMetadata.getSourceCodePath());
+    }
+    if(pMetadata.getScanRoot()){
+      pMetadata.setScanRoot(pMetadata.getScanRoot());
+    }
+    pMetadata.save();
+    log.info('%cProject Migration 1.31.0 finished', 'color:green');
+  } catch (e: any) {
+    log.error(e.message);
+  }
 }

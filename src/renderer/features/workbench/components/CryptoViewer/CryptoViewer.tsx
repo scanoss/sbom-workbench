@@ -57,7 +57,7 @@ const CryptoViewer = () => {
   };
 
   const copyFilePath = async () => {
-    const absolutePath = await fileService.getFilePath(`${sourceCodePath}/${file}`);
+    const absolutePath = await fileService.getFilePath(file);
     navigator.clipboard.writeText(absolutePath);
     setShowCopiedSnackbar(true);
   }
