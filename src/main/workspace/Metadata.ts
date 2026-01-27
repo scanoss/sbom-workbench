@@ -8,6 +8,7 @@ import * as ScannerCFG from '../task/scanner/types';
 import { workspace } from './Workspace';
 import path from 'path';
 import { userSettingService } from '../services/UserSettingService';
+import { toPosix } from '../utils/utils';
 
 export class Metadata {
   private appVersion: string;
@@ -88,11 +89,12 @@ export class Metadata {
   public setScanRoot(scanRoot: string) {
     const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
     const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
-    if(scanSources && scanRoot.includes(scanSources)){
-      this.scan_root = path.relative(scanSources, scanRoot);
+    const scanRootPosix = toPosix(scanRoot);
+    if(scanSources && scanRootPosix.includes(scanSources)){
+      this.scan_root = toPosix(path.relative(scanSources, scanRoot));
       return;
     }
-    this.scan_root = scanRoot;
+    this.scan_root = toPosix(scanRoot);
   }
 
   public setScannerState(s: ScanState) {
@@ -185,11 +187,12 @@ export class Metadata {
   public setSourceCodePath(sourceCodePath: string) {
     const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
     const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
-    if(scanSources && sourceCodePath.includes(scanSources)){
-      this.sourceCodePath = path.relative(scanSources, sourceCodePath);
+    const sourceCodePosix = toPosix(sourceCodePath);
+    if(scanSources && sourceCodePosix.includes(scanSources)){
+      this.sourceCodePath = toPosix(path.relative(scanSources, sourceCodePath));
       return;
     }
-    this.sourceCodePath = sourceCodePath;
+    this.sourceCodePath = toPosix(sourceCodePath);
   }
 
   public getSourceCodePath() {

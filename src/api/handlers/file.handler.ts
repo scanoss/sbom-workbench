@@ -62,8 +62,8 @@ function isAllowed(filePath: string) {
 api.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
   const fileContent = { content: null };
   try {
-    const basePath = projectService.getSourceCodeBasePath()
-    filePath = fileService.normalizePath(path.join(basePath,filePath));
+    const basePath = projectService.getSourceCodeBasePath();
+    filePath = path.resolve(path.join(basePath, filePath));
     if (!isAllowed(filePath)) {
       fileContent.content = FileType.BINARY;
     } else {
@@ -130,9 +130,8 @@ api.handle(IpcChannels.FILE_GET_REMOTE_CONTENT, async (_event, fileHash: string)
 api.handle(IpcChannels.SHELL_SHOW_ITEM_IN_FOLDER, async (_event, filePath: string) => {
   try {
     const basePath = projectService.getSourceCodeBasePath()
-    const absoluteFilePath = path.resolve(basePath, filePath);
-    const normalizedPath = fileService.normalizePath(absoluteFilePath);
-    shell.showItemInFolder(normalizedPath);
+    const absoluteFilePath = path.resolve(path.join(basePath, filePath));
+    shell.showItemInFolder(absoluteFilePath);
     return Response.ok({ message: 'Item shown in folder' });
   } catch (error: any) {
     log.error('[ SHELL_SHOW_ITEM_IN_FOLDER ]:', error, filePath);
@@ -143,9 +142,8 @@ api.handle(IpcChannels.SHELL_SHOW_ITEM_IN_FOLDER, async (_event, filePath: strin
 api.handle(IpcChannels.SHELL_GET_FILE_PATH, async (_event, filePath: string) => {
   try {
     const basePath = projectService.getSourceCodeBasePath()
-    const absoluteFilePath = path.resolve(basePath, filePath);
-    const normalizedPath = fileService.normalizePath(absoluteFilePath);
-    return Response.ok({ message: 'File path retrieved', data: normalizedPath });
+    const absoluteFilePath = path.resolve(path.join(basePath, filePath));
+    return Response.ok({ message: 'File path retrieved', data: absoluteFilePath });
   } catch (error: any) {
     log.error('[ SHELL_GET_FILE_PATH ]:', error, filePath);
     return Response.fail({ message: error.message });
