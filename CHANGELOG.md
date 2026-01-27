@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactored search index to support multiplatform shared workspaces
 - Upgraded scanoss.js SDK version to v0.30.1
+### Fixed
+- Fixed `null` licenses on detected report 
 
 ## [1.30.1] - 2026-01-22
 ### Fixed
