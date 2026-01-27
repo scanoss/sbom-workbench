@@ -2,14 +2,12 @@ import { modelProvider } from '../../services/ModelProvider';
 import { dependencyService } from '../../services/DependencyService';
 import { Scanner } from '../scanner/types';
 import { Project } from '../../workspace/Project';
-import { IDependencyResponse, LicensesList , FilesList } from 'scanoss';
+import { IDependency, IDependencyFile, IDependencyResponse, IDependencyLicense } from 'scanoss';
 import i18next from 'i18next';
 import path from 'path';
 import fs from 'fs';
-import { DependenciesList } from 'scanoss/build/main/sdk/Dependencies/DependencyTypes';
 import { ScannerStage } from '../../../api/types';
 import log from 'electron-log';
-import { EOL } from 'os';
 import { parser } from 'stream-json';
 import { streamObject } from 'stream-json/streamers/StreamObject';
 
@@ -35,32 +33,36 @@ export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
     this.project = project;
   }
 
-  private getDependencyLicenses(licenses: DependencyLicense[]): LicensesList[] {
-    const dependencyList: LicensesList[] = [];
+  private getDependencyLicenses(licenses: DependencyLicense[]): Array<IDependencyLicense> {
+    const dependencyList : Array<IDependencyLicense> = [];
     licenses.forEach((l) => {
       dependencyList.push({
         name: l.name,
         spdxId: l.spdx_id,
         isSpdxApproved: l.is_spdx_approved,
+        url: ''
       });
     });
     return dependencyList;
   }
 
-  private processFileDependencies(fileName: string,dependencies: Array<ResultDependency>): FilesList {
-    const fileDependency = {
+  private processFileDependencies(fileName: string,dependencies: Array<ResultDependency>): IDependencyFile {
+    const fileDependency: IDependencyFile = {
       file: fileName,
       id: 'dependency',
       status: 'pending',
       dependenciesList: [],
     }
     dependencies.forEach((d: ResultDependency) => {
-      const dependencyList: DependenciesList = {
+      const dependencyList: IDependency = {
         component: d.component || '',
         scope: 'unknown', // Add scope from data if available
         version: d.version || null,
         purl: d.purl || '',
         licensesList: [],
+        requirement: d.version,
+        url: d.url,
+        comment: ''
       };
       const licenses = this.getDependencyLicenses(d.licenses);
       dependencyList.licensesList.push(...licenses)
@@ -71,7 +73,7 @@ export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
 
   private async getDependencies(): Promise<IDependencyResponse> {
     const resultPath = path.join(this.project.getMyPath(), 'result.json');
-    const dependencies: IDependencyResponse = { filesList: [] };
+    const dependencies: IDependencyResponse = {filesList: [], status:null};
     const pipeline = fs.createReadStream(resultPath)
       .pipe(parser())
       .pipe(streamObject());

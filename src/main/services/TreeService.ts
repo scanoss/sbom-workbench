@@ -32,7 +32,7 @@ class TreeService {
 
   public async updateTree(ids: Array<number>, status: NodeStatus): Promise<void> {
     this.updateStart();
-    return modelProvider.model.result.getSummaryByids(ids).then(async (results) => {
+    return modelProvider.model.result.getSummaryByids(ids).then(async (results: any) => {
       const paths = utilHelper.getArrayFromObjectFilter(results, 'path', new FilterTrue()) as Array<string>;
       this.updateStatus(paths, status);
       return this.updateDependencyStatus();

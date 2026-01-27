@@ -29,7 +29,7 @@ export class ProjectKnowledgeExtractor {
         projectName: this.projectKnowledgeExtractor.source[i].name,
         inventories: [],
       };
-      const inventories = await model.extractProjectInventoryData(path.join(workspace.getMyPath(), this.projectKnowledgeExtractor.source[i].work_root, 'scan_db'), filesToProcess, this.projectKnowledgeExtractor.md5File);
+      const inventories: any = await model.extractProjectInventoryData(path.join(workspace.getMyPath(), this.projectKnowledgeExtractor.source[i].work_root, 'scan_db'), filesToProcess, this.projectKnowledgeExtractor.md5File);
       project.inventories = inventories;
       projectInventories.push(project);
     }
