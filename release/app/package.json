@@ -17,6 +17,7 @@
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^9.4.1",
     "flexsearch": "^0.8.151",
+    "libarchive.js": "^2.0.2",
     "sqlite3": "^5.1.6"
   }
 }
