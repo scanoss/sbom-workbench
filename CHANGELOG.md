@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added support for new archive decompression formats: `.rar`, `.rpm`, `.tar.bz2`, `.tar.lzma`, `.tar.xz`, `.tbz2`, `.txz`, `.7z`
+- Added support for single-file `.gz` decompression
+### Changed
+- Upgraded `scanoss.js` SDK to `v0.31.2`  
+### Fixed
+- Fixed Cryptography scanner hang when processing empty file list
 
 ## [1.31.0] - 2026-01-28
 ### Added
