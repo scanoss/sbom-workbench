@@ -6,7 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-Upcoming changes...
+### Fixed
+- Fixed AppImage sandbox permission crash on Linux (Ubuntu 24.04+) by re-enabling afterPack hook
 
 ## [1.35.1] - 2026-03-04
 ### Changed
@@ -63,7 +64,7 @@ Upcoming changes...
 ### Added
 - Added support for new archive decompression formats: `.rar`, `.rpm`, `.tar.bz2`, `.tar.lzma`, `.tar.xz`, `.tbz2`, `.txz`, `.7z`
 - Added support for single-file `.gz` decompression
-- Added scan warning dialog to display decompress errors 
+- Added scan warning dialog to display decompress errors
 ### Changed
 - Upgraded `scanoss.js` SDK to `v0.32.0`
 - Refactored scanner pipeline task execution to cache stage properties
