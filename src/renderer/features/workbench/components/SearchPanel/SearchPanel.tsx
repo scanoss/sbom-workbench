@@ -100,7 +100,7 @@ const SearchPanel = () => {
   const goto = (path: string) => {
     navigate({
       pathname: '/workbench/search/file',
-      search: `?path=file|${encodeURIComponent(path)}&highlight=${encodeURIComponent(searchQuery.current)}`,
+      search: `?path=file|${encodeURIComponent(path)}&highlight=${encodeURIComponent(value.join(','))}`,
     });
   };
 
