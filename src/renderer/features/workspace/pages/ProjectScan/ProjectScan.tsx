@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IpcChannels } from '@api/ipc-channels';
+import { StageWarning } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +27,7 @@ const ProjectScan = () => {
     stageLabel: 'preparing',
     stageStep: '-',
   });
+  const warningsRef = useRef<StageWarning[]>([]);
 
   const init = async () => {
     try {
@@ -89,10 +91,21 @@ const ProjectScan = () => {
     // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
+  const handlerScannerWarnings = (e, args: { warnings: StageWarning[] }) => {
+    warningsRef.current = args.warnings;
+  };
+
+  const showWarningsDialog = async (warnings: StageWarning[]) => {
+    await dialogCtrl.openScanWarningDialog(warnings);
+  };
+
   const handlerScannerFinish = async (e, args) => {
     await dispatch(fetchProjects());
-    console.log();
     if (args.success) {
+      if (warningsRef.current.length > 0) {
+        await showWarningsDialog(warningsRef.current);
+        warningsRef.current = [];
+      }
       onShowScan(args.resultsPath);
     }
   };
@@ -121,6 +134,12 @@ const ProjectScan = () => {
       window.electron.ipcRenderer.on(
         IpcChannels.SCANNER_UPDATE_STAGE,
         handlerScannerStage,
+      ),
+    );
+    subscriptions.push(
+      window.electron.ipcRenderer.on(
+        IpcChannels.SCANNER_WARNINGS,
+        handlerScannerWarnings,
       ),
     );
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
