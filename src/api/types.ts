@@ -1,7 +1,9 @@
 import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 import { NodeStatus } from '../main/workspace/tree/Node';
-import { Scanner } from '../main/task/scanner/types';
+import { Scanner, StageWarning, StageItemError } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
+
+export type { StageWarning, StageItemError };
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
 import { CryptographicItem } from '../main/model/entity/Cryptography';
