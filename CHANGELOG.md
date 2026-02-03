@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added support for new archive decompression formats: `.rar`, `.rpm`, `.tar.bz2`, `.tar.lzma`, `.tar.xz`, `.tbz2`, `.txz`, `.7z`
 - Added support for single-file `.gz` decompression
+- Added scan warning dialog to display decompress errors 
 ### Changed
-- Upgraded `scanoss.js` SDK to `v0.31.2`  
+- Upgraded `scanoss.js` SDK to `v0.31.2`
+- Refactored scanner pipeline task execution to cache stage properties
 ### Fixed
 - Fixed Cryptography scanner hang when processing empty file list
 - Fixed search keywords not being highlighted
