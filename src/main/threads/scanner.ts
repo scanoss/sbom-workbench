@@ -10,11 +10,18 @@ process.parentPort.once('message', async (e) => {
   if (action === 'DECOMPRESS') {
     try {
       const decompressThread = new DecompressThread(data);
-      const success = await decompressThread.run();
-      process.parentPort.postMessage({
-        event: 'success',
-        data: success
-      });
+      const results = await decompressThread.run();
+      if(results.failedFiles.length<=0){
+        process.parentPort.postMessage({
+          event: 'success',
+          data: true
+        });
+      }else{
+        process.parentPort.postMessage({
+          event: 'error',
+          error: JSON.stringify(results)
+        });
+      }
     } catch(e: any){
       process.parentPort.postMessage({
         event: 'error',

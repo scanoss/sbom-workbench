@@ -42,12 +42,11 @@ export class DecompressThread {
     return results;
   }
 
-  public async run(): Promise<boolean> {
-      const filesToDecompress = this.getFilesToDecompress(
-        this.projectScanRoot,
-        this.decompressionManager.getSupportedFormats()
-      );
-      await this.decompressionManager.decompress(filesToDecompress);
-      return true;
-    }
+  public async run(): Promise<{ parentFolders: Array<string>, failedFiles: Array<{ path: string, error: string }> }> {
+    const filesToDecompress = this.getFilesToDecompress(
+      this.projectScanRoot,
+      this.decompressionManager.getSupportedFormats()
+    );
+    return await this.decompressionManager.decompress(filesToDecompress);
+  }
 }
