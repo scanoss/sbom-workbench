@@ -44,25 +44,6 @@ export class ScanossResultValidator {
       this.addError('file_path', 'file path must be a non-empty string', path);
       return;
     }
-
-    if (!this.isValidFilePath(path)) {
-      this.addError('file_path', 'does not look like a valid file path', path);
-    }
-  }
-
-  // Check if a string looks like a file path
-  isValidFilePath(path) {
-    // Check for common file path patterns
-    if (path.includes('/') || path.includes('\\')) {
-      return true;
-    }
-
-    // Check if it has a file extension
-    if (path.includes('.') && path.lastIndexOf('.') > 0) {
-      return true;
-    }
-
-    return false;
   }
 
   private validateMatchResults(filePath, results){
