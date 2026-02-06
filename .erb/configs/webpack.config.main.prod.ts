@@ -70,6 +70,8 @@ const configuration: webpack.Configuration = {
    * If you run the bundle in node.js it falls back to these values of node.js.
    * https://github.com/webpack/webpack/issues/2010
    */
+  externals: ['libarchive.js/dist/worker-bundle-node.mjs'],
+
   node: {
     __dirname: false,
     __filename: false,

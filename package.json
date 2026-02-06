@@ -160,7 +160,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.5",
     "rimraf": "^6.0.1",
-    "scanoss": "^0.32.0-beta.1",
+    "scanoss": "^0.32.0-beta.3",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "stream-json": "^1.9.1",
@@ -169,7 +169,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "libarchive.js": "^2.0.2",
     "@electron/notarize": "^3.0.1",
     "@eslint/config-array": "^0.20.0",
     "@eslint/object-schema": "^2.1.6",
@@ -221,6 +220,7 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jiti": "^2.4.2",
+    "libarchive.js": "^2.0.2",
     "lint-staged": "^12.4.1",
     "mini-css-extract-plugin": "^2.6.0",
     "monaco-editor-webpack-plugin": "^7.0.1",
