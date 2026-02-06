@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added support for single-file `.gz` decompression
 - Added scan warning dialog to display decompress errors 
 ### Changed
-- Upgraded `scanoss.js` SDK to `v0.31.2`
+- Upgraded `scanoss.js` SDK to `v0.32.0`
 - Refactored scanner pipeline task execution to cache stage properties
 ### Fixed
 - Fixed Cryptography scanner hang when processing empty file list
