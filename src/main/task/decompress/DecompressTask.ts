@@ -39,13 +39,24 @@ export class DecompressTask implements Scanner.IPipelineTask {
 
     const child = utilityProcess.fork(RESOURCES_PATH, [], { stdio: 'pipe' });
 
-    child.stdout.on('data', (data) => {
-      log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data);
+    child.stdout.on('data', (data: Buffer) => {
+      log.info(`[ THREAD stdout ]:`, data.toString());
+    });
+
+    child.stderr.on('data', (data: Buffer) => {
+      log.error(`[ THREAD stderr ]:`, data.toString());
     });
 
     child.postMessage({ action: 'DECOMPRESS', data: this.project.getScanRoot() });
 
     return new Promise((resolve, reject) => {
+      child.on('exit', (code) => {
+        log.info(`[ THREAD exit ]: code=${code}`);
+        if (code !== 0 && code !== null) {
+          reject(new Error(`Decompress utility process exited with code ${code}`));
+        }
+      });
+
       child.on('message', (data) => {
         if (data.event === 'success') {
           child.kill();
