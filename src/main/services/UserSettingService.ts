@@ -76,12 +76,14 @@ class UserSettingService {
     if (setting.LNG !== this.store.LNG) AppI18n.getI18n()?.changeLanguage(setting.LNG);
 
     // Convert paths to posix format
-    setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH);
-    setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES);
+    if (setting.WORKSPACES && setting.DEFAULT_WORKSPACE_INDEX !== undefined) {
+      setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].PATH);
+      setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES = toPosix(setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES);
 
-    const scanSourcesPath = setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES;
-    if(scanSourcesPath) {
-      this.createScanSourcesFolder(scanSourcesPath);
+      const scanSourcesPath = setting.WORKSPACES[setting.DEFAULT_WORKSPACE_INDEX].SCAN_SOURCES;
+      if(scanSourcesPath) {
+        this.createScanSourcesFolder(scanSourcesPath);
+      }
     }
 
     if (setting.APIS.length <= 0) {
