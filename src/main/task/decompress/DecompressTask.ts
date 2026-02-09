@@ -3,11 +3,16 @@ import { app, utilityProcess } from 'electron';
 import { DecompressionManager } from 'scanoss';
 import path from 'path';
 import { Project } from '../../workspace/Project';
-import { Scanner } from '../scanner/types';
+import { Scanner, StageWarning } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
 
 export class DecompressTask implements Scanner.IPipelineTask {
   private project: Project;
+  private decompressTaskWarning: StageWarning = {
+    title: 'Decompress',
+    stage: ScannerStage.UNZIP,
+    errors: [],
+  };
 
   private decompressionManager: DecompressionManager;
 
@@ -20,7 +25,8 @@ export class DecompressTask implements Scanner.IPipelineTask {
     return {
       name: ScannerStage.UNZIP,
       label: 'Decompressing files',
-      isCritical: true,
+      isCritical: false,
+      warnings: this.decompressTaskWarning,
     };
   }
 
@@ -28,30 +34,50 @@ export class DecompressTask implements Scanner.IPipelineTask {
     log.info('[ DecompressTask init ]');
 
     const RESOURCES_PATH = app.isPackaged
-     ? path.join(__dirname, 'scanner.js')
-     : path.join(app.getAppPath(), '.erb/dll/scanner.js');
+      ? path.join(__dirname, 'scanner.js')
+      : path.join(app.getAppPath(), '.erb/dll/scanner.js');
 
-   const child = utilityProcess.fork(RESOURCES_PATH, [], { stdio: "pipe" });
+    const child = utilityProcess.fork(RESOURCES_PATH, [], { stdio: 'pipe' });
 
-   child.stdout.on ("data", (data) => {
-     log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data.toString());
-   });
+    child.stdout.on('data', (data: Buffer) => {
+      log.info(`[ THREAD stdout ]:`, data.toString());
+    });
 
-   child.postMessage({ action: 'DECOMPRESS', data: this.project.getScanRoot() });
+    child.stderr.on('data', (data: Buffer) => {
+      log.error(`[ THREAD stderr ]:`, data.toString());
+    });
 
-   return new Promise((resolve, reject) => {
-     child.on('message', (data) => {
-       log.info(`%c[ THREAD ]: Decompress Thread `, 'color: green', data.toString());
-       if (data.event === 'success'){
-         resolve(true);
-       }
-       if(data.event === 'error'){
-         reject(new Error(data.error));
-       }
-       reject(new Error(`Decompress task failed`));
-       child.kill();
-     });
-   });
+    child.postMessage({ action: 'DECOMPRESS', data: this.project.getScanRoot() });
+
+    return new Promise((resolve, reject) => {
+      child.on('exit', (code) => {
+        log.info(`[ THREAD exit ]: code=${code}`);
+        if (code !== 0 && code !== null) {
+          reject(new Error(`Decompress utility process exited with code ${code}`));
+        }
+      });
+
+      child.on('message', (data) => {
+        if (data.event === 'success') {
+          child.kill();
+          return resolve(true);
+        }
+
+        if (data.event === 'error') {
+          const parsedData = JSON.parse(data.error);
+          parsedData.failedFiles.forEach((file) => {
+            this.decompressTaskWarning.errors.push({
+              item: file.path,
+              message: file.error,
+            });
+          });
+          child.kill();
+          return reject(new Error(data.error));
+        }
+
+        child.kill();
+        reject(new Error(`Decompress task failed: unknown event '${data.event}'`));
+      });
+    });
   }
-
 }

@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+Upcoming changes...
+
+## [1.32.0] - 2026-02-09
+### Added
+- Added support for new archive decompression formats: `.rar`, `.rpm`, `.tar.bz2`, `.tar.lzma`, `.tar.xz`, `.tbz2`, `.txz`, `.7z`
+- Added support for single-file `.gz` decompression
+- Added scan warning dialog to display decompress errors 
+### Changed
+- Upgraded `scanoss.js` SDK to `v0.32.0`
+- Refactored scanner pipeline task execution to cache stage properties
+### Fixed
+- Fixed Cryptography scanner hang when processing empty file list
+- Fixed search keywords not being highlighted
+- Fixed raw result import
+- Fixed crash when saving user settings with missing workspace configuration
 
 ## [1.31.0] - 2026-01-28
 ### Added
@@ -131,4 +146,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.30.0]: https://github.com/scanoss/sbom-workbench/compare/v1.29.0...v1.30.0
 [1.30.1]: https://github.com/scanoss/sbom-workbench/compare/v1.30.0...v1.30.1
 [1.31.0]: https://github.com/scanoss/sbom-workbench/compare/v1.30.1...v1.31.0
-
+[1.32.0]: https://github.com/scanoss/sbom-workbench/compare/v1.31.0...v1.32.0

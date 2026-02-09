@@ -40,6 +40,7 @@ const Editor = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
 
   const isLoaded = useRef<boolean>(false);
 
@@ -52,6 +53,8 @@ const Editor = () => {
   const { appInfo } = useSelector(selectWorkspaceState);
 
   const file = node?.type === 'file' ? node.path : null;
+  const searchHighlight = searchParams.get('highlight');
+  const searchHighlights = searchHighlight ? searchHighlight.split(',').filter(Boolean) : null;
 
   const [matchInfo, setMatchInfo] = useState<any[] | null>(null);
   const [inventories, setInventories] = useState<Inventory[] | null>(null);
@@ -333,7 +336,9 @@ const Editor = () => {
                 language={getExtension(file)}
                 value={localFileContent?.content || ''}
                 highlight={ currentMatch?.lines || null}
+                highlights={searchHighlights}
                 syncScrollWith={isDiffView ? CodeViewerManager.RIGHT : undefined}
+                highlightMatchOptions={{ matchCase: false }}
               />
             ) : (
               <div className="file-loader">{localFileContent?.content || t('LoadingLocalFile')}</div>
