@@ -230,9 +230,21 @@ export default class Folder extends Node {
   public getFiles(banned: BlackListAbstract = null): Array<any> {
     const files: Array<any> = [];
     if (banned && banned.evaluate(this)) return files;
-    this.children.forEach((child) => {
-      files.push(...child.getFiles(banned));
-    });
+    const stack: Node[] = [...this.children];
+    while (stack.length > 0) {
+      const node = stack.pop();
+      if (banned && banned.evaluate(node)) continue;
+      if (node.getType() === 'folder') {
+        for (let i = node.getChildrenCount() - 1; i >= 0; i--) {
+          stack.push(node.getChild(i));
+        }
+      } else {
+        const result = node.getFiles(banned);
+        for (const f of result) {
+          files.push(f);
+        }
+      }
+    }
     return files;
   }
 
