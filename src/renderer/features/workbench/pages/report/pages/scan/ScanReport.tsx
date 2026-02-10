@@ -26,7 +26,8 @@ const ScanReport = () => {
 
   const isEmpty = summary?.identified.scan === 0
     && summary?.original === 0
-    && identified?.licenses.length === 0;
+    && identified?.licenses.length === 0
+    && identified?.cryptographies?.local === 0;
 
   const refresh = async () => {
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
