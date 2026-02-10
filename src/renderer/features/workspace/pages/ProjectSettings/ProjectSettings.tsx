@@ -16,7 +16,7 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Add } from '@mui/icons-material';
+import { Add, WarningAmber } from '@mui/icons-material';
 import { Trans, useTranslation } from 'react-i18next';
 import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { SettingsFileInfo, INewProject } from '@api/types';
@@ -61,7 +61,7 @@ const ProjectSettings = () => {
       mode: Scanner.ScannerMode.SCAN,
       source: scanPath?.source || ScannerSource.CODE,
       pipelineStages: [
-        ScannerType.CODE,
+        ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [ScannerType.CODE] : []),
         ScannerType.DEPENDENCIES,
         ScannerType.VULNERABILITIES,
         ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
@@ -73,6 +73,8 @@ const ProjectSettings = () => {
   const [projectValidName, setProjectValidName] = useState(false);
   const [projectNameExists, setProjectNameExists] = useState(false);
   const [projectNameReserved, setProjectNameReserved] = useState(false);
+  const [showPipelineMinWarning, setShowPipelineMinWarning] = useState(false);
+  const [showVulnerabilityAloneWarning, setShowVulnerabilityAloneWarning] = useState(false);
 
   useEffect(() => {
     init();
@@ -96,7 +98,7 @@ const ProjectSettings = () => {
     const defaultApiKey = !!apiUrlKey.APIS?.[apiUrlKey.DEFAULT_API_INDEX]?.API_KEY;
     setHasApiKey(defaultApiKey);
     const defaultTypes = [
-      ScannerType.CODE,
+      ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [ScannerType.CODE] : []),
       ScannerType.DEPENDENCIES,
       ScannerType.VULNERABILITIES,
       ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
@@ -221,12 +223,33 @@ const ProjectSettings = () => {
   const onPipelineStageHandler = (type: ScannerType, checked: boolean) => {
     const newType = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== type);
     if (checked) newType.push(type);
+
+    // When source is CODE, at least one option must remain enabled
+    if (scanPath?.source === ScannerSource.CODE && newType.length === 0) {
+      setShowPipelineMinWarning(true);
+      return;
+    }
+    setShowPipelineMinWarning(false);
+
+    // Warn when only VULNERABILITIES is selected (needs CODE or DEPENDENCIES to scan)
+    setShowVulnerabilityAloneWarning(
+      newType.length === 1 && newType[0] === ScannerType.VULNERABILITIES
+    );
+
+    const updatedConfig = {
+      ...projectSettings.scannerConfig,
+      pipelineStages: newType,
+    };
+
+    // When CODE scanning is disabled, reset obfuscate and hpsm
+    if (type === ScannerType.CODE && !checked) {
+      updatedConfig.obfuscate = false;
+      updatedConfig.hpsm = false;
+    }
+
     setProjectSettings({
       ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        pipelineStages: newType,
-      },
+      scannerConfig: updatedConfig,
     });
   };
 
@@ -418,7 +441,12 @@ const ProjectSettings = () => {
 
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={(
+                        <Checkbox
+                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
+                          checked={projectSettings.scannerConfig.obfuscate}
+                        />
+                      )}
                       label={t('ObfuscateFilePaths')}
                       onChange={(event, checked) => onObfuscateHandler(checked)}
                     />
@@ -429,7 +457,12 @@ const ProjectSettings = () => {
 
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={(
+                        <Checkbox
+                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
+                          checked={projectSettings.scannerConfig.hpsm || false}
+                        />
+                      )}
                       label={t('EnableHPSM')}
                       onChange={(event, checked) => onHPSMhandler(checked)}
                     />
@@ -444,6 +477,36 @@ const ProjectSettings = () => {
             <div className="grid-item settings-right-column">
               <div>
                 <label className="input-label">{t('Title:PipelineStages')}</label>
+                <FormGroup>
+                  <FormControlLabel
+                    control={(
+                      <Checkbox
+                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
+                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.CODE, checked)}
+                        disabled={scanPath?.source === ScannerSource.WFP || scanPath?.source === ScannerSource.IMPORTED_RESULTS_RAW}
+                      />
+                    )}
+                    label={t('PipelineStageCode')}
+                  />
+                  <FormHelperText className="helper">
+                    {t('PipelineStageCodeHint')}
+                  </FormHelperText>
+                  {projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE) && (
+                  <FormHelperText className="helper" style={{
+                    padding: '6px',
+                    marginTop: '5px',
+                    border: 'solid 1px #F59E0B',
+                    borderRadius: '4px',
+                    color: '#92400E',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    backgroundColor: '#FFF3CD',
+                  }}>
+                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                    {t('PipelineStageCodeWarning')}
+                  </FormHelperText>
+                  )}
+                </FormGroup>
                 <FormGroup>
                   <FormControlLabel
                     control={(
@@ -502,6 +565,40 @@ const ProjectSettings = () => {
                     {t('PipelineStageSearchIndexHint')}
                   </FormHelperText>
                 </FormGroup>
+                {showPipelineMinWarning && (
+                  <FormHelperText className="helper" style={{
+                    padding: '6px',
+                    marginTop: '20px',
+                    marginBottom: '5px',
+                    border: 'solid 1px #F59E0B',
+                    borderRadius: '4px',
+                    color: '#92400E',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    marginLeft: '0px',
+                    backgroundColor: '#FFF3CD',
+                  }}>
+                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                    {t('PipelineStageMinWarning')}
+                  </FormHelperText>
+                )}
+                {showVulnerabilityAloneWarning && (
+                  <FormHelperText className="helper" style={{
+                    padding: '6px',
+                    marginTop: '20px',
+                    marginBottom: '5px',
+                    border: 'solid 1px #F59E0B',
+                    borderRadius: '4px',
+                    color: '#92400E',
+                    fontSize: '13px',
+                    fontWeight: 400,
+                    marginLeft: '0px',
+                    backgroundColor: '#FFF3CD',
+                  }}>
+                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                    {t('PipelineStageVulnerabilityAloneWarning')}
+                  </FormHelperText>
+                )}
               </div>
               <div className="context-files-info">
                 { showConfigurationOptions && settingsFileInfo.type === 'none' && (

@@ -62,7 +62,7 @@ export class FileModel extends Model {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
         for (let i = 0; i < data.length; i += 1) {
-          this.connection.run('INSERT INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type);
+          this.connection.run('INSERT OR REPLACE INTO FILES(path,type) VALUES(?,?)', data[i].path, data[i].type);
         }
 
         this.connection.run('commit', (err: any) => {

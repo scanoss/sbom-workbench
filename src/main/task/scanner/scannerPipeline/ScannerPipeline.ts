@@ -4,6 +4,7 @@ import { Scanner, StageWarning } from '../types';
 import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
 import { Project } from '../../../workspace/Project';
 import { ITask } from '../../Task';
+import { ScanState } from '../../../../api/types';
 
 export abstract class ScannerPipeline implements ITask<Project, boolean> {
   protected queue: Array<Scanner.IPipelineTask>;
@@ -64,6 +65,8 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
   }
 
   protected async done(project: Project) {
+    project.metadata.setScannerState(ScanState.FINISHED);
+    project.save();
     await project.close();
 
     // Send warnings via dedicated channel if there are any
