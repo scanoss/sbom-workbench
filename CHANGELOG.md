@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File/Snippet Scanning is disabled and unchecked by default for raw result imports
 - File/Snippet Scanning checkbox is locked (always enabled) for WFP imports
 - Obfuscate and HPSM options are now disabled when File/Snippet Scanning is unchecked
+- Upgraded `scanoss.js` SDK to `v0.33.0`
 
 ### Fixed
 - Set scanner state to `FINISHED` when pipeline completes

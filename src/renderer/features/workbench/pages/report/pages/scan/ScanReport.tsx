@@ -26,7 +26,8 @@ const ScanReport = () => {
 
   const isEmpty = summary?.identified.scan === 0
     && summary?.original === 0
-    && identified?.licenses.length === 0;
+    && identified?.licenses.length === 0
+    && identified?.cryptographies?.local === 0;
 
   const refresh = async () => {
     const dialog = await dialogCtrl.createProgressDialog(t('Dialog:UpdatingReport').toUpperCase());
@@ -47,8 +48,13 @@ const ScanReport = () => {
     }
   };
 
-  const setTab = (identified) => {
-    if (state.tree.hasIdentified || state.tree.hasIgnored || identified.licenses.length > 0) {
+  const setTab = (identified, detected) => {
+    if (
+      state.tree.hasIdentified ||
+      state.tree.hasIgnored ||
+      identified.licenses.length > 0 ||
+      identified.cryptographies?.local > 0
+    ) {
       navigate('identified', { replace: true });
     } else {
       navigate('detected', { replace: true });
@@ -60,7 +66,7 @@ const ScanReport = () => {
       if (location.pathname.endsWith('scan')) { // only reload if user click in main item (avoid reload on back navigation)
         const { payload } = await dispatch<any>(getReport());
         if (payload) {
-          setTab(payload.identified);
+          setTab(payload.identified, payload.detected);
         }
       }
     };

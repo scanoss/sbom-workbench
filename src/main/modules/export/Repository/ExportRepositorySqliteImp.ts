@@ -78,7 +78,7 @@ export class ExportRepositorySqliteImp implements ExportRepository {
   }
 
   public async getCBOMIdentifiedData(): Promise<ExportCryptographyData> {
-    const localCrypto = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
+    const localCrypto = await modelProvider.model.localCryptography.findAllDetectedGroupByType(); // Detected Local Cryptography is considered Identified in CBOM
     const componentCrypto = await modelProvider.model.cryptography.findAllIdentifiedGroupByType();
     return {
       localCryptography: localCrypto,
