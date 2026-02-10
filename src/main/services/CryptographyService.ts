@@ -144,18 +144,18 @@ class CryptographyService {
     try {
       // Get identified algorithms and hints
       const components = await modelProvider.model.cryptography.findAllIdentifiedGroupByType();
-      const files = await modelProvider.model.localCryptography.findAllIdentifiedGroupByType();
+      const files = await modelProvider.model.localCryptography.findAllDetectedGroupByType();
 
       // Crypto type summary for identified files(local) and components: i.e { algorithm: 2, library:1 }
-      const fileTypeSummary = await modelProvider.model.localCryptography.getIdentifiedTypeSummary();
+      const fileTypeSummary = await modelProvider.model.localCryptography.getDetectedTypeSummary();
       const componentTypeSummary = await modelProvider.model.cryptography.getIdentifiedTypeSummary();
 
       // Crypto summary for identified files(local) and components: i.e { md5: 2, openssl:1 }
-      const fileCryptoSummary = await modelProvider.model.localCryptography.getIdentifiedCryptoSummary();
+      const fileCryptoSummary = await modelProvider.model.localCryptography.getDetectedCryptoSummary();
       const componentCryptoSummary = await modelProvider.model.cryptography.getIdentifiedCryptoSummary();
 
       // Get detection grouped by type { algorithm: ['MD5'] }
-      const localTypeDetection = await modelProvider.model.localCryptography.getIdentifiedDetectionGroupedByType();
+      const localTypeDetection = await modelProvider.model.localCryptography.getDetectedDetectionGroupedByType();
       const componentTypeDetection = await modelProvider.model.cryptography.getIdentifiedDetectionGroupedByType();
 
       return {
