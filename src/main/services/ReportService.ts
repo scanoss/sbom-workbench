@@ -126,7 +126,7 @@ class ReportService {
     // Crypto
     const cryptographies = {
       sbom: await modelProvider.model.cryptography.identifiedTypeCount(),
-      local: await modelProvider.model.localCryptography.identifiedTypeCount(),
+      local: await modelProvider.model.localCryptography.detectedTypeCount(), // local cryptography is considered always as detected
     };
 
     // Dependencies

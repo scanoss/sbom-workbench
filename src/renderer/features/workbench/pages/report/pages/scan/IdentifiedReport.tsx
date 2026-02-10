@@ -46,8 +46,7 @@ const IdentifiedReport = ({ data, summary, onRefresh }: { data: any, summary: an
   const [componentsDeclared, setComponentsDeclared] = useState<ReportComponent[]>([]);
   const [obligationsFiltered, setObligationsFiltered] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0;
+  const isEmpty = summary?.identified.scan === 0 && summary?.original === 0 && data.licenses.length === 0 && data?.cryptographies.local.length === 0 ;
 
   const init = async () => {
     setIsLoading(true);
