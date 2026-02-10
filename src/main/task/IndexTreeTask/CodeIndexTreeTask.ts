@@ -2,6 +2,7 @@ import { IndexTreeTask } from "./IndexTreeTask";
 import { Tree } from "../../workspace/tree/Tree";
 import log from 'electron-log';
 import { promises as fsPromises } from 'fs';
+import { fileService } from '../../services/FileService';
 
 export class CodeIndexTreeTask  extends IndexTreeTask {
 
@@ -10,6 +11,7 @@ export class CodeIndexTreeTask  extends IndexTreeTask {
     const tree = await this.buildTreeFromDirectory();
     this.setTreeSummary(tree);
     tree.orderTree();
+    await fileService.insert(tree.getRootFolder().getFiles());
     log.info('[ CodeIndexTreeTask end ]');
     return true;
   }
