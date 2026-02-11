@@ -6,13 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+Upcoming changes...
 
+## [1.33.0] - 2026-02-12
 ### Added
 - Added ability to enable/disable File/Snippet Scanning pipeline stage from project settings
 - Added warning for large projects (100K+ files) when File/Snippet Scanning is enabled
 - Added validation to ensure at least one of 'File/Snippet Scanning' or 'Dependencies' stages is enabled
 - Added i18n support for pipeline stage labels, hints, and warnings (en, es, jp, zh)
-
 ### Changed
 - Refactored `Folder.getFiles()` from recursive to iterative approach for better performance
 - Changed `INSERT` to `INSERT OR REPLACE` in `FileModel` to handle duplicate file entries
@@ -20,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File/Snippet Scanning checkbox is locked (always enabled) for WFP imports
 - Obfuscate and HPSM options are now disabled when File/Snippet Scanning is unchecked
 - Upgraded `scanoss.js` SDK to `v0.33.0`
-
 ### Fixed
 - Set scanner state to `FINISHED` when pipeline completes
 - Insert file records into database during code index tree task
@@ -164,3 +164,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.30.1]: https://github.com/scanoss/sbom-workbench/compare/v1.30.0...v1.30.1
 [1.31.0]: https://github.com/scanoss/sbom-workbench/compare/v1.30.1...v1.31.0
 [1.32.0]: https://github.com/scanoss/sbom-workbench/compare/v1.31.0...v1.32.0
+[1.33.0]: https://github.com/scanoss/sbom-workbench/compare/v1.32.0...v1.33.0
