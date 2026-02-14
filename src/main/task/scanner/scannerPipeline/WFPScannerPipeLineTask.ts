@@ -12,6 +12,8 @@ import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { WFPResumeTask } from '../resume/WFPResumeTask';
 import { CryptographyTask } from '../cryptography/CryptographyTask';
 import { IndexTask } from '../../search/indexTask/IndexTask';
+import { DependencyTask } from '../dependency/DependencyTask';
+import { ReScanDependencyTask } from '../dependency/ReScanDependencyTask';
 
 
 export class WFPScannerPipeLineTask extends ScannerPipeline {
@@ -32,6 +34,15 @@ export class WFPScannerPipeLineTask extends ScannerPipeline {
         : new WFPRescanTask(project);
 
     this.queue.push(scanTask);
+
+    // dependencies
+    if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.DEPENDENCIES)){
+      const dependencyTask: DependencyTask =
+        metadata.getScannerConfig().mode === Scanner.ScannerMode.SCAN
+          ? new DependencyTask(project)
+          : new ReScanDependencyTask(project);
+      this.queue.push(dependencyTask);
+    }
 
     // vulnerabilities
     if (metadata.getScannerConfig().pipelineStages.includes(ScannerType.VULNERABILITIES)) this.queue.push(new VulnerabilitiesTask(project));
