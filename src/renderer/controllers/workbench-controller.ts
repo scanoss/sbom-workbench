@@ -25,6 +25,7 @@ export interface ScanResult {
   config: Scanner.ScannerConfig;
   mode: ProjectAccessMode
   lockedBy: string;
+  sqliteLocked?: boolean;
   projectSource: ProjectSource;
   sourceCodePath: string;
 }
@@ -121,6 +122,7 @@ class WorkbenchController {
       config: data.metadata.scannerConfig,
       mode: data.mode,
       lockedBy: data.lockedBy,
+      sqliteLocked: data.sqliteLocked,
       projectSource: data.metadata.source as ProjectSource || ProjectSource.SCAN
     };
   }

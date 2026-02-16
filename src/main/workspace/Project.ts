@@ -13,6 +13,7 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
+import { removeSqliteLockFiles } from './sqliteLockHelper';
 
 export class Project {
   work_root: string;
@@ -105,6 +106,14 @@ export class Project {
     if (modelProvider.model) {
       await modelProvider.model.destroy();
     }
+
+    // Force-clear any stale SQLite lock files after closing the DB connection
+    try {
+      removeSqliteLockFiles(this.metadata.getMyPath());
+    } catch (err: any) {
+      log.warn(`%c[ PROJECT ]: Failed to clean SQLite lock files: ${err.message}`, 'color: orange');
+    }
+
     this.logical_tree = null;
     this.tree = null;
     this.store = null;

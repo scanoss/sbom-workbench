@@ -23,6 +23,8 @@ import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
 import api from '../api';
 import { modelProvider } from '../../main/services/ModelProvider';
+import { removeSqliteLockFiles } from '../../main/workspace/sqliteLockHelper';
+import path from 'path';
 
 api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
   // TODO: factory to create filters depending on arguments
@@ -42,6 +44,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
     metadata: p.metadata,
     mode: payload.mode,
     ...(payload.lockedBy && { lockedBy: payload.lockedBy }),
+    ...(payload.sqliteLocked && { sqliteLocked: true }),
   };
   return {
     status: 'ok',
@@ -238,6 +241,19 @@ api.handle(IpcChannels.PROJECT_CURRENT_CLOSE, async (_event) => {
     });
   } catch (error: any) {
     log.error('[PROJECT_CURRENT_CLOSE]', error);
+    return Response.fail({ message: error.message });
+  }
+});
+
+api.handle(IpcChannels.PROJECT_FORCE_UNLOCK_SQLITE, async (_event, payload: { path: string }) => {
+  try {
+    const pName = path.basename(payload.path).trim();
+    const projectPath = path.join(workspace.getMyPath(), pName);
+    removeSqliteLockFiles(projectPath);
+    log.info(`[PROJECT_FORCE_UNLOCK_SQLITE] SQLite lock files removed for ${pName}`);
+    return Response.ok({ message: 'SQLite lock files removed' });
+  } catch (error: any) {
+    log.error('[PROJECT_FORCE_UNLOCK_SQLITE]', error);
     return Response.fail({ message: error.message });
   }
 });

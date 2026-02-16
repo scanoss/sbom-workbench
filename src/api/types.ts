@@ -401,6 +401,7 @@ export interface ProjectOpenResponse {
   metadata: Metadata;
   mode: ProjectAccessMode;
   lockedBy: string;
+  sqliteLocked?: boolean;
 }
 
 export interface LOCK {

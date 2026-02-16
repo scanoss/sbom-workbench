@@ -34,6 +34,7 @@ export interface WorkbenchState {
   };
   mode: ProjectAccessMode,
   lockedBy: string;
+  sqliteLocked: boolean;
 }
 
 const initialState: WorkbenchState = {
@@ -61,6 +62,7 @@ const initialState: WorkbenchState = {
   },
   mode: ProjectAccessMode.WRITE,
   lockedBy: null,
+  sqliteLocked: false,
 };
 
 export const workbenchSlice = createSlice({
@@ -99,7 +101,7 @@ export const workbenchSlice = createSlice({
     });
     builder.addCase(loadProject.fulfilled, (state, action) => {
       const {
-        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, projectSource, sourceCodePath
+        name, imported, fileTree, dependencies, scanRoot, config, mode, lockedBy, sqliteLocked, projectSource, sourceCodePath
       } = action.payload;
       state.path = scanRoot;
       state.sourceCodePath = sourceCodePath
@@ -114,6 +116,7 @@ export const workbenchSlice = createSlice({
       state.mode = mode;
       state.projectSource = projectSource;
       state.lockedBy = lockedBy;
+      state.sqliteLocked = sqliteLocked || false;
     });
     builder.addCase(setTree.fulfilled, (state, action) => {
       state.tree = action.payload;

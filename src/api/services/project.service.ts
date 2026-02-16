@@ -99,6 +99,11 @@ class ProjectService extends BaseService {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_CURRENT_CLOSE);
     return this.response(response);
   }
+
+  public async forceUnlockSqlite(path: string): Promise<void> {
+    const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_FORCE_UNLOCK_SQLITE, { path });
+    return this.response(response);
+  }
 }
 
 export const projectService = new ProjectService();

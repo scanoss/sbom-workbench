@@ -4,6 +4,8 @@ import path from 'path';
 import { ProjectAccessMode } from '../types';
 import { modelProvider } from '../../main/services/ModelProvider';
 import { userSettingService } from '../../main/services/UserSettingService';
+import { workspace } from '../../main/workspace/Workspace';
+import { hasSqliteLockFiles } from '../../main/workspace/sqliteLockHelper';
 
 export async function lockMiddleware(payload: any) {
   try {
@@ -42,6 +44,13 @@ export async function lockMiddleware(payload: any) {
 
       await modelProvider.workspace.lock.delete(projectLock.project, projectLock.username, projectLock.hostname);
       await modelProvider.workspace.lock.create({ projectPath: pName, hostname, username });
+    }
+
+    // Check for stale SQLite file-level locks on the project database
+    const projectPath = path.join(workspace.getMyPath(), pName);
+    if (hasSqliteLockFiles(projectPath)) {
+      log.warn(`[ LOCK MIDDLEWARE ]: SQLite lock files detected for project ${pName}`);
+      payload.sqliteLocked = true;
     }
   } catch (e: any) {
     console.error(e);
