@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 Upcoming changes...
+### Changed
+- Upgraded `scanoss.js` SDK to `v0.34.0`
+### Added
+- Added support for pnpm-lock.yaml dependency parsing
+- Added support for pip_requirements_lock.txt
 
 ## [1.33.1] - 2026-02-12
 ### Fixed
