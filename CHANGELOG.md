@@ -7,11 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 Upcoming changes...
+
+## [1.34.0] - 2026-02-26
 ### Changed
-- Upgraded `scanoss.js` SDK to `v0.34.0`
+- Upgraded `scanoss.js` SDK to `v0.35.0`
 ### Added
-- Added support for pnpm-lock.yaml dependency parsing
-- Added support for pip_requirements_lock.txt
+- Added support for `pnpm-lock.yaml` and  `pip_requirements_lock.txt` dependency parsing
+- Added support for `.mtar` archive decompression format
 
 ## [1.33.1] - 2026-02-12
 ### Fixed
@@ -178,3 +180,4 @@ Upcoming changes...
 [1.32.0]: https://github.com/scanoss/sbom-workbench/compare/v1.31.0...v1.32.0
 [1.33.0]: https://github.com/scanoss/sbom-workbench/compare/v1.32.0...v1.33.0
 [1.33.1]: https://github.com/scanoss/sbom-workbench/compare/v1.33.0...v1.33.1
+[1.34.0]: https://github.com/scanoss/sbom-workbench/compare/v1.33.1...v1.34.0
