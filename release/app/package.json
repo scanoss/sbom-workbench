@@ -1,6 +1,6 @@
 {
   "name": "scanoss-workbench",
-  "version": "1.34.0",
+  "version": "1.35.0-rc1",
   "description": "Desktop version to use SCANOSS OSS in your projects",
   "license": "GPL-2.0-only",
   "author": {
@@ -17,7 +17,7 @@
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^9.4.1",
     "flexsearch": "^0.8.151",
-    "scanoss": "0.35.0",
+    "scanoss": "0.36.0",
     "sqlite3": "^5.1.6"
   }
 }

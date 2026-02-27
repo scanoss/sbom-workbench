@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 Upcoming changes...
+### Changed
+- Upgraded `scanoss.js` SDK to `v0.36.0`
+### Added
+- Added support for scoped `requirements.txt` files (`dev-requirements.txt`, `requirements-tox.txt`, etc.) with automatic scope extraction from filename prefix/suffix
+### Fixed
+- Fixed Poetry `pyproject.toml` parser to set scope `dev` for `[tool.poetry.group.dev.dependencies]` and `[tool.poetry.dev-dependencies]` sections instead of `dependency`
+
 
 ## [1.34.0] - 2026-02-26
 ### Changed
