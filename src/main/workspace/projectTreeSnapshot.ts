@@ -111,9 +111,12 @@ export const writeTreeSnapshot = (
   snapshotFile: string = TREE_SNAPSHOT_FILENAME,
 ) => {
   const snapshotPath = buildSnapshotFilePath(projectPath, snapshotFile);
-  const fd = fs.openSync(snapshotPath, 'w');
+  const tempSnapshotPath = `${snapshotPath}.tmp.${process.pid}`;
+  let fd: number | null = null;
+  let persisted = false;
 
   try {
+    fd = fs.openSync(tempSnapshotPath, 'w');
     const root = tree.getRootFolder();
     const rootRecord: ITreeSnapshotRootRecord = {
       k: 'root',
@@ -146,8 +149,26 @@ export const writeTreeSnapshot = (
         stack.push(node.getChild(i));
       }
     }
-  } finally {
+    fs.fsyncSync(fd);
     fs.closeSync(fd);
+    fd = null;
+    fs.renameSync(tempSnapshotPath, snapshotPath);
+    persisted = true;
+  } finally {
+    if (fd !== null) {
+      try {
+        fs.closeSync(fd);
+      } catch {
+        // noop
+      }
+    }
+    if (!persisted) {
+      try {
+        fs.unlinkSync(tempSnapshotPath);
+      } catch {
+        // noop
+      }
+    }
   }
 };
 

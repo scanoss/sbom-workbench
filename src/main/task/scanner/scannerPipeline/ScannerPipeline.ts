@@ -59,15 +59,26 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         throw e;
       }
       log.warn(`Stage: ${stageProps.label} error: ${e.message}`);
-      if(stageProps.warnings) this.addWarning(stageProps.warnings);
+      if (stageProps.warnings) this.addWarning(stageProps.warnings);
       return true; // Non-critical task failed, continue pipeline
     }
   }
 
   protected async done(project: Project) {
     project.metadata.setScannerState(ScanState.FINISHED);
-    project.saveWithSnapshot();
-    await project.close();
+    let saveError: unknown = null;
+    try {
+      project.saveWithSnapshot();
+    } catch (e) {
+      saveError = e;
+    } finally {
+      await project.close();
+    }
+
+    if (saveError) {
+      log.error('[SCANNER PIPELINE ERROR]', 'Failed to persist project snapshot', saveError);
+      throw saveError;
+    }
 
     // Send warnings via dedicated channel if there are any
     if (this.warnings.length > 0) {

@@ -262,7 +262,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     await this.done();
     this.flushProjectSave();
-    this.project.save();
+    this.project.saveWithSnapshot();
     return true;
   }
 

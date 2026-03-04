@@ -78,4 +78,17 @@ describe('ReScanDependencyTask', () => {
     expect(setStatus).toHaveBeenCalledWith('/dep/b.ts', 'IDENTIFIED');
     expect(project.saveWithSnapshot).toHaveBeenCalled();
   });
+
+  it('fails fast when project tree is not initialized', async () => {
+    jest.spyOn(DependencyTask.prototype, 'run').mockResolvedValue(true);
+    const project: any = {
+      tree: null,
+      saveWithSnapshot: jest.fn(),
+    };
+
+    const task = new ReScanDependencyTask(project);
+    await expect(task.run()).rejects.toThrow('project tree is not initialized');
+
+    expect(project.saveWithSnapshot).not.toHaveBeenCalled();
+  });
 });

@@ -22,9 +22,14 @@ export class ReScanDependencyTask extends DependencyTask {
   }
 
   private async updateDependenciesOnFileTree() {
+    const rootFolder = this.project.tree?.getRootFolder();
+    if (!rootFolder) {
+      throw new Error('Cannot update dependency status: project tree is not initialized');
+    }
+
     const dep = await treeService.getDependencyStatus();
     dep.forEach((d) => {
-      this.project.tree.getRootFolder().setStatus(d.path, d.status as NodeStatus);
+      rootFolder.setStatus(d.path, d.status as NodeStatus);
     });
     this.project.saveWithSnapshot();
   }

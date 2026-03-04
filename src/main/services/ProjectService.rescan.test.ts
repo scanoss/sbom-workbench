@@ -86,4 +86,21 @@ describe('ProjectService reScan lifecycle', () => {
     expect(projectMock.save).toHaveBeenCalledTimes(1);
     expect(projectMock.close).toHaveBeenCalledTimes(1);
   });
+
+  it('closes project and rethrows original scan error even if save fails in error path', async () => {
+    const projectMock = createProjectMock(ProjectState.OPENED);
+    const originalError = new Error('boom');
+    const run = jest.fn().mockRejectedValue(originalError);
+    projectMock.save.mockImplementation(() => {
+      throw new Error('save failed');
+    });
+
+    (workspace.openProject as jest.Mock).mockResolvedValue(projectMock);
+    (ScannerPipelineFactory.getScannerPipeline as jest.Mock).mockReturnValue({ run });
+
+    await expect(projectService.reScan('/tmp/project')).rejects.toThrow('boom');
+
+    expect(projectMock.save).toHaveBeenCalledTimes(1);
+    expect(projectMock.close).toHaveBeenCalledTimes(1);
+  });
 });

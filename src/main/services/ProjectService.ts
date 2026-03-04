@@ -110,8 +110,13 @@ class ProjectService {
       // If scanning fails, ensure the project is properly opened and saved
       // This maintains project integrity even when the rescan operation fails
       if (p.getState() === ProjectState.CLOSED) await p.open();
-      p.save();
-      if (p.getState() === ProjectState.OPENED) await p.close();
+      try {
+        p.save();
+      } catch (saveError) {
+        log.error('[ProjectService.reScan]: Failed to persist project in error path', saveError);
+      } finally {
+        if (p.getState() === ProjectState.OPENED) await p.close();
+      }
       throw e;
     }
   }
