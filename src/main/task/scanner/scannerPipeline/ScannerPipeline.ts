@@ -66,7 +66,7 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
 
   protected async done(project: Project) {
     project.metadata.setScannerState(ScanState.FINISHED);
-    project.save();
+    project.saveWithSnapshot();
     await project.close();
 
     // Send warnings via dedicated channel if there are any

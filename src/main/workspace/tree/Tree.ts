@@ -44,13 +44,17 @@ export class Tree {
     broadcastManager.get().send(eventName, data);
   }
 
-  public build(files: Array<string>, addedNodes: Record<string, Folder> = {}) {
+  public build(
+    files: Array<string>,
+    addedNodes: Record<string, Folder> = {},
+    onFileCreated?: (file: File) => void,
+  ) {
     files.forEach((f) => {
       const splitPath = f.split('/');
       if (splitPath.length > 1) {
         if (splitPath[0] === '') splitPath.shift();
-        this.recursive(splitPath, this.rootFolder, addedNodes);
-      } else this.recursive([f], this.rootFolder, addedNodes);
+        this.recursive(splitPath, this.rootFolder, addedNodes, onFileCreated);
+      } else this.recursive([f], this.rootFolder, addedNodes, onFileCreated);
     });
     return this.rootFolder;
   }
@@ -62,13 +66,19 @@ export class Tree {
     this.rootFolder.order();
   }
 
-  private recursive(splitPath: Array<string>, node: Folder, addedNodes : Record<string, Folder>): Node {
+  private recursive(
+    splitPath: Array<string>,
+    node: Folder,
+    addedNodes : Record<string, Folder>,
+    onFileCreated?: (file: File) => void,
+  ): Node {
     // TODO: Change by node.getPath() ? `${node.getPath()}/${splitPath[0]}` : splitPath[0];
     const nodePath = `${node.getPath()}/${splitPath[0]}`;
     // File
     if (splitPath.length === 1) {
       const file = new File(nodePath, splitPath[0]);
       node.addChild(file);
+      if (onFileCreated) onFileCreated(file);
       return file;
     }
     // Folder
@@ -84,7 +94,7 @@ export class Tree {
       node = f;
     }
     splitPath.shift();
-    this.recursive(splitPath, node, addedNodes);
+    this.recursive(splitPath, node, addedNodes, onFileCreated);
     return node;
   }
 

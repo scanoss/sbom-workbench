@@ -36,12 +36,40 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
   protected obfuscationMapper: Record<string, string> = null;
 
+  private pendingProjectSave = false;
+
+  private projectSaveTimer: NodeJS.Timeout | null = null;
+
+  private readonly PROJECT_SAVE_THROTTLE_MS = 10_000;
+
   public abstract getStageProperties(): ScannerModule.StageProperties;
 
   constructor(project: Project, dispatch: TDispatcher, inputAdapter: TInputScannerAdapter) {
     this.project = project;
     this.dispatcher = dispatch;
     this.inputAdapter = inputAdapter;
+  }
+
+  private scheduleProjectSave(): void {
+    this.pendingProjectSave = true;
+    if (this.projectSaveTimer) return;
+
+    this.projectSaveTimer = setTimeout(() => {
+      this.flushProjectSave();
+    }, this.PROJECT_SAVE_THROTTLE_MS);
+  }
+
+  private flushProjectSave(): boolean {
+    if (this.projectSaveTimer) {
+      clearTimeout(this.projectSaveTimer);
+      this.projectSaveTimer = null;
+    }
+
+    if (!this.pendingProjectSave) return false;
+
+    this.pendingProjectSave = false;
+    this.project.save();
+    return true;
   }
 
   protected sendToUI(eventName, data: any) {
@@ -77,7 +105,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
           this.project.filesNotScanned,
           this.project.filesNotScanned,
         );
-        this.project.save();
+        this.scheduleProjectSave();
       },
     );
 
@@ -85,6 +113,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
       ScannerEvents.SCAN_DONE,
       async (resultPath, filesNotScanned) => {
         log.info('%cScannerEvents.SCAN_DONE', 'color: green');
+        this.flushProjectSave();
       },
     );
 
@@ -93,7 +122,7 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     });
 
     this.scanner.on('error', async (error) => {
-      this.project.save();
+      if (!this.flushProjectSave()) this.project.save();
       await this.project.close();
       this.sendToUI(IpcChannels.SCANNER_ERROR_STATUS, error);
     });
@@ -226,11 +255,13 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
 
     // If scan was stopped (no result path returned), skip done process
     if (!resultPath) {
+      this.flushProjectSave();
       log.info('[ BaseScannerTask ]: Scan was stopped, skipping import');
       return false;
     }
 
     await this.done();
+    this.flushProjectSave();
     this.project.save();
     return true;
   }

@@ -5,6 +5,7 @@ import path from 'path';
 import log from 'electron-log';
 import { parser } from 'stream-json';
 import { streamObject } from 'stream-json/streamers/StreamObject';
+import { createFilesSummary } from '../../workspace/projectScanState';
 
 export class RawResultFileTreeTask extends IndexTreeTask {
 
@@ -88,14 +89,12 @@ export class RawResultFileTreeTask extends IndexTreeTask {
 
   public setTreeSummary(tree: Tree):void {
     this.project.filesToScan = this.filesToScan.reduce((acc,curr)=> { if(!acc[curr])acc[curr]=null; return acc; },{});
-    this.project.filesSummary = { total: this.filesToScan.length, include: this.filesToScan.length, filter: 0, files: Object.assign(this.project.filesToScan) } ;
+    this.project.filesSummary = createFilesSummary(this.filesToScan.length, this.filesToScan.length, 0);
     this.project.filesNotScanned = {};
     this.project.processedFiles = 0;
     this.project.setTree(tree);
     this.project.metadata.setFileCounter(this.filesToScan.length);
-    this.project.save();
+    this.project.saveWithSnapshot();
   }
 
 }
-
-

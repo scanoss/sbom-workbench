@@ -13,6 +13,28 @@ import { IpcChannels } from '../../api/ipc-channels';
 import * as ScannerCFG from '../task/scanner/types';
 import { broadcastManager } from '../broadcastManager/BroadcastManager';
 import { userSettingService } from '../services/UserSettingService';
+import { normalizeProjectScanState } from './projectScanState';
+import {
+  createTreeSnapshotRef,
+  isTreeSnapshotRef,
+  readTreeSnapshot,
+  TREE_STATE_SCHEMA_VERSION,
+  writeTreeSnapshot,
+} from './projectTreeSnapshot';
+
+interface ILegacyProjectState {
+  filesToScan?: unknown;
+  filesNotScanned?: unknown;
+  processedFiles?: unknown;
+  filesSummary?: unknown;
+  tree?: {
+    rootFolder?: {
+      label?: string;
+    };
+  };
+  schemaVersion?: number;
+  treeSnapshot?: unknown;
+}
 
 export class Project {
   work_root: string;
@@ -49,6 +71,8 @@ export class Project {
 
   fileTreeViewMode: FileTreeViewMode;
 
+  private hasSnapshotOnDisk: boolean;
+
   constructor(name: string) {
     this.metadata = new Metadata(name);
     this.state = ProjectState.CLOSED;
@@ -56,6 +80,7 @@ export class Project {
     this.fileTreeViewMode = FileTreeViewMode.DEFAULT;
     this.tree = null;
     this.filesToScan = {};
+    this.hasSnapshotOnDisk = false;
   }
 
   public static async readFromPath(pathToProject: string): Promise<Project> {
@@ -80,17 +105,46 @@ export class Project {
 
   public async open(): Promise<boolean> {
     this.state = ProjectState.OPENED;
-    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`; //Concatenate workspace root
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`; // Concatenate workspace root
     const project = await fs.promises.readFile(`${this.metadata.getMyPath()}/tree.json`, 'utf8');
-    const a = JSON.parse(project);
-    this.filesToScan = a.filesToScan;
-    this.filesNotScanned = a.filesNotScanned;
-    this.processedFiles = a.processedFiles;
-    this.filesSummary = a.filesSummary;
+    const a = JSON.parse(project) as ILegacyProjectState;
+    const normalized = normalizeProjectScanState(
+      a.filesToScan,
+      a.filesNotScanned,
+      a.processedFiles,
+      a.filesSummary,
+    );
+    this.filesToScan = normalized.filesToScan;
+    this.filesNotScanned = normalized.filesNotScanned;
+    this.processedFiles = normalized.processedFiles;
+    this.filesSummary = normalized.filesSummary;
     await modelProvider.init(this.metadata.getMyPath());
     this.metadata = await Metadata.readFromPath(this.metadata.getMyPath());
-    this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(), a.tree.rootFolder.label);
-    this.tree.loadTree(a.tree.rootFolder);
+
+    if (a.schemaVersion === TREE_STATE_SCHEMA_VERSION && isTreeSnapshotRef(a.treeSnapshot)) {
+      const snapshotPath = `${this.metadata.getMyPath()}/${a.treeSnapshot.file}`;
+      if (fs.existsSync(snapshotPath)) {
+        this.tree = await readTreeSnapshot({
+          projectPath: this.metadata.getMyPath(),
+          snapshotFile: a.treeSnapshot.file,
+          defaultRootName: this.metadata.getName(),
+          defaultScanRoot: this.metadata.getScanRoot(),
+        });
+        this.hasSnapshotOnDisk = true;
+        return true;
+      }
+      log.warn(`[ PROJECT ]: Missing tree snapshot file ${snapshotPath}. Falling back to legacy tree payload`);
+    }
+
+    if (a.tree?.rootFolder) {
+      this.tree = new Tree(a.tree.rootFolder.label, this.metadata.getMyPath(), a.tree.rootFolder.label);
+      this.tree.loadTree(a.tree.rootFolder);
+      this.hasSnapshotOnDisk = false;
+      return true;
+    }
+
+    this.tree = new Tree(this.metadata.getName(), this.metadata.getMyPath(), this.metadata.getScanRoot());
+    this.hasSnapshotOnDisk = false;
     return true;
   }
 
@@ -110,23 +164,47 @@ export class Project {
     this.store = null;
     this.filesToScan = null;
     this.filter = null;
+    this.hasSnapshotOnDisk = false;
     if (this.scanner && this.scanner.isRunning()) this.scanner.stop();
     this.scanner = null;
   }
 
   public save(): void {
+    this.saveState();
+  }
+
+  public saveState(): void {
+    if (this.tree && !this.hasSnapshotOnDisk) {
+      this.saveTreeSnapshot();
+    }
     this.metadata.save();
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
     const a = {
-      filesToScan: self.filesToScan,
-      filesNotScanned: self.filesNotScanned,
-      processedFiles: self.processedFiles,
-      filesSummary: self.filesSummary,
-      tree: self.tree,
+      schemaVersion: TREE_STATE_SCHEMA_VERSION,
+      filesToScan: this.filesToScan,
+      filesNotScanned: this.filesNotScanned,
+      processedFiles: this.processedFiles,
+      filesSummary: this.filesSummary,
+      treeSnapshot: this.tree ? createTreeSnapshotRef() : null,
     };
     fs.writeFileSync(`${this.metadata.getMyPath()}/tree.json`, JSON.stringify(a));
     log.info(`%c[ PROJECT ]: Project ${this.metadata.getName()} saved`, 'color:green');
+  }
+
+  public saveTreeSnapshot(): void {
+    if (!this.tree) return;
+    writeTreeSnapshot(this.metadata.getMyPath(), this.tree);
+    this.hasSnapshotOnDisk = true;
+  }
+
+  public saveWithSnapshot(): void {
+    try {
+      this.saveTreeSnapshot();
+      this.saveState();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      log.error(`[ PROJECT ]: Failed persisting tree snapshot - ${message}`);
+      throw new Error(`Project persistence error: ${message}`);
+    }
   }
 
   public setState(state: ProjectState) {
@@ -239,7 +317,7 @@ export class Project {
   }
 
   public updateTree() {
-    this.save();
+    this.saveWithSnapshot();
     this.notifyTree();
   }
 
@@ -267,7 +345,7 @@ export class Project {
 
   public async setGlobalFilter(filter: IWorkbenchFilter) {
     try {
-      if (filter?.path) filter.path = filter.path + '/';
+      if (filter?.path) filter.path += '/';
 
       if (!(JSON.stringify({ ...filter, path: null }) === JSON.stringify({ ...this.filter, path: null }))) {
         broadcastManager.get().send(IpcChannels.TREE_UPDATING, {});
@@ -300,5 +378,6 @@ export class Project {
 
   public setTree(tree: Tree) {
     this.tree = tree;
+    this.hasSnapshotOnDisk = false;
   }
 }

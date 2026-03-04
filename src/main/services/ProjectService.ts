@@ -8,7 +8,6 @@ import { modelProvider } from './ModelProvider';
 import { Scanner } from '../task/scanner/types';
 import { userSettingService } from './UserSettingService';
 import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
-import { CodeScannerPipelineTask } from '../task/scanner/scannerPipeline/CodeScannerPipelineTask';
 import { ScannerPipelineFactory } from '../task/scanner/scannerPipelineFactory/ScannerPipelineFactory';
 import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKnowledgeExtractor';
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
@@ -98,30 +97,27 @@ class ProjectService {
    * @throws {Error} Re-throws any scanning errors after ensuring project consistency
    */
   public async reScan(projectPath: string) {
-      await workspace.closeAllProjects();
-      const p = await workspace.getProject(new ProjectFilterPath(projectPath));
-      p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
-      // Add crypto scanner config depending on API Key token
-      // this.setCryptographyScanType(p);
-      // Save only metadata to avoid overwriting the filetree with an empty new one
-      // Using p.save() would overwrite the entire project including the filetree
-      p.metadata.save();
-      try {
-        await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
-      } catch (e) {
-        // If scanning fails, ensure the project is properly opened and saved
-        // This maintains project integrity even when the rescan operation fails
-        await p.open()
-        p.save()
-        await p.close();
-        throw e
-      }
+    const p = await workspace.openProject(new ProjectFilterPath(projectPath));
+    p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESCAN;
+    // Add crypto scanner config depending on API Key token
+    // this.setCryptographyScanType(p);
+    // Save only metadata to avoid overwriting the filetree with an empty new one
+    // Using p.save() would overwrite the entire project including the filetree
+    p.metadata.save();
+    try {
+      await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
+    } catch (e) {
+      // If scanning fails, ensure the project is properly opened and saved
+      // This maintains project integrity even when the rescan operation fails
+      if (p.getState() === ProjectState.CLOSED) await p.open();
+      p.save();
+      if (p.getState() === ProjectState.OPENED) await p.close();
+      throw e;
+    }
   }
 
   public async resume(projectPath: string) {
-    await workspace.closeAllProjects();
-    const p = await workspace.getProject(new ProjectFilterPath(projectPath));
-    const scanner = new CodeScannerPipelineTask();
+    const p = await workspace.openProject(new ProjectFilterPath(projectPath));
     p.metadata.getScannerConfig().mode = Scanner.ScannerMode.RESUME;
     await ScannerPipelineFactory.getScannerPipeline(p.metadata.getScannerConfig().source).run(p);
   }

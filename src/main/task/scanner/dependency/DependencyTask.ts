@@ -29,7 +29,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
     log.info('[ DependencyTask init ]');
     await this.scanDependencies();
     await this.addDependencies();
-    this.project.save();
+    this.project.saveWithSnapshot();
     return true;
   }
 
