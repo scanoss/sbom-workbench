@@ -3,6 +3,7 @@ import { Tree } from "../../workspace/tree/Tree";
 import log from 'electron-log';
 import { promises as fsPromises } from 'fs';
 import { fileService } from '../../services/FileService';
+import { createFilesSummary } from '../../workspace/projectScanState';
 
 export class CodeIndexTreeTask  extends IndexTreeTask {
 
@@ -83,12 +84,12 @@ export class CodeIndexTreeTask  extends IndexTreeTask {
     tree.summarize();
     const summary = tree.getSummarize();
     this.project.filesToScan = summary.files;
-    this.project.filesSummary = summary;
+    this.project.filesSummary = createFilesSummary(summary.total, summary.include, summary.filter);
     this.project.filesNotScanned = {};
     this.project.processedFiles = 0;
     this.project.metadata.setFileCounter(summary.total);
     this.project.setTree(tree);
-    this.project.save();
+    this.project.saveWithSnapshot();
   }
 
 }

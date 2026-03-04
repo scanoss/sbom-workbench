@@ -192,6 +192,10 @@ export default class File extends Node {
     return this.isDependencyFile;
   }
 
+  public setDependencyFile(isDependencyFile: boolean): void {
+    this.isDependencyFile = isDependencyFile;
+  }
+
   public containsFile(filename: string): boolean {
     return this.getName() === filename;
   }

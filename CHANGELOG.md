@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 Upcoming changes...
 
+## [1.35.1] - 2026-03-04
+### Changed
+- Refactored project persistence to store compact scan state in `tree.json` and large file-tree snapshots in streamed `tree.nodes.jsonl` sidecar format
+- Replaced direct `tree.json` read/write in dependency rescan with project persistence APIs
+### Fixed
+- Fixed `RangeError: Invalid string length` during indexing on very large projects by removing full nested-tree serialization from frequent state saves
+- Added backward-compatible project open flow for both legacy embedded-tree projects and new `schemaVersion: 2` snapshot-based projects
+- Ensured scanner finalization writes a fresh tree snapshot after attaching scan results
+- Improved scanner/project cleanup in error paths so projects are closed even when persistence fails
+- Added guards for dependency tree status updates when project tree is not initialized
+- Made tree snapshot writes atomic using temp-file + fsync + rename to prevent partial snapshot corruption
+
 ## [1.35.0] - 2026-02-27
 ### Changed
 - Upgraded `scanoss.js` SDK to `v0.36.0`
@@ -190,3 +202,4 @@ Upcoming changes...
 [1.33.1]: https://github.com/scanoss/sbom-workbench/compare/v1.33.0...v1.33.1
 [1.34.0]: https://github.com/scanoss/sbom-workbench/compare/v1.33.1...v1.34.0
 [1.35.0]: https://github.com/scanoss/sbom-workbench/compare/v1.34.0...v1.35.0
+[1.35.1]: https://github.com/scanoss/sbom-workbench/compare/v1.35.0...v1.35.1

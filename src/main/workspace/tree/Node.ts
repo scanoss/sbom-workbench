@@ -152,6 +152,10 @@ export default abstract class Node {
 
   public abstract setOriginal(status: NodeStatus): void;
 
+  public getOriginal(): NodeStatus {
+    return this.original;
+  }
+
   public abstract restoreStatus(path: string);
 
   public abstract attachResults(component: any, path: string): boolean;
