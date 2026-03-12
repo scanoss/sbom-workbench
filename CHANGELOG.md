@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.36.0] - 2026-03-13
+### Changed
+- Upgraded `scanoss.js` SDK to `v0.38.0` with support for Gradle Kotlin DSL (`build.gradle.kts`) and version catalog (`libs.versions.toml`) dependency parsing
 ### Fixed
 - Fixed AppImage sandbox permission crash on Linux (Ubuntu 24.04+) by re-enabling afterPack hook
 
@@ -204,3 +208,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.34.0]: https://github.com/scanoss/sbom-workbench/compare/v1.33.1...v1.34.0
 [1.35.0]: https://github.com/scanoss/sbom-workbench/compare/v1.34.0...v1.35.0
 [1.35.1]: https://github.com/scanoss/sbom-workbench/compare/v1.35.0...v1.35.1
+[1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.35.1...v1.36.0
