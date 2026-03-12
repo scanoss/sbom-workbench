@@ -44,8 +44,7 @@ export class DependencyTask implements Scanner.IPipelineTask {
           allFiles.push(rootPath + f.path);
         });
       const depScanner = ScannerFactory.createScanner(DependencyScannerCfg, DependencyScanner);
-      const resp = await depScanner.scan(allFiles);
-      resp.filesList.forEach((f) => {})
+      const resp = await depScanner.scan(allFiles, rootPath);
       resp.filesList.forEach((f) => {
         f.file = f.file.replace(rootPath, '');
       });
