@@ -936,6 +936,109 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
       INNER JOIN inventories i ON cv.id = i.cvid
       WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0;`;
 
+  UNIFIED_REPORT_DATA_FILES = `SELECT * FROM (
+  SELECT DISTINCT
+    i.id as inventory_id,
+    f.path,
+    i.usage,
+    coalesce(r.component,'') as detected_component,
+    coalesce(cv.name,'') as concluded_component,
+    r.purl as detected_purl,
+    cv.purl as concluded_purl,
+    r.version as detected_version,
+    cv.version as concluded_version,
+    r.latest_version,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+        FROM license_component_version lcv
+        INNER JOIN licenses l ON lcv.licid = l.id
+        WHERE lcv.cvid = cv.id) AS detected_license,
+    i.spdxid as concluded_license,
+    r.url as detected_url,
+    cv.url as concluded_url,
+    i.notes as comment,
+    'IDENTIFIED' as status
+  FROM inventories i
+  INNER JOIN file_inventories fi ON i.id = fi.inventoryid
+  INNER JOIN files f ON f.fileId = fi.fileId
+  INNER JOIN component_versions cv ON cv.id = i.cvid
+  INNER JOIN results r ON f.fileId = r.fileId
+  WHERE f.identified = 1
+  UNION
+  SELECT DISTINCT
+    '' as inventory_id,
+    f.path,
+    r.idtype as usage,
+    r.component as detected_component,
+    '' as concluded_component,
+    r.purl as detected_purl,
+    '' as concluded_purl,
+    r.version as detected_version,
+    '' as concluded_version,
+    r.latest_version,
+    (SELECT GROUP_CONCAT(l.spdxid, ' AND ')
+        FROM license_component_version lcv
+        INNER JOIN licenses l ON lcv.licid = l.id
+        WHERE lcv.cvid = cv.id) AS detected_license,
+    '' as concluded_license,
+    r.url as detected_url,
+    '' as concluded_url,
+    '' as comment,
+    CASE WHEN f.ignored = 1 THEN 'ORIGINAL' ELSE 'PENDING' END as status
+  FROM files f
+  INNER JOIN results r ON f.fileId = r.fileId
+  LEFT JOIN result_license rl ON r.id = rl.resultId
+  INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
+  WHERE f.identified = 0
+  UNION
+  SELECT
+    i.id as inventory_id,
+    f.path,
+    i.usage,
+    d.component as detected_component,
+    cv.name as concluded_component,
+    d.purl as detected_purl,
+    cv.purl as concluded_purl,
+    d.originalVersion as detected_version,
+    d.version as concluded_version,
+    '' as latest_version,
+    REPLACE(d.originalLicense, ',', '|') as detected_license,
+    i.spdxid as concluded_license,
+    d.url as detected_url,
+    d.url as concluded_url,
+    '' as comment,
+    'IDENTIFIED' as status
+  FROM dependencies d
+  INNER JOIN files f ON d.fileId = f.fileId
+  INNER JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
+  INNER JOIN inventories i ON cv.id = i.cvid
+  WHERE i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+  GROUP BY d.dependencyId
+  UNION
+  SELECT
+    '' as inventory_id,
+    f.path,
+    'dependency' as usage,
+    d.component as detected_component,
+    '' as concluded_component,
+    d.purl as detected_purl,
+    '' as concluded_purl,
+    d.originalVersion as detected_version,
+    '' as concluded_version,
+    '' as latest_version,
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license,
+    '' as concluded_license,
+    d.url as detected_url,
+    '' as concluded_url,
+    '' as comment,
+    CASE WHEN d.rejectedAt IS NOT NULL THEN 'ORIGINAL' ELSE 'PENDING' END as status
+  FROM dependencies d
+  INNER JOIN files f ON f.fileId = d.fileId
+  LEFT JOIN component_versions cv ON cv.purl = d.purl AND cv.version = d.version
+  LEFT JOIN inventories i ON cv.id = i.cvid AND i.usage = 'dependency' AND i.source = 'declared' AND instr(d.licenses, i.spdxid) > 0
+  WHERE i.id IS NULL
+  GROUP BY d.dependencyId)
+  ORDER BY usage DESC;`;
+
   /**
    * SQL query to retrieve identification decisions.
    * @type {string}

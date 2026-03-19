@@ -194,6 +194,7 @@ export enum ExportFormat {
   BOM = 'BOM',
   HTMLSUMMARY = 'HTMLSUMMARY',
   SETTINGS = 'SETTINGS',
+  UNIFIED_JSON = 'UNIFIED_JSON',
 }
 
 export enum ExportSource {

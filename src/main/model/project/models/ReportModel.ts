@@ -6,6 +6,7 @@ import { LicenseReport } from '../../../services/ReportService';
 import { After } from '../../hooks/after/afterHook';
 import { detectedLicenseSummaryAdapter } from '../../adapters/report/detectedLicenseSummaryAdapter';
 import { DataRecord } from '../../interfaces/report/DataRecord';
+import { UnifiedDataRecord } from '../../interfaces/report/UnifiedDataRecord';
 import { ExportComponentData } from '../../interfaces/report/ExportComponentData';
 import { DecisionData } from '../../interfaces/report/DecisionData';
 
@@ -34,6 +35,16 @@ export class ReportModel extends Model {
   public async fetchAllDetectedRecordsFiles(): Promise<Array<DataRecord>> {
     const call = util.promisify(this.connection.all.bind(this.connection)) as any;
     const data = await call(queries.DETECTED_REPORT_DATA_FILES);
+    return data;
+  }
+
+  /**
+   * Fetches all unified component records for each file (identified, pending, and original).
+   * @returns {Promise<Array<UnifiedDataRecord>>} A promise that resolves to an array of unified data records.
+   */
+  public async fetchAllUnifiedRecordsFiles(): Promise<Array<UnifiedDataRecord>> {
+    const call = util.promisify(this.connection.all.bind(this.connection)) as any;
+    const data = await call(queries.UNIFIED_REPORT_DATA_FILES);
     return data;
   }
 

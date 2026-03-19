@@ -16,6 +16,7 @@ import { SpdxLiteDetected } from '../../modules/export/format/SPDXLite/SpdxLiteD
 import { SpdxLiteIdentified } from '../../modules/export/format/SPDXLite/SpdxLiteIdentified';
 import { Settings } from '../../modules/export/format/Settings/Settings';
 import { VulnerabilityCsv } from '../../modules/export/format/CSV/Vulnerability-csv';
+import { UnifiedJson } from '../../modules/export/format/UnifiedJson';
 
 export class Export implements ITask<string, IExportResult> {
   private format: Format;
@@ -51,6 +52,9 @@ export class Export implements ITask<string, IExportResult> {
         break;
       case ExportFormat.SETTINGS:
         this.format = new Settings(exportDTO.source);
+        break;
+      case ExportFormat.UNIFIED_JSON:
+        this.format = new UnifiedJson();
         break;
       default:
         throw new Error(`Unsupported export format: ${exportDTO.format}`);

@@ -8,6 +8,7 @@ import { ComponentVulnerability } from '../../main/model/entity/ComponentVulnera
 import { detectedVulnerabilityData, identifiedVulnerabilityData } from './mocks/vulnerability.model.mock';
 import { ExportCryptographyData } from '../../main/model/interfaces/report/ExportCryptographyData';
 import { DataRecord } from '../../main/model/interfaces/report/DataRecord';
+import { UnifiedDataRecord } from '../../main/model/interfaces/report/UnifiedDataRecord';
 
 export class ExportRepositoryMock implements ExportRepository {
   private mockDecisionData: Array<DecisionData>;
@@ -327,6 +328,10 @@ export class ExportRepositoryMock implements ExportRepository {
         comment: '',
       },
     ]);
+  }
+
+  getAllUnifiedRecordFiles(): Promise<Array<UnifiedDataRecord>> {
+    return Promise.resolve([]);
   }
 
   getAllIdentifiedRecordFiles(): Promise<Array<DataRecord>> {

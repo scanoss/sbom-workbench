@@ -4,6 +4,7 @@ import { ComponentVulnerability } from '../../../model/entity/ComponentVulnerabi
 import { LicenseDTO } from '../../../../api/dto';
 import { ExportCryptographyData } from '../../../model/interfaces/report/ExportCryptographyData';
 import { DataRecord } from '../../../model/interfaces/report/DataRecord';
+import { UnifiedDataRecord } from '../../../model/interfaces/report/UnifiedDataRecord';
 
 export interface ExportRepository {
   getIdentifiedData(): Promise<ExportComponentData[]>;
@@ -18,4 +19,5 @@ export interface ExportRepository {
   getCBOMIdentifiedData(): Promise<ExportCryptographyData>;
   getAllIdentifiedRecordFiles(): Promise<Array<DataRecord>>;
   getAllDetectedRecordFiles(): Promise<Array<DataRecord>>;
+  getAllUnifiedRecordFiles(): Promise<Array<UnifiedDataRecord>>;
 }

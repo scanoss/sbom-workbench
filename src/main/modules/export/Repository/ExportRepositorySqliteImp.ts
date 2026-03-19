@@ -11,6 +11,7 @@ import { LicenseDTO } from '../../../../api/dto';
 import { CryptographicItem } from '../../../model/entity/Cryptography';
 import { ExportCryptographyData } from '../../../model/interfaces/report/ExportCryptographyData';
 import { DataRecord } from '../../../model/interfaces/report/DataRecord';
+import { UnifiedDataRecord } from '../../../model/interfaces/report/UnifiedDataRecord';
 import path from 'path';
 
 export interface ExportData {
@@ -92,5 +93,9 @@ export class ExportRepositorySqliteImp implements ExportRepository {
 
   public async getAllIdentifiedRecordFiles(): Promise<Array<DataRecord>>{
     return modelProvider.model.report.fetchAllIdentifiedRecordsFiles();
+  }
+
+  public async getAllUnifiedRecordFiles(): Promise<Array<UnifiedDataRecord>>{
+    return modelProvider.model.report.fetchAllUnifiedRecordsFiles();
   }
 }
