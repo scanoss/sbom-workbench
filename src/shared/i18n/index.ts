@@ -25,8 +25,9 @@ export class AppI18n {
   private static languages: Record<string, string> = {
     en: 'English',
     es: 'Español',
+    fr: 'Français',
     zh: '简体中文',
-    jp: '日本語',   
+    jp: '日本語',
   };
 
   private static lng: string;
