@@ -35,7 +35,7 @@
   "AddNewCustomComponent": "Ajouter un nouveau composant personnalisé",
   "AddNewVersion": "Ajouter une nouvelle version",
   "FindInFile": "Rechercher dans le fichier",
-  "CopyFilePath": "Rechercher dans le fichier",
+  "CopyFilePath": "Copier le chemin du fichier",
   "OpenFileInFolder": "Ouvrir le fichier dans le dossier",
   "OpenFileInBrowser": "Ouvrir le fichier dans le navigateur",
   "ExportHintWFP": "Exporter le fingerprint Winnowing du projet analysé",
