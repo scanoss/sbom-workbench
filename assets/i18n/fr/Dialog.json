@@ -28,7 +28,7 @@
   "SuccessfulImport": "Import réussi",
   "ImportingProject": "Import du projet en cours",
   "UpdatingReport": "Mise à jour du rapport en cours",
-  "UpdateFinished": "Mise à jour du rapport en cours",
+  "UpdateFinished": "Mise à jour du rapport terminée",
   "ErrorUpdatingReport": "Erreur lors de la mise à jour du rapport",
   "WorkspaceName": "Nom de l'espace de travail",
   "WorkspaceLocation": "Emplacement de l'espace de travail",
