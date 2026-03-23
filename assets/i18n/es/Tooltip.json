@@ -52,5 +52,6 @@
   "ExportHintSettings": "Exportar archivo de configuracion",
   "ExportCSVVulnerability": "Exportar reporte de vulnerabilidades",
   "ExportHintCycloneDXVulnerabilities": "Exportar informe en formato CycloneDX con vulnerabilities",
-  "ExportHintBOM": "Exportar la lista de materiales (BOM)"
+  "ExportHintBOM": "Exportar la lista de materiales (BOM)",
+  "ExportHintUnifiedJSON": "Export a unified JSON report reflecting the current state of all files"
 }

@@ -853,7 +853,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN file_inventories fi ON i.id = fi.inventoryid
   INNER JOIN files f ON f.fileId = fi.fileId
   INNER JOIN component_versions cv ON cv.id = i.cvid
-  INNER JOIN results r ON f.fileId = r.fileId
+  LEFT JOIN results r ON f.fileId = r.fileId AND r.purl = cv.purl AND cv.version = r.version
   UNION
   SELECT i.id as inventory_id,
          f.path,
@@ -865,7 +865,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
          d.originalVersion as detected_version,
          d.version as concluded_version,
          '' as latest_version,
-         REPLACE(d.originalLicense, ',', '|') as detected_license,
+         REPLACE(d.originalLicense, ',', ' | ') as detected_license,
          i.spdxid as concluded_license,
          d.url as detected_url,
          d.url as concluded_url,
@@ -961,7 +961,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN file_inventories fi ON i.id = fi.inventoryid
   INNER JOIN files f ON f.fileId = fi.fileId
   INNER JOIN component_versions cv ON cv.id = i.cvid
-  INNER JOIN results r ON f.fileId = r.fileId
+  LEFT JOIN results r ON f.fileId = r.fileId AND r.purl = cv.purl AND cv.version = r.version
   WHERE f.identified = 1
   UNION
   SELECT DISTINCT
@@ -986,7 +986,6 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     CASE WHEN f.ignored = 1 THEN 'ORIGINAL' ELSE 'PENDING' END as status
   FROM files f
   INNER JOIN results r ON f.fileId = r.fileId
-  LEFT JOIN result_license rl ON r.id = rl.resultId
   INNER JOIN component_versions cv ON cv.purl = r.purl AND cv.version = r.version
   WHERE f.identified = 0
   UNION
@@ -1001,7 +1000,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     d.originalVersion as detected_version,
     d.version as concluded_version,
     '' as latest_version,
-    REPLACE(d.originalLicense, ',', '|') as detected_license,
+    REPLACE(d.originalLicense, ',', ' | ') as detected_license,
     i.spdxid as concluded_license,
     d.url as detected_url,
     d.url as concluded_url,

@@ -109,6 +109,12 @@ export const ExportButton = ({ empty }) => {
       fileName: 'settings',
       disable: false,
     },
+    UNIFIED_JSON: {
+      label: 'Unified JSON',
+      hint: t('Tooltip:ExportHintUnifiedJSON'),
+      sources: [ExportSource.DETECTED, ExportSource.IDENTIFIED],
+      disable: false,
+    },
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -125,8 +131,11 @@ export const ExportButton = ({ empty }) => {
   };
 
   const onExport = async (format: ExportFormat, inventoryType: InventoryType = null) => {
-    await exportFile(format, inventoryType);
-    handleClose();
+    try {
+      await exportFile(format, inventoryType);
+    } finally {
+      handleClose();
+    }
   };
 
   const getDefaultPath = (attributes: Record<string,any>, inventoryType: InventoryType ) => {
@@ -139,25 +148,31 @@ export const ExportButton = ({ empty }) => {
   }
 
   const exportFile = async (format: ExportFormat, inventoryType: InventoryType) => {
-    const attributes = getFormatFilesAttributes(format);
-    const path = await dialogController.showSaveDialog({
-      defaultPath: getDefaultPath(attributes,inventoryType),
-      filters: [{ name: attributes.description, extensions: [attributes.extension] }],
-    });
+    try {
+      const attributes = getFormatFilesAttributes(format);
+      const path = await dialogController.showSaveDialog({
+        defaultPath: getDefaultPath(attributes,inventoryType),
+        filters: [{ name: attributes.description, extensions: [attributes.extension] }],
+      });
 
-    if (path) {
-      localStorage.setItem('last-path-used', window.path.dirname(path));
-      const response = await exportService.export({ path, format, source, inventoryType });
-      if (response.statusCode !== ExportStatusCode.SUCCESS && response.info.invalidPurls.length > 0) {
-        await dialogCtrl.openReportDialog(response.info.invalidPurls);
+      if (path) {
+        localStorage.setItem('last-path-used', window.path.dirname(path));
+        const response = await exportService.export({ path, format, source, inventoryType });
+        if (response.statusCode !== ExportStatusCode.SUCCESS && response.info.invalidPurls.length > 0) {
+          await dialogCtrl.openReportDialog(response.info.invalidPurls);
+        }
       }
+    } catch (error) {
+      console.error('Export failed:', error);
+      const message = error instanceof Error ? error.message : 'Export failed. Please try again.';
+      await dialogCtrl.openAlertDialog(message);
     }
   };
 
   const CustomMenuItem = ({ format, item, depth = 1 }) => {
     const onClickHandler = (e) => {
       if (!item.childrens) {
-        onExport(format as ExportFormat, item.type);
+        onExport(format as ExportFormat, item.type).catch(console.error);
       } else {
         setSubMenuOpened(subMenuOpened === format ? null : format);
       }

@@ -36,6 +36,7 @@ export const AppConfigDefault: IAppConfig = {
     ExportFormat.BOM,
     ExportFormat.HTMLSUMMARY,
     ExportFormat.SETTINGS,
+    ExportFormat.UNIFIED_JSON,
   ],
   FF_ENABLE_AUTO_ACCEPT_AFTER_SCAN: false,
   FF_ENABLE_API_CONNECTION_SETTINGS: true,

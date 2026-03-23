@@ -29,6 +29,7 @@ const getFormatFilesAttributes = (format: ExportFormat) => {
   attr.set(ExportFormat.BOM, { description: 'JSON Files', extension: 'json' });
   attr.set(ExportFormat.HTMLSUMMARY, { description: 'HTML Files', extension: 'html', defaultFileName: 'HTMLSummary' });
   attr.set(ExportFormat.SETTINGS, { description: 'settings', extension: 'json', defaultFileName: 'settings' });
+  attr.set(ExportFormat.UNIFIED_JSON, { description: 'JSON Files', extension: 'json', defaultFileName: 'UnifiedReport' });
 
   return attr.get(format);
 };
