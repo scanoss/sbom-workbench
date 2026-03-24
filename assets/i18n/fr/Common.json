@@ -90,7 +90,6 @@
   "OverridePreviousWork": "Écraser le travail précédent",
   "ChooseProjectToImport": "Choisissez un projet pour importer les identifications",
   "KeepOriginalUsage": "Garder l'utilisation détectée",
-  "PreRequiste": "Prérequis",
   "ObfuscateFilePaths": "Obfusquer les chemins de fichiers",
   "ObfuscateFilePathsHint": "Vos chemins de fichiers seront obfusqués pour garantir une meilleure confidentialité",
   "EnableHPSM": "Activer l'HPSM (identification de snippets à haute précision)",
