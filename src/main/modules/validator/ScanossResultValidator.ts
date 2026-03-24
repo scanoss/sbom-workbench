@@ -113,11 +113,8 @@ export class ScanossResultValidator {
       'lines': result.lines,
       'matched': result.matched,
       'oss_lines': result.oss_lines,
-      'release_date': result.release_date,
       'source_hash': result.source_hash,
       'status': result.status,
-      'url': result.url,
-      'url_hash': result.url_hash,
       'vendor': result.vendor,
       'version': result.version,
     };
