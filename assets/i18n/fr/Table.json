@@ -1,0 +1,31 @@
+{
+  "Header": {
+    "Name": "Nom",
+    "Date": "Date",
+    "TotalFiles": "Fichiers totaux",
+    "Component": "Composant",
+    "Severity": "Sévérité",
+    "CVE": "CVE",
+    "Source": "Source",
+    "Published": "Publié",
+    "Modified": "Modifié",
+    "Vendor": "Vendeur",
+    "Version": "Version",
+    "License": "Licence",
+    "Copyleft": "Copyleft",
+    "IncompatibleLicenses": "Licences incompatibles",
+    "PURL": "PURL",
+    "URL": "URL",
+    "LocalFile": "Fichier local",
+    "Algorithm": "Algorithme",
+    "Strength": "Force",
+    "File": "Fichier",
+    "Dependencies": "Dépendances",
+    "Cryptography": "Cryptographie",
+    "Type": "Type",
+    "Detected": "Détecté",
+    "CVSSSeverity": "Sévérité CVSS"
+  },
+  "Version": "Version",
+  "License": "Licence"
+}
