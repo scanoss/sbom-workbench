@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.37.0] - 2026-03-13
+### Added
+- Added "Include all file types" option in project creation settings to bypass default file and folder filters
+  
 ## [1.36.0] - 2026-03-13
 ### Changed
 - Upgraded `scanoss.js` SDK to `v0.38.0` with support for Gradle Kotlin DSL (`build.gradle.kts`) and version catalog (`libs.versions.toml`) dependency parsing
@@ -209,3 +213,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.35.0]: https://github.com/scanoss/sbom-workbench/compare/v1.34.0...v1.35.0
 [1.35.1]: https://github.com/scanoss/sbom-workbench/compare/v1.35.0...v1.35.1
 [1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.35.1...v1.36.0
+[1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.36.0...v1.37.0
