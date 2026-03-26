@@ -244,15 +244,17 @@ export class Tree {
     return 'FULL_SCAN';
   }
 
-  public setFilter() {
-    const bannedList = new Filtering.BannedList('NoFilter');
-    if (!fs.existsSync(`${this.projectPath}/filter.json`)) {
-      fs.writeFileSync(
-        `${this.projectPath}/filter.json`,
-        JSON.stringify(defaultBannedList).toString(),
-      );
+  public setFilter(bannedList?: Filtering.BannedList) {
+    if (!bannedList) {
+      bannedList = new Filtering.BannedList('NoFilter');
+      if (!fs.existsSync(`${this.projectPath}/filter.json`)) {
+        fs.writeFileSync(
+          `${this.projectPath}/filter.json`,
+          JSON.stringify(defaultBannedList).toString(),
+        );
+      }
+      bannedList.load(`${this.projectPath}/filter.json`);
     }
-    bannedList.load(`${this.projectPath}/filter.json`);
 
     log.info('%c[ PROJECT ]: Building tree', 'color: green');
     log.info('%c[ PROJECT ]: Applying filters to the tree', 'color: green');

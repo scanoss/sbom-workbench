@@ -95,6 +95,8 @@
   "ObfuscateFilePathsHint": "Todas sus rutas de ficheros se ofuscarán para garantizar una mayor confidencialidad.",
   "EnableHPSM": "Habilitar HPSM (High Precision Snippet Matching)",
   "HPSMHint": "HPSM requiere una suscripción premium",
+  "IncludeAllFileTypes": "Incluir todos los tipos de archivo",
+  "IncludeAllFileTypesHint": "Incluir todos los archivos y carpetas, incluyendo los que normalmente se filtran",
   "NoDataFound": "No se encontraron datos",
   "Current": "Actual",
   "Default": "Default",

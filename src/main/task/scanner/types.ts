@@ -54,6 +54,7 @@ export namespace Scanner {
     source?: ScannerSource;
     obfuscate?: boolean;
     hpsm?: boolean;
+    allExtensions?: boolean;
   }
 
   export interface StageProperties {
