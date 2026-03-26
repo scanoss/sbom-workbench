@@ -1,11 +1,12 @@
-import { IndexTreeTask } from "./IndexTreeTask";
-import { Tree } from "../../workspace/tree/Tree";
 import log from 'electron-log';
 import { promises as fsPromises } from 'fs';
+import { IndexTreeTask } from "./IndexTreeTask";
+import * as Filtering from '../../workspace/filtering';
+import { Tree } from '../../workspace/tree/Tree';
 import { fileService } from '../../services/FileService';
 import { createFilesSummary } from '../../workspace/projectScanState';
 
-export class CodeIndexTreeTask  extends IndexTreeTask {
+export class CodeIndexTreeTask extends IndexTreeTask {
 
   public async run(params: void):Promise<boolean> {
     log.info('[ CodeIndexTreeTask init ]');
@@ -69,14 +70,23 @@ export class CodeIndexTreeTask  extends IndexTreeTask {
       tree.build(fileChunk, addedNodes);
     }
 
-    tree.setFilter();
+    if (this.project.metadata.getScannerConfig()?.allExtensions) {
+      tree.setFilter(new Filtering.BannedList('NoFilter'));
+    } else {
+      tree.setFilter();
+    }
     return tree;
   }
 
   public async buildTree(files: Array<string>): Promise<Tree> {
     const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath(),this.project.metadata.getScanRoot());
     tree.build(files);
-    tree.setFilter();
+    const allExtensions = this.project.metadata.getScannerConfig()?.allExtensions || false;
+    if (allExtensions) {
+      tree.setFilter(new Filtering.BannedList('NoFilter'));
+    } else {
+      tree.setFilter();
+    }
     return tree;
   }
 

@@ -67,6 +67,7 @@ const ProjectSettings = () => {
         ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
       ],
       obfuscate: false,
+      allExtensions: false,
     },
   });
 
@@ -220,6 +221,16 @@ const ProjectSettings = () => {
     });
   };
 
+  const onAllExtensionsHandler = (checked: boolean) => {
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        allExtensions: checked,
+      },
+    });
+  };
+
   const onPipelineStageHandler = (type: ScannerType, checked: boolean) => {
     const newType = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== type);
     if (checked) newType.push(type);
@@ -241,10 +252,11 @@ const ProjectSettings = () => {
       pipelineStages: newType,
     };
 
-    // When CODE scanning is disabled, reset obfuscate and hpsm
+    // When CODE scanning is disabled, reset obfuscate, hpsm, and allExtensions
     if (type === ScannerType.CODE && !checked) {
       updatedConfig.obfuscate = false;
       updatedConfig.hpsm = false;
+      updatedConfig.allExtensions = false;
     }
 
     setProjectSettings({
@@ -468,6 +480,22 @@ const ProjectSettings = () => {
                     />
                     <FormHelperText className="helper">
                       {t('HPSMHint')}
+                    </FormHelperText>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <FormControlLabel
+                      control={(
+                        <Checkbox
+                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
+                          checked={projectSettings.scannerConfig.allExtensions}
+                        />
+                      )}
+                      label={t('IncludeAllFileTypes')}
+                      onChange={(event, checked) => onAllExtensionsHandler(checked)}
+                    />
+                    <FormHelperText className="helper">
+                      {t('IncludeAllFileTypesHint')}
                     </FormHelperText>
                   </FormGroup>
                 </div>

@@ -94,6 +94,8 @@
   "ObfuscateFilePathsHint": "Vos chemins de fichiers seront obfusqués pour garantir une meilleure confidentialité",
   "EnableHPSM": "Activer l'HPSM (identification de snippets à haute précision)",
   "HPSMHint": "HPSM nécessite un abonnement",
+  "IncludeAllFileTypes": "Inclure tous les types de fichiers",
+  "IncludeAllFileTypesHint": "Inclure tous les fichiers et dossiers, y compris ceux normalement filtrés",
   "NoDependenciesScanned": "Aucune dépendance n'a été scannée",
   "NoVulnerabilitiesScanned": "Aucune vulnérabilité n'a été scannée",
   "NoDataFound": "Aucune donnée trouvée",
