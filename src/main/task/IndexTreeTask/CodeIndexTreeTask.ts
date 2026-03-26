@@ -78,6 +78,7 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     return tree;
   }
 
+  // TODO: This method appears to be unused — consider removing it
   public async buildTree(files: Array<string>): Promise<Tree> {
     const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath(),this.project.metadata.getScanRoot());
     tree.build(files);
