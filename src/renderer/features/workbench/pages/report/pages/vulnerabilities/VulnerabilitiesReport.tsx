@@ -192,7 +192,7 @@ const VulnerabilitiesReport = () => {
                     </TableCell>
                     <TableCell><Link
                       className="d-flex align-center"
-                      href={`https://nvd.nist.gov/vuln/detail/${item.vulnerability.cve}`}
+                      href={item.vulnerability.source?.toUpperCase() === 'OSV' ? `https://osv.dev/vulnerability/${item.vulnerability.cve}` : `https://nvd.nist.gov/vuln/detail/${item.vulnerability.cve}`}
                       target="_blank"
                       rel="noreferrer"
                     >

@@ -7,11 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.37.0] - 2026-03-13
+## [1.37.0] - 2026-03-30
 ### Added
 - Added "Include all file types" option in project creation settings to bypass default file and folder filters
 ### Changed
 - Removed `url`, `url_hash` and `release_date` from mandatory string fields in scan result validation
+- Updated vulnerability report links to dynamically resolve URL based on source (NVD or OSV)
 ### Fixed
 - Fixed dependency import from raw result files
 
@@ -217,4 +218,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.35.0]: https://github.com/scanoss/sbom-workbench/compare/v1.34.0...v1.35.0
 [1.35.1]: https://github.com/scanoss/sbom-workbench/compare/v1.35.0...v1.35.1
 [1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.35.1...v1.36.0
-[1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.36.0...v1.37.0
+[1.37.0]: https://github.com/scanoss/sbom-workbench/compare/v1.36.0...v1.37.0
