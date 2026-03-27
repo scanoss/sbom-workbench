@@ -79,11 +79,12 @@ export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
       .pipe(streamObject());
 
     return new Promise((resolve, reject) => {
-      pipeline.on('data', async ({ file, results }) => {
-        results.forEach((r: any) => {
-          if(r.id === "dependency"){
-            const fileList = this.processFileDependencies(file, r.dependencies);
-            dependencies.filesList.push(fileList)
+      pipeline.on('data', ({ key, value }) => {
+        if (!Array.isArray(value)) return;
+        value.forEach((r: any) => {
+          if(r.id === "dependency" && Array.isArray(r.dependencies)){
+            const fileList = this.processFileDependencies(key, r.dependencies);
+            dependencies.filesList.push(fileList);
           }
         });
       });
@@ -93,7 +94,7 @@ export class RawResultDependencyImportTask implements Scanner.IPipelineTask {
       pipeline.on('error', (err) => {
         reject(err);
       });
-    })
+    });
   }
 
   public getStageProperties(): Scanner.StageProperties{

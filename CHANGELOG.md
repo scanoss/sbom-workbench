@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Changed
 - Removed `url`, `url_hash` and `release_date` from mandatory string fields in scan result validation
+### Fixed
+- Fixed dependency import from raw result files
 
 ## [1.37.0] - 2026-03-13
 ### Added
