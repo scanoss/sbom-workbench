@@ -6,15 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.37.0] - 2026-03-13
+### Added
+- Added "Include all file types" option in project creation settings to bypass default file and folder filters
 ### Changed
 - Removed `url`, `url_hash` and `release_date` from mandatory string fields in scan result validation
 ### Fixed
 - Fixed dependency import from raw result files
 
-## [1.37.0] - 2026-03-13
-### Added
-- Added "Include all file types" option in project creation settings to bypass default file and folder filters
-  
 ## [1.36.0] - 2026-03-13
 ### Changed
 - Upgraded `scanoss.js` SDK to `v0.38.0` with support for Gradle Kotlin DSL (`build.gradle.kts`) and version catalog (`libs.versions.toml`) dependency parsing
