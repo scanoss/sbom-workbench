@@ -12,7 +12,7 @@ function isLinux(targets) {
 async function afterPack({ targets, appOutDir }) {
   if (!isLinux(targets)) return;
   const scriptPath = path.join(appOutDir, appName);
-  const script = `#!/bin/bash\n"\${BASH_SOURCE%/*}"/${appName}.bin "$@" --no-sandbox`;
+  const script = `#!/bin/bash\nexport ELECTRON_DISABLE_SANDBOX=1\n"\${BASH_SOURCE%/*}"/${appName}.bin "$@"`;
   child_process.execSync(`mv ${appName} ${appName}.bin`, { cwd: appOutDir });
   fs.writeFileSync(scriptPath, script);
   child_process.execSync(`chmod +x ${appName}`, { cwd: appOutDir });
