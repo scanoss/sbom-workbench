@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- Fixed async race condition in `appimage-fix.js` afterPack hook
+- AppImage sandbox wrapper causing launch failure over SSH by using `ELECTRON_DISABLE_SANDBOX` env var instead of `--no-sandbox` CLI flag
+- Async race condition in `appimage-fix.js` afterPack hook
 - Updated `scanoss` dependency to v0.38.1 which fixes decompression failing on Windows when scanning from UNC network paths (e.g. `\\server\share\...`)
 
 ## [1.37.0] - 2026-03-30
