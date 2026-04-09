@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.37.1] - 2026-04-09
 ### Fixed
 - AppImage sandbox wrapper causing launch failure over SSH by using `ELECTRON_DISABLE_SANDBOX` env var instead of `--no-sandbox` CLI flag
 - Async race condition in `appimage-fix.js` afterPack hook
@@ -223,3 +225,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.35.1]: https://github.com/scanoss/sbom-workbench/compare/v1.35.0...v1.35.1
 [1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.35.1...v1.36.0
 [1.37.0]: https://github.com/scanoss/sbom-workbench/compare/v1.36.0...v1.37.0
+[1.37.1]: https://github.com/scanoss/sbom-workbench/compare/v1.37.0...v1.37.1
