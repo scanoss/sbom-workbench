@@ -6,6 +6,7 @@ import { IIndexer } from '../../modules/searchEngine/indexer/IIndexer';
 import { BlackListKeyWordIndex } from '../../workspace/tree/blackList/BlackListKeyWordIndex';
 import { Tree } from '../../workspace/tree/Tree';
 import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
+import { CollectFilesVisitor } from '../../workspace/tree/visitor/CollectFilesVisitor';
 
 export async function migration120(projectPath: string): Promise<void> {
   log.info('%cMigration 1.2.0 In progress...', 'color:green');
@@ -25,8 +26,9 @@ async function indexMigration(projectPath: string) {
     const a = JSON.parse(project);
     const tree = new Tree(metadata.name, projectPath,metadata.scan_root);
     tree.loadTree(a.tree.rootFolder);
-    const f = tree.getRootFolder().getFiles(new BlackListKeyWordIndex());
-    const paths = f.map((fi) => fi.path);
+    const collector = new CollectFilesVisitor(new BlackListKeyWordIndex());
+    tree.getRootFolder().accept<void>(collector);
+    const paths = collector.files.map((fi) => fi.getPath());
     const files = await modelProvider.model.file.getAll(
       QueryBuilderCreator.create(paths)
     );

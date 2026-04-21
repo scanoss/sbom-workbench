@@ -8,6 +8,7 @@ import { Tree } from '../../workspace/tree/Tree';
 import File from '../../workspace/tree/File';
 import { fileService } from '../../services/FileService';
 import { createFilesSummary } from '../../workspace/projectScanState';
+import { CollectFilesVisitor } from '../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class CodeIndexTreeTask extends IndexTreeTask {
 
@@ -16,7 +17,9 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     const tree = await this.buildTreeFromDirectory();
     this.setTreeSummary(tree);
     tree.orderTree();
-    await fileService.insert(tree.getRootFolder().getFiles());
+    const collector = new CollectFilesVisitor();
+    tree.getRootFolder().accept<void>(collector);
+    await fileService.insert(collector.files);
     log.info('[ CodeIndexTreeTask end ]');
     return true;
   }

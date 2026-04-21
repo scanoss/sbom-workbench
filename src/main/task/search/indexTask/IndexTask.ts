@@ -10,6 +10,7 @@ import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCre
 import { Project } from '../../../workspace/Project';
 import { ScannerStage } from '../../../../api/types';
 import path from 'path';
+import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -30,12 +31,9 @@ export class IndexTask implements Scanner.IPipelineTask {
     log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
-    const f = this.project
-      .getTree()
-      .getRootFolder()
-      .getFiles(new BlackListKeyWordIndex());
-
-    const paths = f.map((fi) => `'${fi.path}'`).join(', ');
+    const collector = new CollectFilesVisitor(new BlackListKeyWordIndex());
+    this.project.getTree().getRootFolder().accept<void>(collector);
+    const paths = collector.files.map((fi) => `'${fi.getPath()}'`).join(', ');
 
     const files = await modelProvider.model.file.getAll(
       QueryBuilderCreator.create({ paths }),

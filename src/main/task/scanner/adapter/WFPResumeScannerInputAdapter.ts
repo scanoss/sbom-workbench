@@ -2,6 +2,7 @@ import { ScannerInput } from 'scanoss';
 import { IScannerInputAdapter } from './IScannerInputAdapter';
 import { Project } from '../../../workspace/Project';
 import { BaseScannerInputAdapter } from './BaseScannerInputAdapter';
+import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class WFPResumeScannerInputAdapter extends BaseScannerInputAdapter implements IScannerInputAdapter {
   constructor(project:Project) {
@@ -11,7 +12,9 @@ export class WFPResumeScannerInputAdapter extends BaseScannerInputAdapter implem
 
   async adapterToScannerInput(filesToScan: Record<string, string>): Promise<Array<ScannerInput>> {
     const pendingFiles = Object.keys(this.project.filesToScan);
-    const totalFiles = this.project.getTree().getRootFolder().getFiles().map((fileItem) => fileItem.path);
+    const collector = new CollectFilesVisitor();
+    this.project.getTree().getRootFolder().accept<void>(collector);
+    const totalFiles = collector.files.map((file) => file.getPath());
     const scannedFiles = totalFiles.filter((path) => !pendingFiles.includes(path));
 
     // @Override

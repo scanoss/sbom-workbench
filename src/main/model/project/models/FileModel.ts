@@ -4,8 +4,17 @@ import { queries } from '../../querys_db';
 import { InventoryModel } from './InventoryModel';
 import { QueryBuilder } from '../../queryBuilder/QueryBuilder';
 import { Model } from '../../Model';
+import File from '../../../workspace/tree/File';
+import { NodeStatus } from '../../../workspace/tree/Node';
 
 const { promisify } = require('util');
+
+const statusToType = (status: NodeStatus): string => {
+  if (status === NodeStatus.PENDING) return NodeStatus.MATCH;
+  if (status === NodeStatus.FILTERED) return NodeStatus.FILTERED;
+  if (status === NodeStatus.NOMATCH) return NodeStatus.NOMATCH;
+  return '';
+};
 
 export class FileModel extends Model {
   private connection: sqlite3.Database;
@@ -57,16 +66,16 @@ export class FileModel extends Model {
     await call(sql);
   }
 
-  public async insertFiles(data: Array<any>) {
+  public async insertFiles(data: Array<File>) {
     return new Promise<void>(async (resolve, reject) => {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
         for (let i = 0; i < data.length; i += 1) {
           this.connection.run(
             'INSERT INTO FILES(path,type,md5_file) VALUES(?,?,?) ON CONFLICT(path) DO UPDATE SET type = excluded.type, md5_file = excluded.md5_file; ',
-            data[i].path,
-            data[i].type,
-            data[i].md5 ?? null,
+            data[i].getPath(),
+            statusToType(data[i].getStatus()),
+            data[i].getMD5() ?? null,
           );
         }
 
