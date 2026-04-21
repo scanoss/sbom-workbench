@@ -86,29 +86,59 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0, pl: 1, pt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
                 {w.errors.map((err, errIdx) => (
-                  <Box key={errIdx} sx={{ mb: 0.5, fontSize: 12, lineHeight: 1.4 }}>
-                    <Typography
-                      sx={{
-                        fontFamily: 'monospace',
-                        fontSize: 'inherit',
-                        wordBreak: 'break-all',
-                      }}
-                    >
-                      {err.item}
-                    </Typography>
-                    <Typography sx={{ mt: -0.5,  pl:0.5 }}>
-                      {w.severity !== 'info' && (
+                  <Box key={errIdx} sx={{ mb: 1, fontSize: 12, lineHeight: 1.4 }}>
+                    {w.severity === 'info' ? (
+                      <>
                         <Typography
-                          component="span"
-                          sx={{ color: '#b60303', mr: 0.5, fontSize: 12, fontWeight: 600 }}
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                            wordBreak: 'break-all',
+                          }}
                         >
-                          Error:
+                          {err.item}
                         </Typography>
-                      )}
-                      <Typography component="span" sx={{ fontSize: 12 }}>
-                        {err.message}
-                      </Typography>
-                    </Typography>
+                        <Typography
+                          sx={{
+                            pl: 1,
+                            ml: 0.25,
+                            mt: 0.25,
+                            borderLeft: '2px solid',
+                            borderColor: 'divider',
+                            fontSize: 11,
+                            fontWeight: 600,
+                            textTransform: 'uppercase',
+                            letterSpacing: 0.5,
+                            color: 'text.secondary',
+                          }}
+                        >
+                          {err.message}
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <Typography
+                          sx={{
+                            fontFamily: 'monospace',
+                            fontSize: 'inherit',
+                            wordBreak: 'break-all',
+                          }}
+                        >
+                          {err.item}
+                        </Typography>
+                        <Box sx={{ pl: 0.5 }}>
+                          <Typography
+                            component="span"
+                            sx={{ color: '#b60303', mr: 0.5, fontSize: 12, fontWeight: 600 }}
+                          >
+                            Error:
+                          </Typography>
+                          <Typography component="span" sx={{ fontSize: 12 }}>
+                            {err.message}
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
                   </Box>
                 ))}
               </AccordionDetails>
