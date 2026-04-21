@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 interface StageWarning {
   title: string;
+  severity?: 'error' | 'info';
   errors: {
     item: string;
     message: string;
@@ -96,12 +97,14 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                       {err.item}
                     </Typography>
                     <Typography sx={{ mt: -0.5,  pl:0.5 }}>
-                      <Typography
-                        component="span"
-                        sx={{ color: '#b60303', mr: 0.5, fontSize: 12, fontWeight: 600 }}
-                      >
-                        Error:
-                      </Typography>
+                      {w.severity !== 'info' && (
+                        <Typography
+                          component="span"
+                          sx={{ color: '#b60303', mr: 0.5, fontSize: 12, fontWeight: 600 }}
+                        >
+                          Error:
+                        </Typography>
+                      )}
                       <Typography component="span" sx={{ fontSize: 12 }}>
                         {err.message}
                       </Typography>
