@@ -1,8 +1,13 @@
-import { utilHelper } from '../helpers/UtilHelper';
 import { NodeStatus } from '../workspace/tree/Node';
+import File from '../workspace/tree/File';
 import { componentService } from './ComponentService';
 import { modelProvider } from './ModelProvider';
 import { IInsertResult } from '../model/interfaces/IInsertResult';
+
+export interface RescanSummary {
+  newFiles: File[];
+  modifiedFiles: File[];
+}
 
 class RescanService {
   public async deleteUnusedComponents(): Promise<void> {
@@ -30,15 +35,16 @@ class RescanService {
   }
 
   public async reScan(
-    files: Array<{path: string, [key: string]: any}>,
+    files: Array<File>,
     resultPath: string,
     projectPath: string,
-  ): Promise<void> {
+  ): Promise<RescanSummary> {
     try {
-      await this.executeRescanProcess(files, resultPath);
+      const summary = await this.executeRescanProcess(files, resultPath);
 
       // Delete unused components (specific to reScan)
       await this.deleteUnusedComponents();
+      return summary;
     } catch (error: any) {
       console.error('[ Rescan Service ]', error);
       throw new Error(`Rescan failed: ${error.message}`);
@@ -46,14 +52,15 @@ class RescanService {
   }
 
   public async reScanWFP(
-    files: Array<{path: string, [key: string]: any}>,
+    files: Array<File>,
     resultPath: string,
-  ): Promise<void> {
+  ): Promise<RescanSummary> {
     try {
-      await this.executeRescanProcess(files, resultPath);
+      const summary = await this.executeRescanProcess(files, resultPath);
 
       // Delete unused components (specific to reScanWFP)
       await this.deleteUnusedComponents();
+      return summary;
     } catch (error: any) {
       throw new Error(`WFP Rescan failed: ${error.message}`);
     }
@@ -100,25 +107,39 @@ class RescanService {
   }
 
   private async executeRescanProcess(
-    files: Array<{path: string, [key: string]: any}>,
+    files: Array<File>,
     resultPath: string,
-  ): Promise<void> {
-    const filePaths = utilHelper.convertsArrayOfStringToString(files, 'path');
+  ): Promise<RescanSummary> {
+    const filePaths = files.map((f) => `"${f.getPath()}"`).join(',');
 
     // UPDATING FILES
     await modelProvider.model.file.setDirty(1);
     await modelProvider.model.file.setDirty(0, filePaths);
+
     const filesDb = await modelProvider.model.file.getAll(null);
+    const dbByPath = new Map(filesDb.map((f) => [f.path, f]));
+    const dbKeys = new Set(filesDb.map((f) => `${f.path}|${f.md5_file ?? ''}`));
 
-    // Insert new files
-    const newFilesDb = [];
+    // Classify incoming files by (path, md5)
+    const newFilesDb: Array<File> = [];
+    const modifiedFilesDb: Array<File> = [];
     files.forEach((file) => {
-      const existingFile = filesDb.find((dbFile) => dbFile.path === file.path);
-      if (existingFile === undefined) newFilesDb.push(file);
+      const key = `${file.getPath()}|${file.getMD5() ?? ''}`;
+      if (dbKeys.has(key)) return;  // unchanged — skip
+      if (!dbByPath.has(file.getPath())) newFilesDb.push(file);  // new path
+      else modifiedFilesDb.push(file);              // content changed
     });
-
     if (newFilesDb.length > 0) {
       await modelProvider.model.file.insertFiles(newFilesDb);
+    }
+
+    if (modifiedFilesDb.length > 0) {
+      const modifiedIds = modifiedFilesDb.map((f) => dbByPath.get(f.getPath()).id);
+      // Update type + md5, then reset user state so the file resurfaces as PENDING.
+      // Prior identified/ignored decisions no longer apply to the new content.
+      await modelProvider.model.file.insertFiles(modifiedFilesDb);
+      await modelProvider.model.inventory.deleteDirtyFileInventories(modifiedIds);
+      await modelProvider.model.file.restore(modifiedIds);
     }
 
     await modelProvider.model.result.updateDirty(1);
@@ -150,6 +171,8 @@ class RescanService {
     await modelProvider.model.component.updateMostReliableLicense(
       mostReliableLicensePerComponent,
     );
+
+    return { newFiles: newFilesDb, modifiedFiles: modifiedFilesDb };
   }
 }
 export const rescanService = new RescanService();
