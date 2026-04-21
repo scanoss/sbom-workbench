@@ -1,0 +1,77 @@
+{
+  "src/main/app.ts": [
+    {
+      "component": "sbom-workbench",
+      "copyrights": [
+        {
+          "name": "1989 Free Software Foundation Inc",
+          "source": "license_file"
+        },
+        {
+          "name": "1989 Free Software Foundation Inc. ",
+          "source": "license_file"
+        }
+      ],
+      "cryptography": [],
+      "dependencies": [],
+      "file": "src/main/app.ts",
+      "file_hash": "cdb71e04d9a9c8f828f2bf51b0791539",
+      "file_url": "https://api.scanoss.com/file_contents/cdb71e04d9a9c8f828f2bf51b0791539",
+      "health": {
+        "creation_date": "2021-06-10",
+        "forks": 13,
+        "issues": 41,
+        "last_push": "2026-04-10",
+        "last_update": "2026-04-10",
+        "stars": 60
+      },
+      "id": "file",
+      "latest": "v1.37.1",
+      "licenses": [
+        {
+          "name": "CC0-1.0",
+          "source": "component_declared",
+          "url": "https://spdx.org/licenses/CC0-1.0.html"
+        }
+      ],
+      "lines": "all",
+      "matched": "100%",
+      "oss_lines": "all",
+      "provenance": "Spain",
+      "purl": [
+        "pkg:github/scanoss/sbom-workbench"
+      ],
+      "quality": [
+        {
+          "score": "3/5",
+          "source": "best_practices"
+        }
+      ],
+      "release_date": "2025-12-11",
+      "server": {
+        "elapsed": "0.003643s",
+        "flags": "0",
+        "hostname": "p37",
+        "kb_version": {
+          "daily": "26.04.14",
+          "monthly": "26.03"
+        },
+        "version": "5.4.25"
+      },
+      "source_hash": "cdb71e04d9a9c8f828f2bf51b0791539",
+      "status": "pending",
+      "url": "https://github.com/scanoss/sbom-workbench",
+      "url_hash": "a1c715811340f6c2312428acd8bb20a7",
+      "url_stats": {
+        "ignored_files": 51,
+        "indexed_files": 673,
+        "package_size": 7041006,
+        "source_files": 505,
+        "total_files": 724
+      },
+      "vendor": "scanoss",
+      "version": "v1.27.0-rc2",
+      "vulnerabilities": []
+    }
+  ]
+}

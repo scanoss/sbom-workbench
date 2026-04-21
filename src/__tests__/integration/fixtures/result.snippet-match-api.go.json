@@ -1,0 +1,89 @@
+{
+  "src/main/app.ts": [
+    {
+      "component": "api.go",
+      "copyrights": [
+        {
+          "name": "2018-2023 SCANOSS.COM",
+          "source": "file_header"
+        }
+      ],
+      "cryptography": [],
+      "dependencies": [],
+      "file": "pkg/cmd/server.go",
+      "file_hash": "75d53552fcdcbcde097066a370e556f1",
+      "file_url": "https://api.scanoss.com/file_contents/75d53552fcdcbcde097066a370e556f1",
+      "health": {
+        "creation_date": "2022-12-14",
+        "forks": 1,
+        "issues": 0,
+        "last_push": "2026-04-09",
+        "last_update": "2026-04-08",
+        "stars": 9
+      },
+      "id": "snippet",
+      "latest": "v1.6.8",
+      "licenses": [
+        {
+          "checklist_url": "https://www.osadl.org/fileadmin/checklists/unreflicenses/GPL-2.0-only.txt",
+          "copyleft": "yes",
+          "incompatible_with": "Apache-1.0, Apache-1.1, Apache-2.0, BSD-4-Clause, BSD-4-Clause-UC, BSD-4.3TAHOE, ECL-2.0, FTL, IJG, LicenseRef-scancode-bsla-no-advert, Minpack, OpenSSL, PHP-3.01, PSF-2.0, Python-2.0, zlib-acknowledgement, XFree86-1.1",
+          "name": "GPL-2.0-only",
+          "osadl_updated": "2026-02-12T16:31:00+0000",
+          "patent_hints": "yes",
+          "source": "component_declared",
+          "url": "https://spdx.org/licenses/GPL-2.0-only.html"
+        },
+        {
+          "checklist_url": "https://www.osadl.org/fileadmin/checklists/unreflicenses/GPL-2.0-or-later.txt",
+          "copyleft": "yes",
+          "incompatible_with": "Apache-1.0, Apache-1.1, Apache-2.0, BSD-4-Clause, BSD-4-Clause-UC, BSD-4.3TAHOE, ECL-2.0, FTL, IJG, LicenseRef-scancode-bsla-no-advert, Minpack, OpenSSL, PHP-3.01, PSF-2.0, Python-2.0, zlib-acknowledgement, XFree86-1.1",
+          "name": "GPL-2.0-or-later",
+          "osadl_updated": "2026-02-12T16:31:00+0000",
+          "patent_hints": "yes",
+          "source": "component_declared",
+          "url": "https://spdx.org/licenses/GPL-2.0-or-later.html"
+        }
+      ],
+      "lines": "10-120",
+      "matched": "75%",
+      "oss_lines": "10-120",
+      "provenance": "Spain",
+      "purl": [
+        "pkg:github/scanoss/api.go"
+      ],
+      "quality": [
+        {
+          "score": "4/5",
+          "source": "best_practices"
+        }
+      ],
+      "release_date": "2026-03-10",
+      "server": {
+        "elapsed": "0.000729s",
+        "flags": "0",
+        "hostname": "p37",
+        "kb_version": {
+          "daily": "26.04.14",
+          "monthly": "26.03"
+        },
+        "version": "5.4.25"
+      },
+      "source_hash": "a1b2c3d4e5f6789012345678901234ab",
+      "status": "pending",
+      "url": "https://github.com/scanoss/api.go",
+      "url_hash": "9a039dd6609f6f9920fe0e3dd5e3cf57",
+      "url_stats": {
+        "ignored_files": 17,
+        "indexed_files": 70,
+        "package_size": 116768,
+        "source_files": 35,
+        "total_files": 87
+      },
+      "vendor": "scanoss",
+      "version": "v1.6.3",
+      "vulnerabilities": [],
+      "hits": 42
+    }
+  ]
+}
