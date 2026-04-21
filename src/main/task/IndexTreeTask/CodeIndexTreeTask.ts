@@ -8,6 +8,7 @@ import { Tree } from '../../workspace/tree/Tree';
 import File from '../../workspace/tree/File';
 import { fileService } from '../../services/FileService';
 import { createFilesSummary } from '../../workspace/projectScanState';
+import { Scanner } from '../scanner/types';
 import { CollectFilesVisitor } from '../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class CodeIndexTreeTask extends IndexTreeTask {
@@ -17,9 +18,16 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     const tree = await this.buildTreeFromDirectory();
     this.setTreeSummary(tree);
     tree.orderTree();
-    const collector = new CollectFilesVisitor();
-    tree.getRootFolder().accept<void>(collector);
-    await fileService.insert(collector.files);
+    // On RESCAN, files already exist in the DB with their correct `type`
+    // from the previous scan. Fresh tree nodes default to status=NOMATCH,
+    // so inserting them here would overwrite `files.type` for every row
+    // and drop IGNORED/PENDING state when tree.sync reads it back.
+    // New and modified files are inserted later by RescanService.executeRescanProcess.
+    if (this.project.metadata.getScannerConfig().mode !== Scanner.ScannerMode.RESCAN) {
+      const collector = new CollectFilesVisitor();
+      tree.getRootFolder().accept<void>(collector);
+      await fileService.insert(collector.files);
+    }
     log.info('[ CodeIndexTreeTask end ]');
     return true;
   }

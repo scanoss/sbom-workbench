@@ -249,7 +249,7 @@ export class Queries {
   SQL_ALL_DETECTED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.originalLicense as licenses, d.url FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId;`;
 
-  SQL_GET_ALL_FILES = `SELECT f.path, r.md5_file, f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type FROM files f
+  SQL_GET_ALL_FILES = `SELECT f.path, f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type, f.md5_file FROM files f
    LEFT JOIN results r ON f.fileId = r.fileId #FILTER;`;
 
   SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id, r.md5_file ,f.type AS filter,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.component AS componentName, r.url,comp.purl,comp.version, rl.spdxid
