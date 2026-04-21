@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { rescanService } from '../../../services/RescanService';
+import { rescanService, RescanSummary } from '../../../services/RescanService';
 import { RescanTask } from './RescanTask';
 import { CodeDispatcher } from '../dispatcher/CodeDispatcher';
 import { CodeScannerInputAdapter } from '../adapter/CodeScannerInputAdapter';
@@ -12,9 +12,9 @@ export class CodeReScanTask extends RescanTask<CodeDispatcher, CodeScannerInputA
     super(project, new CodeDispatcher(), new CodeScannerInputAdapter(project));
   }
 
-  public async reScan(resultPath: string): Promise<void> {
+  public async reScan(resultPath: string): Promise<RescanSummary> {
     const collector = new CollectFilesVisitor();
     this.project.getTree().getRootFolder().accept<void>(collector);
-    await rescanService.reScan(collector.files, resultPath, this.project.getMyPath());
+    return rescanService.reScan(collector.files, resultPath, this.project.getMyPath());
   }
 }

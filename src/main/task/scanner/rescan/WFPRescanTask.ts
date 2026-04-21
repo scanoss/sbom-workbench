@@ -1,5 +1,5 @@
 import fs from "fs";
-import { rescanService } from "../../../services/RescanService";
+import { rescanService, RescanSummary } from "../../../services/RescanService";
 import { RescanTask } from "./RescanTask";
 import { WFPDispatcher } from "../dispatcher/WFPDispatcher";
 import { WFPScannerInputAdapter } from "../adapter/WFPScannerInputAdapter";
@@ -13,10 +13,10 @@ export class WFPRescanTask extends RescanTask<WFPDispatcher,WFPScannerInputAdapt
     super(project, new WFPDispatcher(), new WFPScannerInputAdapter(project));
   }
 
-  public async reScan(resultsPath:string): Promise<void> {
+  public async reScan(resultsPath:string): Promise<RescanSummary> {
     const collector = new CollectFilesVisitor();
     this.project.getTree().getRootFolder().accept<void>(collector);
-    await rescanService.reScanWFP(collector.files, resultsPath);
+    return rescanService.reScanWFP(collector.files, resultsPath);
   }
 
 }
