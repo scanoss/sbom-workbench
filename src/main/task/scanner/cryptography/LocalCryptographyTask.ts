@@ -10,6 +10,7 @@ import { normalizeCryptoAlgorithms } from '../../../../shared/adapters/crypto.ad
 import { cryptographyService } from '../../../services/CryptographyService';
 import appConfigModule from '../../../../config/AppConfigModule';
 import { BlackListCryptography } from '../../../workspace/tree/blackList/BlackListCrytography';
+import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
 
 /**
  * Represents a pipeline task for performing local cryptography analysis.
@@ -55,9 +56,9 @@ export class LocalCryptographyTask implements Scanner.IPipelineTask {
       cryptoCfg.THREADS = this.THREADS;
       const cryptoScanner = new CryptographyScanner(cryptoCfg);
       const scanRoot = this.project.getScanRoot();
-      const files = this.project.getTree().getRootFolder().getFiles(new BlackListCryptography(scanRoot));
-      const filePaths = files
-        .map((f) => path.join(scanRoot, f.path));
+      const collector = new CollectFilesVisitor(new BlackListCryptography(scanRoot));
+      this.project.getTree().getRootFolder().accept<void>(collector);
+      const filePaths = collector.files.map((f) => path.join(scanRoot, f.getPath()));
 
       // Create map to get fileId from absolute file path
       const dbFiles = await modelProvider.model.file.getAll(null);
