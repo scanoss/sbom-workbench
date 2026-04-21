@@ -112,23 +112,6 @@ export default class File extends Node {
     return this.status;
   }
 
-  public getFiles(banned: BlackListAbstract = null): Array<any> {
-    if (banned && banned.evaluate(this)) return [];
-    let type = '';
-    if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
-    if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;
-    if (this.status === NodeStatus.NOMATCH) type = NodeStatus.NOMATCH;
-    return [
-      {
-        path: this.getPath(),
-        type,
-        isBinaryFile: this.isBinaryFile,
-        isDependencyFile: this.isDependencyFile,
-        md5: this.md5,
-      },
-    ];
-  }
-
   public summarize(root: string, summary: any): any {
     summary.total += 1;
     if (this.getAction() === 'filter') {
