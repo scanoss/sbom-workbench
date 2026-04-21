@@ -1,6 +1,7 @@
 import { IndexTreeTask } from '../IndexTreeTask/IndexTreeTask';
 import fs from 'fs';
 import { Tree } from '../../workspace/tree/Tree';
+import File from '../../workspace/tree/File';
 import path from 'path';
 import log from 'electron-log';
 import { parser } from 'stream-json';
@@ -22,13 +23,20 @@ export class RawResultFileTreeTask extends IndexTreeTask {
       .pipe(streamObject());
 
     const CHUNK_SIZE = 1000;
-    let fileChunk: string[] = [];
+    let fileChunk: File[] = [];
     const addedNodes = {}; // Shared across all chunks to prevent duplicate folders
 
     return new Promise((resolve, reject) => {
-      pipeline.on('data', ({ key }) => {
+      pipeline.on('data', ({ key, value }) => {
+        const nodePath = key.startsWith('/') ? key : `/${key}`;
+        const name = nodePath.split('/').pop();
+        const file = new File(nodePath, name);
+        const sourceHash = Array.isArray(value)
+          ? value.find((v: any) => v?.source_hash)?.source_hash
+          : undefined;
+        if (sourceHash) file.setMD5(sourceHash);
         files.push(key);
-        fileChunk.push(key);
+        fileChunk.push(file);
 
         // Process chunk when it reaches CHUNK_SIZE
         if (fileChunk.length >= CHUNK_SIZE) {

@@ -4,12 +4,21 @@ import { Visitor } from './visitor/Visitor';
 
 export default class File extends Node {
   private isDependencyFile: boolean;
+  private md5: string;
 
   constructor(path: string, name: string) {
     super(path, name);
     this.type = 'file';
     this.isDependencyFile = false;
     this.isBinaryFile = false;
+  }
+
+  public setMD5(md5: string): void {
+    this.md5 = md5;
+  }
+
+  public getMD5(): string {
+    return this.md5;
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
@@ -115,6 +124,7 @@ export default class File extends Node {
         type,
         isBinaryFile: this.isBinaryFile,
         isDependencyFile: this.isDependencyFile,
+        md5: this.md5,
       },
     ];
   }

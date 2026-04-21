@@ -62,7 +62,12 @@ export class FileModel extends Model {
       this.connection.serialize(async () => {
         this.connection.run('begin transaction');
         for (let i = 0; i < data.length; i += 1) {
-          this.connection.run('INSERT INTO FILES(path,type) VALUES(?,?) ON CONFLICT(path) DO UPDATE SET type = excluded.type; ', data[i].path, data[i].type);
+          this.connection.run(
+            'INSERT INTO FILES(path,type,md5_file) VALUES(?,?,?) ON CONFLICT(path) DO UPDATE SET type = excluded.type, md5_file = excluded.md5_file; ',
+            data[i].path,
+            data[i].type,
+            data[i].md5 ?? null,
+          );
         }
 
         this.connection.run('commit', (err: any) => {
