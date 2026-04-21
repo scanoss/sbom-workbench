@@ -48,7 +48,13 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         stageLabel: stageProps.label,
         stageStep: `${stageStep + 1}/${this.queue.length}`,
       });
-      return await task.run();
+      const result = await task.run();
+      // Tasks may populate warnings during a successful run to surface
+      // informational messages (e.g. rescan summary) in the end-of-scan dialog.
+      if (stageProps.warnings && stageProps.warnings.errors.length > 0) {
+        this.addWarning(stageProps.warnings);
+      }
+      return result;
     } catch (e: any) {
       if (stageProps.isCritical) {
         log.error('[SCANNER PIPELINE ERROR]', `Stage: ${stageProps.label} error: ${e.message}`);

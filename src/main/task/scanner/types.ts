@@ -12,16 +12,19 @@ export interface StageItemError {
 }
 
 /**
- * Represents a collection of non-critical errors from a pipeline stage
- * These errors don't stop the scan but should be reported to the user at the end
+ * Represents a collection of messages from a pipeline stage reported to the user
+ * at the end of a scan. Covers both non-critical errors and informational summaries
+ * (e.g. list of files changed during a rescan).
  */
 export interface StageWarning {
   /** Display title for the warning (e.g., "Dependency Analysis") */
   title: string;
   /** The stage that generated these warnings */
   stage: ScannerStage;
-  /** List of individual errors with affected items */
+  /** List of individual items with their associated message */
   errors: StageItemError[];
+  /** Controls how each item is rendered — errors show an "Error:" prefix, info does not. Defaults to 'error' when absent. */
+  severity?: 'error' | 'info';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
