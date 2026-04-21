@@ -1,8 +1,11 @@
 import log from 'electron-log';
+import fs from 'fs';
 import { promises as fsPromises } from 'fs';
+import crypto from 'crypto';
 import { IndexTreeTask } from "./IndexTreeTask";
 import * as Filtering from '../../workspace/filtering';
 import { Tree } from '../../workspace/tree/Tree';
+import File from '../../workspace/tree/File';
 import { fileService } from '../../services/FileService';
 import { createFilesSummary } from '../../workspace/projectScanState';
 
@@ -29,8 +32,23 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     );
 
     const CHUNK_SIZE = 1000;
-    let fileChunk: string[] = [];
+    let fileChunk: File[] = [];
     const addedNodes = {}; // Shared across all chunks to prevent duplicate folders
+
+    const scanRoot = this.project.getScanRoot();
+
+    const buildFileNode = (relativePath: string, absolutePath: string): File => {
+      const name = relativePath.split('/').pop();
+      const file = new File(relativePath, name);
+      try {
+        const hash = crypto.createHash('md5');
+        hash.update(fs.readFileSync(absolutePath));
+        file.setMD5(hash.digest('hex'));
+      } catch (err) {
+        log.warn(`[ CodeIndexTreeTask ]: Failed to compute md5 for ${relativePath}`, err);
+      }
+      return file;
+    };
 
     const scanDirectory = async (dir: string, rootPath: string) => {
       try {
@@ -40,14 +58,14 @@ export class CodeIndexTreeTask extends IndexTreeTask {
           // Skip symbolic links
           if (dirent.isSymbolicLink()) continue;
 
-          const relativePath = `${dir}/${dirent.name}`.replace(rootPath, '');
+          const absolutePath = `${dir}/${dirent.name}`;
+          const relativePath = absolutePath.replace(rootPath, '');
 
           if (dirent.isDirectory()) {
             // Recursively scan subdirectory
-            await scanDirectory(`${dir}/${dirent.name}`, rootPath);
+            await scanDirectory(absolutePath, rootPath);
           } else {
-            // Add file to chunk
-            fileChunk.push(relativePath);
+            fileChunk.push(buildFileNode(relativePath, absolutePath));
 
             // Process chunk when it reaches CHUNK_SIZE
             if (fileChunk.length >= CHUNK_SIZE) {
@@ -63,7 +81,7 @@ export class CodeIndexTreeTask extends IndexTreeTask {
 
     // Start scanning from root
 
-    await scanDirectory(this.project.getScanRoot(), this.project.getScanRoot());
+    await scanDirectory(scanRoot, scanRoot);
 
     // Process remaining files in the last chunk
     if (fileChunk.length > 0) {
@@ -71,19 +89,6 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     }
 
     if (this.project.metadata.getScannerConfig()?.allExtensions) {
-      tree.setFilter(new Filtering.BannedList('NoFilter'));
-    } else {
-      tree.setFilter();
-    }
-    return tree;
-  }
-
-  // TODO: This method appears to be unused — consider removing it
-  public async buildTree(files: Array<string>): Promise<Tree> {
-    const tree = new Tree(this.project.metadata.getName(),this.project.getMyPath(),this.project.metadata.getScanRoot());
-    tree.build(files);
-    const allExtensions = this.project.metadata.getScannerConfig()?.allExtensions || false;
-    if (allExtensions) {
       tree.setFilter(new Filtering.BannedList('NoFilter'));
     } else {
       tree.setFilter();

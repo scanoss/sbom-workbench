@@ -26,6 +26,7 @@ interface ITreeSnapshotFileRecord {
   a?: SnapshotAction;
   b?: 0 | 1;
   d?: 0 | 1;
+  h?: string;
 }
 
 type ITreeSnapshotRecord = ITreeSnapshotRootRecord | ITreeSnapshotFileRecord;
@@ -82,6 +83,7 @@ const applyFileSnapshot = (file: File, record: ITreeSnapshotFileRecord) => {
   file.setStatus(file.getPath(), status);
   file.setIsBinaryFile(record.b === 1);
   file.setDependencyFile(record.d === 1);
+  file.setMD5(record.h);
 };
 
 const rebuildFolderStatusFlags = (node: Node) => {
@@ -140,6 +142,7 @@ export const writeTreeSnapshot = (
           a: normalizeAction(file.getAction()),
           b: file.getIsBinaryFile() ? 1 : 0,
           d: file.isDependency() ? 1 : 0,
+          h: file.getMD5()
         };
         fs.writeSync(fd, `${JSON.stringify(fileRecord)}\n`);
         continue;
@@ -187,7 +190,7 @@ export const readTreeSnapshot = async ({
 
   let tree: Tree = null;
   let lineIndex = 0;
-  let fileChunk: string[] = [];
+  let fileChunk: File[] = [];
   let fileRecords = new Map<string, ITreeSnapshotFileRecord>();
   const addedNodes = {};
 
@@ -235,7 +238,8 @@ export const readTreeSnapshot = async ({
       continue;
     }
 
-    fileChunk.push(parsed.p);
+    const name = parsed.p.split('/').pop();
+    fileChunk.push(new File(parsed.p, name));
     fileRecords.set(parsed.p, parsed);
 
     if (fileChunk.length >= SNAPSHOT_BUILD_CHUNK_SIZE) {

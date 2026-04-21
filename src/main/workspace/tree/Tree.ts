@@ -45,17 +45,11 @@ export class Tree {
   }
 
   public build(
-    files: Array<string>,
+    files: Array<File>,
     addedNodes: Record<string, Folder> = {},
     onFileCreated?: (file: File) => void,
-  ) {
-    files.forEach((f) => {
-      const splitPath = f.split('/');
-      if (splitPath.length > 1) {
-        if (splitPath[0] === '') splitPath.shift();
-        this.recursive(splitPath, this.rootFolder, addedNodes, onFileCreated);
-      } else this.recursive([f], this.rootFolder, addedNodes, onFileCreated);
-    });
+  ): Folder {
+    files.forEach((file) => this.place(file, addedNodes, onFileCreated));
     return this.rootFolder;
   }
 
@@ -66,36 +60,29 @@ export class Tree {
     this.rootFolder.order();
   }
 
-  private recursive(
-    splitPath: Array<string>,
-    node: Folder,
-    addedNodes : Record<string, Folder>,
+  private place(
+    file: File,
+    addedNodes: Record<string, Folder>,
     onFileCreated?: (file: File) => void,
-  ): Node {
-    // TODO: Change by node.getPath() ? `${node.getPath()}/${splitPath[0]}` : splitPath[0];
-    const nodePath = `${node.getPath()}/${splitPath[0]}`;
-    // File
-    if (splitPath.length === 1) {
-      const file = new File(nodePath, splitPath[0]);
-      node.addChild(file);
-      if (onFileCreated) onFileCreated(file);
-      return file;
+  ): void {
+    const segments = file.getPath().split('/').filter(Boolean);
+    let parent: Folder = this.rootFolder;
+    let currentPath = '';
+
+    // Walk/create ancestor folders
+    for (let i = 0; i < segments.length - 1; i += 1) {
+      currentPath += `/${segments[i]}`;
+      let folder = addedNodes[currentPath];
+      if (!folder) {
+        folder = new Folder(currentPath, segments[i]);
+        addedNodes[currentPath] = folder;
+        parent.addChild(folder);
+      }
+      parent = folder;
     }
-    // Folder
-    const treeNode = addedNodes[nodePath];
-    if (treeNode !== undefined) {
-      // eslint-disable-next-line no-param-reassign
-      node = treeNode;
-    } else {
-      const f = new Folder(nodePath, splitPath[0]);
-      addedNodes[nodePath] = f;
-      node.addChild(f);
-      // eslint-disable-next-line no-param-reassign
-      node = f;
-    }
-    splitPath.shift();
-    this.recursive(splitPath, node, addedNodes, onFileCreated);
-    return node;
+
+    parent.addChild(file);
+    if (onFileCreated) onFileCreated(file);
   }
 
   public attachResults(results: any): void {
