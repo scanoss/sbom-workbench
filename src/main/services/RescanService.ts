@@ -7,6 +7,7 @@ import { IInsertResult } from '../model/interfaces/IInsertResult';
 export interface RescanSummary {
   newFiles: File[];
   modifiedFiles: File[];
+  deletedFiles: string[];
 }
 
 class RescanService {
@@ -129,9 +130,16 @@ class RescanService {
       if (!dbByPath.has(file.getPath())) newFilesDb.push(file);  // new path
       else modifiedFilesDb.push(file);              // content changed
     });
+
     if (newFilesDb.length > 0) {
       await modelProvider.model.file.insertFiles(newFilesDb);
     }
+
+    // DB rows whose path is no longer in the tree are about to be removed
+    const incomingPaths = new Set(files.map((f) => f.getPath()));
+    const deletedPaths: string[] = filesDb
+      .filter((dbFile) => !incomingPaths.has(dbFile.path))
+      .map((dbFile) => dbFile.path);
 
     if (modifiedFilesDb.length > 0) {
       const modifiedIds = modifiedFilesDb.map((f) => dbByPath.get(f.getPath()).id);
@@ -172,7 +180,7 @@ class RescanService {
       mostReliableLicensePerComponent,
     );
 
-    return { newFiles: newFilesDb, modifiedFiles: modifiedFilesDb };
+    return { newFiles: newFilesDb, modifiedFiles: modifiedFilesDb, deletedFiles: deletedPaths };
   }
 }
 export const rescanService = new RescanService();

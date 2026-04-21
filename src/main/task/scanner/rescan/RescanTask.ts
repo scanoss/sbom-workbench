@@ -109,9 +109,10 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
   public async done() {
     await this.project.open();
     await this.updateResultFile();
-    const { newFiles, modifiedFiles } = await this.reScan(`${this.project.getMyPath()}/result.json`);
+    const { newFiles, modifiedFiles, deletedFiles } = await this.reScan(`${this.project.getMyPath()}/result.json`);
     newFiles.forEach((f) => this.rescanWarnings.errors.push({ item: f.getPath(), message: 'New file' }));
     modifiedFiles.forEach((f) => this.rescanWarnings.errors.push({ item: f.getPath(), message: 'Content changed' }));
+    deletedFiles.forEach((p) => this.rescanWarnings.errors.push({ item: p, message: 'File deleted' }));
     const newFileStatusResults = await rescanService.getNewResults();
     this.project.getTree().sync(newFileStatusResults);
     this.project.metadata.setScannerState(ScanState.FINISHED);
