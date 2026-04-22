@@ -105,7 +105,9 @@
     "testPathIgnorePatterns": [
       "release/app/dist",
       "src/__tests__/export/ExportRepositoryMock.ts",
-      "src/__tests__/export/mocks/*"
+      "src/__tests__/export/mocks/*",
+      "src/__tests__/integration/support/*",
+      "src/__tests__/integration/fixtures/*"
     ],
     "transform": {
       "\\.(ts|tsx|js|jsx)$": "ts-jest"
