@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored `Tree.build` to accept pre-constructed `File` nodes instead of path strings
 ### Removed
 - Removed unused `ExportControlService.ts`
+### Fixed
+- Fixed `import Workbench project`  
 
 ## [1.37.1] - 2026-04-09
 ### Fixed
