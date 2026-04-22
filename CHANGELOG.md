@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - File MD5 is now computed during tree build and persisted to the `files.md5_file` column and the `tree.nodes.jsonl` snapshot
 ### Changed
 - Refactored `Tree.build` to accept pre-constructed `File` nodes instead of path strings
+### Removed
+- Removed unused `ExportControlService.ts`
 
 ## [1.37.1] - 2026-04-09
 ### Fixed
