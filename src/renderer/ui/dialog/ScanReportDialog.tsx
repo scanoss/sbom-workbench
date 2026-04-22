@@ -15,24 +15,24 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useTranslation } from 'react-i18next';
 
-interface StageWarning {
+interface StageReport {
   title: string;
   severity?: 'error' | 'info';
-  errors: {
+  entries: {
     item: string;
     message: string;
   }[];
 }
 
-interface ScanWarningDialogProps {
+interface ScanReportDialogProps {
   open: boolean;
   onClose: () => void;
-  warnings: StageWarning[];
+  reports: StageReport[];
 }
 
-const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, warnings }) => {
+const ScanReportDialog: React.FC<ScanReportDialogProps> = ({ open, onClose, reports }) => {
   const { t } = useTranslation();
-  const totalErrors = warnings.reduce((acc, w) => acc + w.errors.length, 0);
+  const totalEntries = reports.reduce((acc, r) => acc + r.entries.length, 0);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
@@ -43,14 +43,14 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
           </Typography>
           <Typography component="span" sx={{ color: '#9E9E9E', fontSize: 12 }}>|</Typography>
           <Typography component="span" color="primary" sx={{ fontSize: 12 }}>
-            {totalErrors} {t('Dialog:WarningsFound')}
+            {totalEntries} {t('Dialog:WarningsFound')}
           </Typography>
         </Box>
       </DialogTitle>
 
       <DialogContent>
         <Box sx={{ maxHeight: 400, overflowY: 'auto', pr: 1 }}>
-          {warnings.map((w, idx) => (
+          {reports.map((r, idx) => (
             <Accordion
               key={idx}
               defaultExpanded
@@ -78,16 +78,16 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                     fontSize: 14,
                   }}
                 >
-                  {w.title}{' '}
+                  {r.title}{' '}
                   <Typography component="span" sx={{ fontWeight: 400, fontSize: 11 }}>
-                    ({w.errors.length})
+                    ({r.entries.length})
                   </Typography>
                 </Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0, pl: 1, pt: 0.5, maxHeight: 200, overflowY: 'auto' }}>
-                {w.errors.map((err, errIdx) => (
-                  <Box key={errIdx} sx={{ mb: 1, fontSize: 12, lineHeight: 1.4 }}>
-                    {w.severity === 'info' ? (
+                {r.entries.map((entry, entryIdx) => (
+                  <Box key={entryIdx} sx={{ mb: 1, fontSize: 12, lineHeight: 1.4 }}>
+                    {r.severity === 'info' ? (
                       <>
                         <Typography
                           sx={{
@@ -96,7 +96,7 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                             wordBreak: 'break-all',
                           }}
                         >
-                          {err.item}
+                          {entry.item}
                         </Typography>
                         <Typography
                           sx={{
@@ -112,7 +112,7 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                             color: 'text.secondary',
                           }}
                         >
-                          {err.message}
+                          {entry.message}
                         </Typography>
                       </>
                     ) : (
@@ -124,7 +124,7 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                             wordBreak: 'break-all',
                           }}
                         >
-                          {err.item}
+                          {entry.item}
                         </Typography>
                         <Box sx={{ pl: 0.5 }}>
                           <Typography
@@ -134,7 +134,7 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
                             Error:
                           </Typography>
                           <Typography component="span" sx={{ fontSize: 12 }}>
-                            {err.message}
+                            {entry.message}
                           </Typography>
                         </Box>
                       </>
@@ -154,4 +154,4 @@ const ScanWarningDialog: React.FC<ScanWarningDialogProps> = ({ open, onClose, wa
   );
 };
 
-export default ScanWarningDialog;
+export default ScanReportDialog;

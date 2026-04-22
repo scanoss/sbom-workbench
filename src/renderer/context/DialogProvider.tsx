@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { IpcChannels } from '@api/ipc-channels';
-import { Dependency, Inventory, NewComponentDTO, StageWarning } from '@api/types';
+import { Dependency, Inventory, NewComponentDTO, StageReport } from '@api/types';
 import { useTranslation } from 'react-i18next';
 import WorkspaceAddDialog from 'renderer/ui/dialog/WorkspaceAddDialog';
 import { KeywordGroupMenu } from 'renderer/features/workbench/components/KeywordGroupMenu/KeywordGroupMenu';
@@ -26,7 +26,7 @@ import ComponentSearcherDialog from '../ui/dialog/ComponentSearcherDialog';
 import { ProjectSelectorDialog } from '../ui/dialog/ProjectSelectorDialog';
 import { ReportDialog } from '../ui/dialog/ReportDialog';
 import { ImportProjectSourceDialog } from '../ui/dialog/ImportProjectSourceDialog';
-import ScanWarningDialog from '../ui/dialog/ScanWarningDialog';
+import ScanReportDialog from '../ui/dialog/ScanReportDialog';
 
 export interface IDialogContext {
   openInventory: (inventory: Partial<InventoryForm>, options?: InventoryDialogOptions) => Promise<Inventory | null>;
@@ -44,7 +44,7 @@ export interface IDialogContext {
   openWorkspaceAddDialog: (existingPaths?: string[]) => Promise<DialogResponse>;
   openReportDialog: (invalidPurls: Array<string>) => Promise<DialogResponse>;
   openImportProjectSourceDialog: (dialogProperties: ImportProjectDialogProps) => Promise<DialogResponse>;
-  openScanWarningDialog: (stageWarnings: Array<StageWarning>) => Promise<void>;
+  openScanReportDialog: (stageReports: Array<StageReport>) => Promise<void>;
 }
 
 export interface InventoryDialogOptions {
@@ -420,19 +420,19 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
   };
 
 
-  const [scanWarningDialog, setScanWarningDialog] = useState<{
+  const [scanReportDialog, setScanReportDialog] = useState<{
     open: boolean;
-    props: Array<StageWarning>,
+    props: Array<StageReport>,
     onClose?:() => void;
   }>({ open: false, props: null });
 
-  const openScanWarningDialog = (stageWarnings: Array<StageWarning>): Promise<void> =>{
+  const openScanReportDialog = (stageReports: Array<StageReport>): Promise<void> =>{
     return new Promise<void>((resolve) => {
-      setScanWarningDialog({
+      setScanReportDialog({
         open: true,
-        props: stageWarnings,
+        props: stageReports,
         onClose: () => {
-          setScanWarningDialog((dialog) => ({ ...dialog, open: false }));
+          setScanReportDialog((dialog) => ({ ...dialog, open: false }));
           resolve();
         },
       });
@@ -486,7 +486,7 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         openWorkspaceAddDialog,
         openImportProjectSourceDialog,
         openReportDialog,
-        openScanWarningDialog
+        openScanReportDialog
       }}
     >
       {children}
@@ -627,11 +627,11 @@ export const DialogProvider: React.FC<any> = ({ children }) => {
         />
       )}
 
-      {scanWarningDialog.open && (
-        <ScanWarningDialog
-          open={scanWarningDialog.open}
-          onClose={() => scanWarningDialog.onClose?.()}
-          warnings={scanWarningDialog.props}
+      {scanReportDialog.open && (
+        <ScanReportDialog
+          open={scanReportDialog.open}
+          onClose={() => scanReportDialog.onClose?.()}
+          reports={scanReportDialog.props}
         />
       )}
 

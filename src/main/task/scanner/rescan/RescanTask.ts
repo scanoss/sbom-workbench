@@ -2,7 +2,7 @@ import log from 'electron-log';
 import fs from 'fs';
 import { ScannerStage, ScanState } from '../../../../api/types';
 import { BaseScannerTask } from '../BaseScannerTask';
-import { Scanner, StageWarning } from '../types';
+import { Scanner, StageReport } from '../types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { licenseService } from '../../../services/LicenseService';
 import { rescanService, RescanSummary } from '../../../services/RescanService';
@@ -15,11 +15,11 @@ import { parser } from 'stream-json';
 import { streamObject } from 'stream-json/streamers/StreamObject';
 
 export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher, TInputScannerAdapter> {
-  private rescanWarnings: StageWarning = {
+  private rescanReport: StageReport = {
     title: 'Rescan summary',
     stage: ScannerStage.RESCAN,
     severity: 'info',
-    errors: [],
+    entries: [],
   };
 
   public getStageProperties(): Scanner.StageProperties {
@@ -27,7 +27,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
       name: ScannerStage.RESCAN,
       label: 'Rescanning',
       isCritical: true,
-      warnings: this.rescanWarnings,
+      stageReport: this.rescanReport,
     };
   }
 
@@ -110,9 +110,9 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     await this.project.open();
     await this.updateResultFile();
     const { newFiles, modifiedFiles, deletedFiles } = await this.reScan(`${this.project.getMyPath()}/result.json`);
-    newFiles.forEach((f) => this.rescanWarnings.errors.push({ item: f.getPath(), message: 'New file' }));
-    modifiedFiles.forEach((f) => this.rescanWarnings.errors.push({ item: f.getPath(), message: 'Content changed' }));
-    deletedFiles.forEach((p) => this.rescanWarnings.errors.push({ item: p, message: 'File deleted' }));
+    newFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'New file' }));
+    modifiedFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'Content changed' }));
+    deletedFiles.forEach((p) => this.rescanReport.entries.push({ item: p, message: 'File deleted' }));
     const newFileStatusResults = await rescanService.getNewResults();
     this.project.getTree().sync(newFileStatusResults);
     this.project.metadata.setScannerState(ScanState.FINISHED);
