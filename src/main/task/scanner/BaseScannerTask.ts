@@ -7,7 +7,7 @@ import {
 } from 'scanoss';
 import log from 'electron-log';
 import fs from 'fs';
-import { ProjectSource, ScanState } from '../../../api/types';
+import { ScanState } from '../../../api/types';
 import { Project } from '../../workspace/Project';
 import { IpcChannels } from '../../../api/ipc-channels';
 import { userSettingService } from '../../services/UserSettingService';
@@ -79,9 +79,6 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
   public abstract set(): Promise<void>;
 
   public async init() {
-    // Set project source
-    this.project.metadata.setSource(ProjectSource.SCAN);
-
     await this.setScannerConfig();
 
     let { processedFiles } = this.project;

@@ -1,4 +1,5 @@
 import log from 'electron-log';
+import fs from 'fs';
 import path from 'path';
 import sqlite3 from 'sqlite3';
 import { ProjectSource } from '../../../api/types';
@@ -12,11 +13,31 @@ import File from '../../workspace/tree/File';
 export async function projectMigration1380(projectPath: string): Promise<void> {
   try {
     log.info('%cProject Migration 1.38.0 in progress...', 'color:green');
+    await fixWfpSource(projectPath);
     await backfillFileMd5(projectPath);
     log.info('%cProject Migration 1.38.0 finished', 'color:green');
   } catch (e: any) {
     log.error('[ Project Migration 1.38.0 ] failed', e);
   }
+}
+
+/**
+ * Retags legacy SCAN projects whose scan_root points at a `.wfp` file as
+ * ProjectSource.WFP. Rewrites metadata.json in-place (only the `source`
+ * field). When Project.readFromPath runs later in the migration, it picks up
+ * the persisted value, and Project.upgrade() re-reads it after all scripts
+ * finish so the upgraded project opens correctly tagged.
+ */
+async function fixWfpSource(projectPath: string): Promise<void> {
+  const metadataPath = path.join(projectPath, 'metadata.json');
+  const raw = JSON.parse(await fs.promises.readFile(metadataPath, 'utf8'));
+  if (
+    raw.source !== ProjectSource.SCAN
+    || typeof raw.scan_root !== 'string'
+    || !raw.scan_root.toLowerCase().endsWith('.wfp')
+  ) return;
+  raw.source = ProjectSource.WFP;
+  await fs.promises.writeFile(metadataPath, JSON.stringify(raw, null, 2));
 }
 
 function openDb(projectPath: string): Promise<sqlite3.Database> {
@@ -57,31 +78,18 @@ function run(db: sqlite3.Database, sql: string, params: any[] = []): Promise<voi
 /**
  * Picks the IndexTreeTask used to rebuild the project's file tree so the
  * migration can extract a md5 for every file.
- *
- * Dispatch on `metadata.source`:
- * - IMPORTED             → WFPIndexTreeTask      (zip import: winnowing.wfp is present)
- * - IMPORT_SCAN_RESULTS  → RawResultFileTreeTask (result.json import)
- * - SCAN                 → CodeIndexTreeTask, unless scan_root ends in `.wfp`
- *                          (winnowing-import flow, which uses source=SCAN too).
- *
- * For IMPORTED projects, `scan_root` was nulled on export, so point it at the
- * workspace's `winnowing.wfp` before building the tree. The mutation is
- * in-memory only — Project.upgrade() re-reads metadata from disk afterwards.
  */
 function createIndexTask(project: Project, projectPath: string): IndexTreeTask {
   switch (project.metadata.getSource()) {
     case ProjectSource.IMPORTED:
-      // scan_root was nulled by ProjectZipper on export; WFPIndexTreeTask reads
-      // it via getScanRoot(), so point it at the workspace's winnowing.wfp.
+      // ProjectZipper nulls scan_root on export; point at workspace WFP.
       project.metadata.setScanRoot(path.join(projectPath, 'winnowing.wfp'));
+      return new WFPIndexTreeTask(project);
+    case ProjectSource.WFP:
       return new WFPIndexTreeTask(project);
     case ProjectSource.IMPORT_SCAN_RESULTS:
       return new RawResultFileTreeTask(project);
-    case ProjectSource.SCAN:
     default:
-      if (project.getScanRoot().toLowerCase().endsWith('.wfp')) {
-        return new WFPIndexTreeTask(project);
-      }
       return new CodeIndexTreeTask(project);
   }
 }

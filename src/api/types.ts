@@ -496,5 +496,7 @@ export enum ProjectSource {
   /** Project created from direct scanning */
   SCAN = 'SCAN',
   /** Project created from imported scan results. result.json */
-  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS'
+  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS',
+  /** Project created from an existing winnowing.wfp file */
+  WFP = 'WFP'
 }
