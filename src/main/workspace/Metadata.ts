@@ -146,6 +146,10 @@ export class Metadata {
   }
 
   public getScanRoot(): string {
+    // ProjectZipper.zipProject strips scan_root on export; on import without a
+    // sourceCodePath it stays null, so guard before path.resolve to avoid
+    // "path argument must be of type string. Received null".
+    if (!this.scan_root) return '';
     const defaultWorkspaceIndex = userSettingService.get().DEFAULT_WORKSPACE_INDEX;
     const scanSources = userSettingService.get().WORKSPACES[defaultWorkspaceIndex].SCAN_SOURCES;
     const fromPath =  scanSources ? scanSources : workspace.getMyPath();
