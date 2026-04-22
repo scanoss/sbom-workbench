@@ -38,7 +38,7 @@ export class FileModel extends Model {
   public async get(queryBuilder: QueryBuilder) {
     const SQLquery = this.getSQL(
       queryBuilder,
-      'SELECT f.fileId, f.path,(CASE WHEN f.identified=1 THEN \'IDENTIFIED\' WHEN f.identified=0 AND f.ignored=0 THEN \'PENDING\' ELSE \'ORIGINAL\' END) AS status, f.type FROM files f #FILTER;',
+      'SELECT f.fileId, f.path, f.md5_file, f.identified, f.ignored, (CASE WHEN f.identified=1 THEN \'IDENTIFIED\' WHEN f.identified=0 AND f.ignored=0 THEN \'PENDING\' ELSE \'ORIGINAL\' END) AS status, f.type FROM files f #FILTER;',
       this.getEntityMapper(),
     );
     const call = promisify(this.connection.get.bind(this.connection));
