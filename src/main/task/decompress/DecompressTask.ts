@@ -3,15 +3,15 @@ import { app, utilityProcess } from 'electron';
 import { DecompressionManager } from 'scanoss';
 import path from 'path';
 import { Project } from '../../workspace/Project';
-import { Scanner, StageWarning } from '../scanner/types';
+import { Scanner, StageReport } from '../scanner/types';
 import { ScannerStage } from '../../../api/types';
 
 export class DecompressTask implements Scanner.IPipelineTask {
   private project: Project;
-  private decompressTaskWarning: StageWarning = {
+  private decompressTaskReport: StageReport = {
     title: 'Decompress',
     stage: ScannerStage.UNZIP,
-    errors: [],
+    entries: [],
   };
 
   private decompressionManager: DecompressionManager;
@@ -26,7 +26,7 @@ export class DecompressTask implements Scanner.IPipelineTask {
       name: ScannerStage.UNZIP,
       label: 'Decompressing files',
       isCritical: false,
-      warnings: this.decompressTaskWarning,
+      stageReport: this.decompressTaskReport,
     };
   }
 
@@ -66,7 +66,7 @@ export class DecompressTask implements Scanner.IPipelineTask {
         if (data.event === 'error') {
           const parsedData = JSON.parse(data.error);
           parsedData.failedFiles.forEach((file) => {
-            this.decompressTaskWarning.errors.push({
+            this.decompressTaskReport.entries.push({
               item: file.path,
               message: file.error,
             });

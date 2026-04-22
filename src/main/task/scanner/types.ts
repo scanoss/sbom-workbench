@@ -4,10 +4,10 @@ import { ITask } from '../Task';
 /**
  * Represents an individual error for a specific file or purl within a pipeline stage
  */
-export interface StageItemError {
+export interface StageReportEntry {
   /** The affected file path or purl */
   item: string;
-  /** Error message describing what went wrong */
+  /** Description for this entry — an error cause, or an informational note (e.g. "New file") */
   message: string;
 }
 
@@ -16,13 +16,13 @@ export interface StageItemError {
  * at the end of a scan. Covers both non-critical errors and informational summaries
  * (e.g. list of files changed during a rescan).
  */
-export interface StageWarning {
+export interface StageReport {
   /** Display title for the warning (e.g., "Dependency Analysis") */
   title: string;
   /** The stage that generated these warnings */
   stage: ScannerStage;
   /** List of individual items with their associated message */
-  errors: StageItemError[];
+  entries: StageReportEntry[];
   /** Controls how each item is rendered — errors show an "Error:" prefix, info does not. Defaults to 'error' when absent. */
   severity?: 'error' | 'info';
 }
@@ -64,7 +64,7 @@ export namespace Scanner {
     name: ScannerStage;
     label: string;
     isCritical: boolean;
-    warnings?: StageWarning;
+    stageReport?: StageReport;
   }
 
   export interface IPipelineTask extends ITask<void, boolean> {

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IpcChannels } from '@api/ipc-channels';
-import { StageWarning } from '@api/types';
+import { StageReport } from '@api/types';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import { projectService } from '@api/services/project.service';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,7 +27,7 @@ const ProjectScan = () => {
     stageLabel: 'preparing',
     stageStep: '-',
   });
-  const warningsRef = useRef<StageWarning[]>([]);
+  const reportsRef = useRef<StageReport[]>([]);
 
   const init = async () => {
     try {
@@ -91,20 +91,20 @@ const ProjectScan = () => {
     // window.electron.ipcRenderer.send(IpcEvents.PROJECT_STOP);
   };
 
-  const handlerScannerWarnings = (e, args: { warnings: StageWarning[] }) => {
-    warningsRef.current = args.warnings;
+  const handlerScannerReports = (e, args: { reports: StageReport[] }) => {
+    reportsRef.current = args.reports;
   };
 
-  const showWarningsDialog = async (warnings: StageWarning[]) => {
-    await dialogCtrl.openScanWarningDialog(warnings);
+  const showReportsDialog = async (reports: StageReport[]) => {
+    await dialogCtrl.openScanReportDialog(reports);
   };
 
   const handlerScannerFinish = async (e, args) => {
     await dispatch(fetchProjects());
     if (args.success) {
-      if (warningsRef.current.length > 0) {
-        await showWarningsDialog(warningsRef.current);
-        warningsRef.current = [];
+      if (reportsRef.current.length > 0) {
+        await showReportsDialog(reportsRef.current);
+        reportsRef.current = [];
       }
       onShowScan(args.resultsPath);
     }
@@ -138,8 +138,8 @@ const ProjectScan = () => {
     );
     subscriptions.push(
       window.electron.ipcRenderer.on(
-        IpcChannels.SCANNER_WARNINGS,
-        handlerScannerWarnings,
+        IpcChannels.SCANNER_REPORTS,
+        handlerScannerReports,
       ),
     );
     return () => subscriptions.forEach((unsubscribe) => unsubscribe());
