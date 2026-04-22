@@ -183,8 +183,6 @@ export default abstract class Node {
 
   public abstract isDependency(): boolean;
 
-  public abstract order(): void;
-
   public abstract someFiltered(): boolean;
 
   public abstract someNoMatch(): boolean;

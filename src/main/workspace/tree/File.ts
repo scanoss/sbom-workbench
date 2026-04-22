@@ -193,8 +193,6 @@ export default class File extends Node {
     return this.getName() === filename;
   }
 
-  public order(): void {}
-
   public updateStatusFlags() {}
 
   public updateFlags() {}

@@ -11,6 +11,7 @@ import * as Filtering from '../filtering';
 import { TreeViewMode } from './treeViewModes/TreeViewMode';
 import { TreeViewDefault } from './treeViewModes/TreeViewDefault';
 import { defaultBannedList } from '../filtering/defaultFilter';
+import { OrderTreeVisitor } from './visitor/OrderTreeVisitor';
 
 const isBinaryPath = require('is-binary-path');
 const fs = require('fs');
@@ -57,7 +58,7 @@ export class Tree {
    * @brief order file tree by folder and files
    * */
   public orderTree(): void {
-    this.rootFolder.order();
+    this.rootFolder.accept(new OrderTreeVisitor());
   }
 
   private place(
