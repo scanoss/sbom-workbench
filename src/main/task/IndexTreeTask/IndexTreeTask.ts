@@ -13,6 +13,8 @@ export abstract class IndexTreeTask implements Scanner.IPipelineTask {
 
   public abstract run(): Promise<boolean>;
 
+  public abstract buildTree(): Promise<Tree>;
+
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.INDEX,

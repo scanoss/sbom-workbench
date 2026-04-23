@@ -13,7 +13,7 @@ export class RawResultFileTreeTask extends IndexTreeTask {
   filesToScan: Array<string>;
 
 
-  private async buildTreeInChunks(): Promise<Tree> {
+  public async buildTree(): Promise<Tree> {
     const resultPath = path.join(this.project.getMyPath(), 'result.json');
     const tree = new Tree(this.project.metadata.getName(), this.project.getMyPath());
     const files: Array<string> = [];
@@ -89,7 +89,7 @@ export class RawResultFileTreeTask extends IndexTreeTask {
   }
 
   public async run(): Promise<boolean> {
-    const tree = await this.buildTreeInChunks();
+    const tree = await this.buildTree();
     this.setTreeSummary(tree);
     await this.loadScanResultsOnFileTree();
     return true;
