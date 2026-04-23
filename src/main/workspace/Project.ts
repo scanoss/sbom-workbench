@@ -92,6 +92,7 @@ export class Project {
   }
 
   public async upgrade() {
+    log.transports.file.resolvePath = () => `${this.metadata.getMyPath()}/project.log`;
     if (this.metadata.getVersion() === '11.4.9') {
       this.metadata.setAppVersion('0.8.0');
       this.metadata.save();
