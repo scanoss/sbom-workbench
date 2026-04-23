@@ -1,6 +1,7 @@
 import log from 'electron-log';
-import { promises as fsPromises } from 'fs';
-import { IndexTreeTask } from "./IndexTreeTask";
+import fs, { promises as fsPromises } from 'fs';
+import crypto from 'crypto';
+import { IndexTreeTask } from './IndexTreeTask';
 import * as Filtering from '../../workspace/filtering';
 import { Tree } from '../../workspace/tree/Tree';
 import File from '../../workspace/tree/File';
@@ -49,8 +50,13 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     const buildFileNode = (relativePath: string, absolutePath: string): File => {
       const name = relativePath.split('/').pop();
       const file = new File(relativePath, name);
-      const md5 = computeFileMd5(absolutePath);
-      if (md5) file.setMD5(md5);
+      try {
+        const hash = crypto.createHash('md5');
+        hash.update(fs.readFileSync(absolutePath));
+        file.setMD5(hash.digest('hex'));
+      } catch (err) {
+        log.warn(`[ CodeIndexTreeTask ]: Failed to compute md5 for ${relativePath}`, err);
+      }
       return file;
     };
 
