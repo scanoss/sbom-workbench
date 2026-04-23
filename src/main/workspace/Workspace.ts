@@ -86,6 +86,7 @@ export class Workspace {
           recursive: true,
         });
         this.projectList.splice(i, 1);
+        log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
         return true;
       }
     }
@@ -122,6 +123,7 @@ export class Workspace {
     log.info('%c[ WORKSPACE ]: Closing all opened projects', 'color: green');
     // eslint-disable-next-line no-restricted-syntax
     for (const p of this.projectList) if (p.getState() === ProjectState.OPENED) await p.close();
+    log.transports.file.resolvePath = () => `${this.wsPath}/ws.log`;
   }
 
   public async addProject(p: Project) {
