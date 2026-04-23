@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - File MD5 is now computed during tree build and persisted to the `files.md5_file` column and the `tree.nodes.jsonl` snapshot
 - Added `ProjectSource.WFP` enum variant so winnowing-based projects are distinguishable from native code scans
+- New `warning` severity level for stage report entries
 ### Changed
 - Refactored `Tree.build` to accept pre-constructed `File` nodes instead of path strings
+- Redesigned scan report dialog as a two-pane layout (stage sidebar + entry list) with severity counts in the header
 ### Removed
 - Removed unused `ExportControlService.ts`
 ### Fixed
