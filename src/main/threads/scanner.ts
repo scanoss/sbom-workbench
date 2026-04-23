@@ -9,14 +9,18 @@ process.parentPort.once('message', async (e) => {
   const { action, data } = e.data;
   if (action === 'DECOMPRESS') {
     try {
-      const decompressThread = new DecompressThread(data);
+      const decompressThread = new DecompressThread(data.scanRoot, {
+        recursive: data.recursive,
+        maxDepth: data.maxDepth,
+      });
       const results = await decompressThread.run();
-      if(results.failedFiles.length<=0){
+      const hasIssues = results.failedFiles.length > 0 || results.skippedByDepth.length > 0;
+      if (!hasIssues) {
         process.parentPort.postMessage({
           event: 'success',
           data: true
         });
-      }else{
+      } else {
         process.parentPort.postMessage({
           event: 'error',
           error: JSON.stringify(results)

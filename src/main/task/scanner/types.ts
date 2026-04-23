@@ -48,6 +48,8 @@ export namespace Scanner {
     obfuscate?: boolean;
     hpsm?: boolean;
     allExtensions?: boolean;
+    recursiveDecompress?: boolean;
+    maxDecompressDepth?: number;
   }
 
   export interface StageProperties {

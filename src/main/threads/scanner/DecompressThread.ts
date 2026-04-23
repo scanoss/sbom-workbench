@@ -2,14 +2,30 @@ import { DecompressionManager } from 'scanoss';
 import path from 'path';
 import fs from 'fs';
 
+export interface DecompressThreadOptions {
+  recursive: boolean;
+  maxDepth: number;
+}
+
+export interface DecompressThreadResult {
+  parentFolders: Array<string>;
+  failedFiles: Array<{ path: string, error: string }>;
+  skippedByDepth: Array<{ path: string, error: string }>;
+}
+
 export class DecompressThread {
   private projectScanRoot: string;
 
   private decompressionManager: DecompressionManager;
 
-  constructor(projectScanRoot: string) {
+  private effectiveDepth: number;
+
+  constructor(projectScanRoot: string, options: DecompressThreadOptions) {
     this.projectScanRoot = projectScanRoot;
-    this.decompressionManager = new DecompressionManager();
+    // effectiveDepth = total nesting levels the SDK is allowed to expand.
+    // 1 = single-pass (top-level archives only).
+    this.effectiveDepth = options.recursive ? options.maxDepth : 1;
+    this.decompressionManager = new DecompressionManager(this.effectiveDepth);
   }
 
   /**
@@ -42,11 +58,20 @@ export class DecompressThread {
     return results;
   }
 
-  public async run(): Promise<{ parentFolders: Array<string>, failedFiles: Array<{ path: string, error: string }> }> {
-    const filesToDecompress = this.getFilesToDecompress(
-      this.projectScanRoot,
-      this.decompressionManager.getSupportedFormats()
-    );
-    return await this.decompressionManager.decompress(filesToDecompress);
+  public async run(): Promise<DecompressThreadResult> {
+    const supportedFormats = this.decompressionManager.getSupportedFormats();
+    const candidates = this.getFilesToDecompress(this.projectScanRoot, supportedFormats);
+    const result = await this.decompressionManager.decompress(candidates);
+
+    const skippedByDepth = result.skippedByDepth.map((p) => ({
+      path: p,
+      error: `Archive not expanded: nesting exceeds configured depth (${this.effectiveDepth})`,
+    }));
+
+    return {
+      parentFolders: result.parentFolders,
+      failedFiles: result.failedFiles,
+      skippedByDepth,
+    };
   }
 }
