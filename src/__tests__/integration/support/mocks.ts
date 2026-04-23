@@ -40,6 +40,19 @@ jest.mock('../../../main/broadcastManager/BroadcastManager', () => ({
   broadcastManager: { get: () => ({ send: jest.fn() }) },
 }));
 
+// --- workspace -------------------------------------------------------------
+// ScannerFactory.buildConfig calls workspace.getOpenProject() to resolve
+// per-project API credentials. Tests don't register a project with the
+// workspace singleton, so return an empty stub — the defaults from
+// userSettingService fill in the rest of the config.
+
+jest.mock('../../../main/workspace/Workspace', () => ({
+  workspace: {
+    getOpenProject: () => ({ getApi: () => '', getApiKey: () => '' }),
+    getOpenedProjects: () => [],
+  },
+}));
+
 // --- userSettingService ----------------------------------------------------
 //
 // Various tasks read user-level config (proxy, API key, scanner timeouts).
@@ -143,6 +156,41 @@ export const scannerScanMock = jest.fn(async (..._args: any[]) => {
   return resultPath;
 });
 
+import type { DependencyMatch } from './dependencies';
+import { buildDependencyEntry } from './dependencies';
+
+export type DependencyScanSpec = Record<string, DependencyMatch | DependencyMatch[]>;
+
+const _dependencyScanSpecsByRoot = new Map<string, DependencyScanSpec>();
+
+export function setDependencyScanSpecForRoot(root: string, spec: DependencyScanSpec): void {
+  _dependencyScanSpecsByRoot.set(root, spec);
+}
+
+export function clearDependencyScanSpecForRoot(root: string): void {
+  _dependencyScanSpecsByRoot.delete(root);
+}
+
+function buildDependencyResponse(rootPath: string, spec: DependencyScanSpec) {
+  const filesList = Object.entries(spec).map(([path, value]) => {
+    const matches = Array.isArray(value) ? value : [value];
+    const absPath = path.startsWith('/') ? rootPath + path : `${rootPath}/${path}`;
+    return {
+      file: absPath,
+      id: 'manifest',
+      status: 'ok',
+      dependenciesList: matches.map(buildDependencyEntry),
+    };
+  });
+  return { filesList, status: { status: 'SUCCESS', message: 'ok' } };
+}
+
+export const dependencyScanMock = jest.fn(async (_files: string[], rootPath: string) => {
+  const spec = _dependencyScanSpecsByRoot.get(rootPath);
+  if (!spec) return { filesList: [], status: { status: 'SUCCESS', message: 'ok' } };
+  return buildDependencyResponse(rootPath, spec);
+});
+
 jest.mock('scanoss', () => ({
   Scanner: jest.fn().mockImplementation(() => ({
     scan: scannerScanMock,
@@ -153,7 +201,7 @@ jest.mock('scanoss', () => ({
   })),
   ScannerCfg: jest.fn(),
   DependencyScanner: jest.fn().mockImplementation(() => ({
-    scan: jest.fn(async () => ({ filesList: [] })),
+    scan: dependencyScanMock,
   })),
   DependencyScannerCfg: jest.fn(),
   CryptographyScanner: jest.fn().mockImplementation(() => ({

@@ -40,9 +40,11 @@ import { randomBytes, createHash } from 'crypto';
 
 import {
   setSpecForDir, clearSpecForDir, setCurrentWorkDir, resetScannerMockCalls,
-  ScanSpec,
+  setDependencyScanSpecForRoot, clearDependencyScanSpecForRoot,
+  ScanSpec, DependencyScanSpec,
 } from './mocks';
 import { COMPONENTS } from './components';
+import { DEPENDENCIES } from './dependencies';
 import { makeTestProject } from './project-stub';
 import { modelProvider } from '../../../main/services/ModelProvider';
 import { fileService } from '../../../main/services/FileService';
@@ -50,6 +52,7 @@ import { resultService } from '../../../main/services/ResultService';
 import { componentService } from '../../../main/services/ComponentService';
 import { inventoryService } from '../../../main/services/InventoryService';
 import { rescanService } from '../../../main/services/RescanService';
+import { dependencyService } from '../../../main/services/DependencyService';
 import { ScannerPipelineFactory } from '../../../main/task/scanner/scannerPipelineFactory/ScannerPipelineFactory';
 import { Scanner } from '../../../main/task/scanner/types';
 
@@ -60,7 +63,9 @@ export {
   resultService,
   componentService,
   rescanService,
+  dependencyService,
   COMPONENTS,
+  DEPENDENCIES,
   Scanner,
 };
 
@@ -106,6 +111,9 @@ export interface TestContext {
 
   /** Configure what the (mocked) engine will return for the next scan in this ctx. */
   mockScanResults(spec: ScanSpec): void;
+
+  /** Configure declared dependencies returned for each manifest path (e.g. `/package.json`). */
+  mockDependencyScan(spec: DependencyScanSpec): void;
 
   /** Run the production CodeScannerPipelineTask against the given project. */
   runPipeline(project: any): Promise<boolean>;
@@ -164,6 +172,10 @@ export async function createTestContext(): Promise<TestContext> {
       setSpecForDir(projectDir, spec);
     },
 
+    mockDependencyScan(spec) {
+      setDependencyScanSpecForRoot(sourceDir, spec);
+    },
+
     async runPipeline(project) {
       const { source } = project.metadata.getScannerConfig();
       const pipeline = ScannerPipelineFactory.getScannerPipeline(source);
@@ -178,6 +190,7 @@ export async function createTestContext(): Promise<TestContext> {
 
     async destroy() {
       clearSpecForDir(projectDir);
+      clearDependencyScanSpecForRoot(sourceDir);
       await (modelProvider.model as any)?.destroy?.();
       try { rmSync(projectDir, { recursive: true, force: true }); } catch { /* ignore */ }
     },
