@@ -162,7 +162,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.5",
     "rimraf": "^6.0.1",
-    "scanoss": "github:scanoss/scanoss.js#feat/SP-4273/recursive-decompress-skipped-reporting",
+    "scanoss": "0.39.0",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "stream-json": "^1.9.1",

@@ -17,7 +17,7 @@
   "dependencies": {
     "@cyclonedx/cyclonedx-library": "^9.4.1",
     "flexsearch": "^0.8.151",
-    "scanoss": "github:scanoss/scanoss.js#feat/SP-4273/recursive-decompress-skipped-reporting",
+    "scanoss": "0.39.0",
     "sqlite3": "^5.1.6"
   }
 }
