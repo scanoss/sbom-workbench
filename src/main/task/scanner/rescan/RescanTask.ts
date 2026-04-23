@@ -18,7 +18,6 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
   private rescanReport: StageReport = {
     title: 'Rescan summary',
     stage: ScannerStage.RESCAN,
-    severity: 'info',
     entries: [],
   };
 
@@ -110,9 +109,9 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     await this.project.open();
     await this.updateResultFile();
     const { newFiles, modifiedFiles, deletedFiles } = await this.reScan(`${this.project.getMyPath()}/result.json`);
-    newFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'New file' }));
-    modifiedFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'Content changed' }));
-    deletedFiles.forEach((p) => this.rescanReport.entries.push({ item: p, message: 'File deleted' }));
+    newFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'New file', severity: 'info' }));
+    modifiedFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'Content changed', severity: 'info' }));
+    deletedFiles.forEach((p) => this.rescanReport.entries.push({ item: p, message: 'File deleted', severity: 'info' }));
     const newFileStatusResults = await rescanService.getNewResults();
     this.project.getTree().sync(newFileStatusResults);
     this.project.metadata.setScannerState(ScanState.FINISHED);
