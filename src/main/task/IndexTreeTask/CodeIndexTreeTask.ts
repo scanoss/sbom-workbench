@@ -1,7 +1,5 @@
 import log from 'electron-log';
-import fs from 'fs';
 import { promises as fsPromises } from 'fs';
-import crypto from 'crypto';
 import { IndexTreeTask } from "./IndexTreeTask";
 import * as Filtering from '../../workspace/filtering';
 import { Tree } from '../../workspace/tree/Tree';
@@ -15,7 +13,7 @@ export class CodeIndexTreeTask extends IndexTreeTask {
 
   public async run(params: void):Promise<boolean> {
     log.info('[ CodeIndexTreeTask init ]');
-    const tree = await this.buildTreeFromDirectory();
+    const tree = await this.buildTree();
     this.setTreeSummary(tree);
     tree.orderTree();
     // On RESCAN, files already exist in the DB with their correct `type`
@@ -35,7 +33,7 @@ export class CodeIndexTreeTask extends IndexTreeTask {
   /**
    * Recursively scan directory and build tree in chunks
    */
-  private async buildTreeFromDirectory(): Promise<Tree> {
+  public async buildTree(): Promise<Tree> {
     const tree = new Tree(
       this.project.metadata.getName(),
       this.project.getMyPath(),
@@ -51,13 +49,8 @@ export class CodeIndexTreeTask extends IndexTreeTask {
     const buildFileNode = (relativePath: string, absolutePath: string): File => {
       const name = relativePath.split('/').pop();
       const file = new File(relativePath, name);
-      try {
-        const hash = crypto.createHash('md5');
-        hash.update(fs.readFileSync(absolutePath));
-        file.setMD5(hash.digest('hex'));
-      } catch (err) {
-        log.warn(`[ CodeIndexTreeTask ]: Failed to compute md5 for ${relativePath}`, err);
-      }
+      const md5 = computeFileMd5(absolutePath);
+      if (md5) file.setMD5(md5);
       return file;
     };
 

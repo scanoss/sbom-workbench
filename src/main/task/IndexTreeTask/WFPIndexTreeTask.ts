@@ -11,7 +11,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
   filesToScan: Array<string>;
 
   public async run(): Promise<boolean> {
-    const tree = await this.buildTreeFromStream();
+    const tree = await this.buildTree();
     await this.setTreeSummary(tree);
     return true;
   }
@@ -20,7 +20,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
    * @brief build tree from WFP file using streaming with chunked processing
    * @return Tree return a tree
    * */
-  public async buildTreeFromStream(): Promise<Tree> {
+  public async buildTree(): Promise<Tree> {
     const tree = new Tree(this.project.metadata.getName(), this.project.getMyPath());
     const filesToScan: Array<string> = [];
     const regex = /file=(?<md5>[^,]*),[^,]*,(?<path>.*)/;
