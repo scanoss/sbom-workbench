@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `import Workbench project`  
 - Preserved user decisions on dependencies across rescans
 
+## [1.38.0] - 2026-04-22
+### Added
+- Recursive archive-in-archive expansion with configurable depth (default 3) in project creation settings. Archives whose nesting exceeds the configured depth are reported in the post-scan warnings dialog.
+
 ## [1.37.1] - 2026-04-09
 ### Fixed
 - AppImage sandbox wrapper causing launch failure over SSH by using `ELECTRON_DISABLE_SANDBOX` env var instead of `--no-sandbox` CLI flag

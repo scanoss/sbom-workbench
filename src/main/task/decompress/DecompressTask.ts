@@ -47,7 +47,15 @@ export class DecompressTask implements Scanner.IPipelineTask {
       log.error(`[ THREAD stderr ]:`, data.toString());
     });
 
-    child.postMessage({ action: 'DECOMPRESS', data: this.project.getScanRoot() });
+    const scannerConfig = this.project.metadata.getScannerConfig();
+    child.postMessage({
+      action: 'DECOMPRESS',
+      data: {
+        scanRoot: this.project.getScanRoot(),
+        recursive: scannerConfig.recursiveDecompress ?? false,
+        maxDepth: scannerConfig.maxDecompressDepth ?? 1,
+      },
+    });
 
     return new Promise((resolve, reject) => {
       child.on('exit', (code) => {
@@ -67,6 +75,12 @@ export class DecompressTask implements Scanner.IPipelineTask {
           const parsedData = JSON.parse(data.error);
           parsedData.failedFiles.forEach((file) => {
             this.decompressTaskReport.entries.push({
+              item: file.path,
+              message: file.error,
+            });
+          });
+          parsedData.skippedByDepth.forEach((file) => {
+            this.decompressTaskWarning.errors.push({
               item: file.path,
               message: file.error,
             });

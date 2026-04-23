@@ -68,6 +68,8 @@ const ProjectSettings = () => {
       ],
       obfuscate: false,
       allExtensions: false,
+      recursiveDecompress: false,
+      maxDecompressDepth: 3,
     },
   });
 
@@ -197,6 +199,29 @@ const ProjectSettings = () => {
       scannerConfig: {
         ...projectSettings.scannerConfig,
         pipelineStages: newType,
+        recursiveDecompress: checked ? projectSettings.scannerConfig.recursiveDecompress : false,
+      },
+    });
+  };
+
+  const onRecursiveDecompressHandler = (checked: boolean) => {
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        recursiveDecompress: checked,
+      },
+    });
+  };
+
+  const onMaxDecompressDepthHandler = (value: string) => {
+    const parsed = parseInt(value, 10);
+    const next = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 20) : 1;
+    setProjectSettings({
+      ...projectSettings,
+      scannerConfig: {
+        ...projectSettings.scannerConfig,
+        maxDecompressDepth: next,
       },
     });
   };
@@ -442,13 +467,55 @@ const ProjectSettings = () => {
                   <label className="input-label">{t('Title:ScannerSettings')}</label>
                   <FormGroup>
                     <FormControlLabel
-                      control={<Checkbox />}
+                      control={<Checkbox checked={projectSettings.scannerConfig.pipelineStages.includes(PipelineStage.UNZIP)} />}
                       label={t('DecompressArchivesLabel')}
                       onChange={(event, checked) => onDecompressHandler(checked)}
                     />
                     <FormHelperText className="helper">
                       {t('DecompressArchivesHint')}
                     </FormHelperText>
+                  </FormGroup>
+
+                  <FormGroup sx={{ pl: 4, my: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'nowrap' }}>
+                      <Tooltip title={t('ExpandNestedArchivesHint')}>
+                        <FormControlLabel
+                          sx={{ mr: 0, '& .MuiFormControlLabel-label': { whiteSpace: 'nowrap' } }}
+                          control={(
+                            <Checkbox
+                              size="small"
+                              sx={{ py: 0 }}
+                              disabled={!projectSettings.scannerConfig.pipelineStages.includes(PipelineStage.UNZIP)}
+                              checked={projectSettings.scannerConfig.recursiveDecompress || false}
+                            />
+                          )}
+                          label={t('ExpandNestedArchivesLabel')}
+                          onChange={(event, checked) => onRecursiveDecompressHandler(checked)}
+                        />
+                      </Tooltip>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          visibility: projectSettings.scannerConfig.recursiveDecompress ? 'visible' : 'hidden',
+                        }}
+                      >
+                        <label htmlFor="maxDecompressDepth" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
+                          {t('MaxDecompressDepthLabel')}
+                        </label>
+                        <TextField
+                          id="maxDecompressDepth"
+                          type="number"
+                          size="small"
+                          variant="outlined"
+                          sx={{ backgroundColor: '#fff', borderRadius: 1 }}
+                          value={projectSettings.scannerConfig.maxDecompressDepth ?? 3}
+                          inputProps={{ min: 1, max: 20, style: { width: 60, paddingTop: 4, paddingBottom: 4 } }}
+                          onChange={(e) => onMaxDecompressDepthHandler(e.target.value)}
+                        />
+                      </div>
+                    </div>
                   </FormGroup>
 
                   <FormGroup>
