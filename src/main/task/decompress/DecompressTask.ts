@@ -8,6 +8,7 @@ import { ScannerStage } from '../../../api/types';
 
 export class DecompressTask implements Scanner.IPipelineTask {
   private project: Project;
+
   private decompressTaskReport: StageReport = {
     title: 'Decompress',
     stage: ScannerStage.UNZIP,
@@ -80,9 +81,10 @@ export class DecompressTask implements Scanner.IPipelineTask {
             });
           });
           parsedData.skippedByDepth.forEach((file) => {
-            this.decompressTaskWarning.errors.push({
+            this.decompressTaskReport.entries.push({
               item: file.path,
               message: file.error,
+              severity: 'info',
             });
           });
           child.kill();
