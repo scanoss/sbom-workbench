@@ -73,7 +73,8 @@ const createWindow = async () => {
     title: AppConfig.APP_NAME,
     show: false,
     width: 1330,
-    height: 820,
+    height: 920,
+    useContentSize: true,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       sandbox: false, // TODO:  remove de access from preload.js, see https://github.com/electron/electron/issues/36437
