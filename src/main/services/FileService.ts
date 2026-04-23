@@ -5,9 +5,10 @@ import { modelProvider } from './ModelProvider';
 import { QueryBuilderCreator } from '../model/queryBuilder/QueryBuilderCreator';
 import AppConfig from '../../config/AppConfigModule';
 import { getHttpConfig } from './utils/httpUtil';
+import File from '../workspace/tree/File';
 
 class FileService {
-  public async insert(files: Array<any>) {
+  public async insert(files: Array<File>) {
     await modelProvider.model.file.insertFiles(files);
   }
 

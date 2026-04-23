@@ -21,6 +21,7 @@ import { projectMigration1290 } from './scripts/1.29.0';
 import { projectMigration1300 } from './scripts/1.30.0';
 import { projectMigration1310 } from './scripts/1.31.0';
 import { projectMigration1331 } from './scripts/1.33.1';
+import { projectMigration1380 } from './scripts/1.38.0';
 
 export class ProjectMigration extends Migration {
   private scripts: Record<string, Array<(data: string) => void>>;
@@ -54,6 +55,7 @@ export class ProjectMigration extends Migration {
       '1.30.0': [projectMigration1300],
       '1.31.0': [projectMigration1310],
       '1.33.1': [projectMigration1331],
+      '1.38.0': [projectMigration1380],
     };
   }
 

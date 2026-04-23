@@ -6,6 +6,7 @@ import { resultService } from '../../services/ResultService';
 import { componentService } from '../../services/ComponentService';
 import { ScannerStage, ScanState } from '../../../api/types';
 import path from 'path';
+import { CollectFilesVisitor } from '../../workspace/tree/visitor/CollectFilesVisitor';
 
 /**
  * ImportTask handles the complete post-scan result processing pipeline.
@@ -60,7 +61,9 @@ export class ImportTask implements Scanner.IPipelineTask {
    */
   public async run(): Promise<boolean> {
     const resultPath = path.join(this.project.getMyPath(), 'result.json');
-    await fileService.insert(this.project.getTree().getRootFolder().getFiles());
+    const collector = new CollectFilesVisitor();
+    this.project.getTree().getRootFolder().accept<void>(collector);
+    await fileService.insert(collector.files);
     const files = await fileHelper.getPathFileId();
     await resultService.insertFromFile(resultPath, files);
     await componentService.importComponents();

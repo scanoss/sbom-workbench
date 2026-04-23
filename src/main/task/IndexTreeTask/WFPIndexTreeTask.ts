@@ -1,6 +1,7 @@
 import fs from "fs";
 import { IndexTreeTask } from "./IndexTreeTask";
 import { Tree } from "../../workspace/tree/Tree";
+import File from "../../workspace/tree/File";
 import { createReadStream } from "fs";
 import { createInterface } from "readline";
 import { createFilesSummary } from '../../workspace/projectScanState';
@@ -10,7 +11,7 @@ export class WFPIndexTreeTask extends IndexTreeTask {
   filesToScan: Array<string>;
 
   public async run(): Promise<boolean> {
-    const tree = await this.buildTreeFromStream();
+    const tree = await this.buildTree();
     await this.setTreeSummary(tree);
     return true;
   }
@@ -19,10 +20,10 @@ export class WFPIndexTreeTask extends IndexTreeTask {
    * @brief build tree from WFP file using streaming with chunked processing
    * @return Tree return a tree
    * */
-  public async buildTreeFromStream(): Promise<Tree> {
+  public async buildTree(): Promise<Tree> {
     const tree = new Tree(this.project.metadata.getName(), this.project.getMyPath());
     const filesToScan: Array<string> = [];
-    const regex = /file=.*,.*,(?<path>.*)/;
+    const regex = /file=(?<md5>[^,]*),[^,]*,(?<path>.*)/;
 
     return new Promise((resolve, reject) => {
       // In WFP projects, getScanRoot() returns the path to the WFP file (not a directory)
@@ -33,15 +34,19 @@ export class WFPIndexTreeTask extends IndexTreeTask {
       });
 
       const CHUNK_SIZE = 1000;
-      let fileChunk: string[] = [];
+      let fileChunk: File[] = [];
       const addedNodes = {}; // Shared across all chunks to prevent duplicate folders
 
       rl.on('line', (line) => {
         const match = regex.exec(line);
         if (match && match.groups.path) {
           const filePath = match.groups.path;
+          const nodePath = filePath.startsWith('/') ? filePath : `/${filePath}`;
+          const name = nodePath.split('/').pop();
+          const file = new File(nodePath, name);
+          file.setMD5(match.groups.md5);
           filesToScan.push(filePath);
-          fileChunk.push(filePath);
+          fileChunk.push(file);
 
           // Process chunk when it reaches CHUNK_SIZE
           if (fileChunk.length >= CHUNK_SIZE) {

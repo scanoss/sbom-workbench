@@ -1,4 +1,3 @@
-import { BlackListAbstract } from './blackList/BlackListAbstract';
 import { Visitor } from './visitor/Visitor';
 
 export enum NodeStatus {
@@ -168,8 +167,6 @@ export default abstract class Node {
 
   public abstract getStatus(): NodeStatus;
 
-  public abstract getFiles(banned: BlackListAbstract): Array<any>;
-
   public abstract summarize(root: string, summary: any): any;
 
   public abstract addDependency(path: string): void;
@@ -185,8 +182,6 @@ export default abstract class Node {
   public abstract setActionDeep(action: string): void;
 
   public abstract isDependency(): boolean;
-
-  public abstract order(): void;
 
   public abstract someFiltered(): boolean;
 

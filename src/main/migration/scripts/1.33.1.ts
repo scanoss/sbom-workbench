@@ -1,6 +1,7 @@
 import log from 'electron-log';
 import sqlite3 from 'sqlite3';
-import { Queries } from '../../model/querys_db';
+
+const FILES_TABLE_1_33_1 = 'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT UNIQUE,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
 export async function projectMigration1331(projectPath: string): Promise<void> {
   try {
@@ -13,7 +14,6 @@ export async function projectMigration1331(projectPath: string): Promise<void> {
 }
 
 async function addUniqueConstraint(projectPath: string): Promise<void> {
-  const query = new Queries();
   return new Promise<void>((resolve, reject) => {
     const db = new sqlite3.Database(
       `${projectPath}/scan_db`,
@@ -64,7 +64,7 @@ async function addUniqueConstraint(projectPath: string): Promise<void> {
           );
           db.run('INSERT INTO files_backup SELECT * FROM files;');
           db.run('DROP TABLE files;');
-          db.run(query.FILES_TABLE);
+          db.run(FILES_TABLE_1_33_1);
           db.run('INSERT OR IGNORE INTO files SELECT * FROM files_backup;');
           db.run('DROP TABLE files_backup;');
 

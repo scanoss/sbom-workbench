@@ -1,0 +1,17 @@
+{
+  "src/main/app.ts": [
+    {
+      "id": "none",
+      "server": {
+        "elapsed": "0.004954s",
+        "flags": "0",
+        "hostname": "p37",
+        "kb_version": {
+          "daily": "26.04.14",
+          "monthly": "26.03"
+        },
+        "version": "5.4.25"
+      }
+    }
+  ]
+}

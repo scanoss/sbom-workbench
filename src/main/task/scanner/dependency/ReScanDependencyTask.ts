@@ -7,7 +7,15 @@ import { DependencyTask } from './DependencyTask';
 export class ReScanDependencyTask extends DependencyTask {
   // @Override
   public async run(params: void): Promise<boolean> {
+    // Capture IGNORED state and user-edited version/licenses before super.run()
+    // wipes the dependencies table. Re-applied by natural identity (purl,
+    // originalVersion, originalLicense) so manifest content changes correctly
+    // invalidate stale decisions.
+    const userDecisionsSnapshot = await modelProvider.model.dependency.getUserDecisionsSnapshot();
+
     await super.run();
+
+    await modelProvider.model.dependency.applyUserDecisionsSnapshot(userDecisionsSnapshot);
 
     // Delete dirty dependencies inventories
     await modelProvider.model.inventory.deleteDirtyDependencyInventories();

@@ -19,7 +19,11 @@ describe('projectTreeSnapshot', () => {
 
   it('roundtrips file attributes and folder status flags using jsonl snapshot', async () => {
     const tree = new Tree('demo-root', tempDir, '/scan/root');
-    tree.build(['/src/a.ts', '/src/b.bin', '/deps/c.js']);
+    tree.build([
+      new File('/src/a.ts', 'a.ts'),
+      new File('/src/b.bin', 'b.bin'),
+      new File('/deps/c.js', 'c.js'),
+    ]);
 
     const fileA = tree.getNode('/src/a.ts') as File;
     fileA.setAction('scan');

@@ -4,12 +4,21 @@ import { Visitor } from './visitor/Visitor';
 
 export default class File extends Node {
   private isDependencyFile: boolean;
+  private md5: string;
 
   constructor(path: string, name: string) {
     super(path, name);
     this.type = 'file';
     this.isDependencyFile = false;
     this.isBinaryFile = false;
+  }
+
+  public setMD5(md5: string): void {
+    this.md5 = md5;
+  }
+
+  public getMD5(): string {
+    return this.md5;
   }
 
   public setStatus(path: string, status: NodeStatus): boolean {
@@ -103,22 +112,6 @@ export default class File extends Node {
     return this.status;
   }
 
-  public getFiles(banned: BlackListAbstract = null): Array<any> {
-    if (banned && banned.evaluate(this)) return [];
-    let type = '';
-    if (this.status === NodeStatus.PENDING) type = NodeStatus.MATCH;
-    if (this.status === NodeStatus.FILTERED) type = NodeStatus.FILTERED;
-    if (this.status === NodeStatus.NOMATCH) type = NodeStatus.NOMATCH;
-    return [
-      {
-        path: this.getPath(),
-        type,
-        isBinaryFile: this.isBinaryFile,
-        isDependencyFile: this.isDependencyFile,
-      },
-    ];
-  }
-
   public summarize(root: string, summary: any): any {
     summary.total += 1;
     if (this.getAction() === 'filter') {
@@ -199,8 +192,6 @@ export default class File extends Node {
   public containsFile(filename: string): boolean {
     return this.getName() === filename;
   }
-
-  public order(): void {}
 
   public updateStatusFlags() {}
 

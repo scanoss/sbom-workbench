@@ -1,6 +1,6 @@
 import log from 'electron-log';
 import { IpcChannels } from '../../../../api/ipc-channels';
-import { Scanner, StageWarning } from '../types';
+import { Scanner, StageReport } from '../types';
 import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
 import { Project } from '../../../workspace/Project';
 import { ITask } from '../../Task';
@@ -9,33 +9,33 @@ import { ScanState } from '../../../../api/types';
 export abstract class ScannerPipeline implements ITask<Project, boolean> {
   protected queue: Array<Scanner.IPipelineTask>;
 
-  protected warnings: StageWarning[];
+  protected stageReports: StageReport[];
 
   public constructor() {
     this.queue = [];
-    this.warnings = [];
+    this.stageReports = [];
   }
 
   /**
-   * Adds a warning to be reported at the end of the scan
+   * Adds a report to be shown at the end of the scan
    * Use this to collect non-critical errors that shouldn't stop the pipeline
    */
-  public addWarning(warning: StageWarning): void {
-    this.warnings.push(warning);
+  public addReport(report: StageReport): void {
+    this.stageReports.push(report);
   }
 
   /**
-   * Returns all collected warnings
+   * Returns all collected reports
    */
-  public getWarnings(): StageWarning[] {
-    return this.warnings;
+  public getReports(): StageReport[] {
+    return this.stageReports;
   }
 
   /**
-   * Clears all collected warnings
+   * Clears all collected reports
    */
-  protected clearWarnings(): void {
-    this.warnings = [];
+  protected clearReports(): void {
+    this.stageReports = [];
   }
 
   public abstract run(params: Project): Promise<boolean>;
@@ -48,7 +48,13 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         stageLabel: stageProps.label,
         stageStep: `${stageStep + 1}/${this.queue.length}`,
       });
-      return await task.run();
+      const result = await task.run();
+      // Tasks may populate a report during a successful run to surface
+      // informational messages (e.g. rescan summary) in the end-of-scan dialog.
+      if (stageProps.stageReport && stageProps.stageReport.entries.length > 0) {
+        this.addReport(stageProps.stageReport);
+      }
+      return result;
     } catch (e: any) {
       if (stageProps.isCritical) {
         log.error('[SCANNER PIPELINE ERROR]', `Stage: ${stageProps.label} error: ${e.message}`);
@@ -59,7 +65,7 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
         throw e;
       }
       log.warn(`Stage: ${stageProps.label} error: ${e.message}`);
-      if (stageProps.warnings) this.addWarning(stageProps.warnings);
+      if (stageProps.stageReport) this.addReport(stageProps.stageReport);
       return true; // Non-critical task failed, continue pipeline
     }
   }
@@ -80,10 +86,10 @@ export abstract class ScannerPipeline implements ITask<Project, boolean> {
       throw saveError;
     }
 
-    // Send warnings via dedicated channel if there are any
-    if (this.warnings.length > 0) {
-      broadcastManager.get().send(IpcChannels.SCANNER_WARNINGS, {
-        warnings: this.warnings,
+    // Send stage reports via dedicated channel if there are any
+    if (this.stageReports.length > 0) {
+      broadcastManager.get().send(IpcChannels.SCANNER_REPORTS, {
+        reports: this.stageReports,
       });
     }
 

@@ -9,6 +9,7 @@ import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
 import { ScannerStage } from '../../../../api/types';
 import { modelProvider } from '../../../services/ModelProvider';
+import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class DependencyTask implements Scanner.IPipelineTask {
   protected project: Project;
@@ -37,12 +38,13 @@ export class DependencyTask implements Scanner.IPipelineTask {
     try {
       const allFiles = [];
       const rootPath = this.project.metadata.getScanRoot();
-      this.project.tree
-        .getRootFolder()
-        .getFiles(new BlackListDependencies(`${this.project.metadata.getMyPath()}/filter.json`))
-        .forEach((f: File) => {
-          allFiles.push(rootPath + f.path);
-        });
+      const collector = new CollectFilesVisitor(
+        new BlackListDependencies(`${this.project.metadata.getMyPath()}/filter.json`),
+      );
+      this.project.tree.getRootFolder().accept<void>(collector);
+      collector.files.forEach((f) => {
+        allFiles.push(rootPath + f.getPath());
+      });
       const depScanner = ScannerFactory.createScanner(DependencyScannerCfg, DependencyScanner);
       const resp = await depScanner.scan(allFiles, rootPath);
       resp.filesList.forEach((f) => {

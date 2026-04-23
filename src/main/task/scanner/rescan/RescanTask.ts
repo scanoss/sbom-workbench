@@ -2,10 +2,10 @@ import log from 'electron-log';
 import fs from 'fs';
 import { ScannerStage, ScanState } from '../../../../api/types';
 import { BaseScannerTask } from '../BaseScannerTask';
-import { Scanner } from '../types';
+import { Scanner, StageReport } from '../types';
 import { modelProvider } from '../../../services/ModelProvider';
 import { licenseService } from '../../../services/LicenseService';
-import { rescanService } from '../../../services/RescanService';
+import { rescanService, RescanSummary } from '../../../services/RescanService';
 import { IDispatch } from '../dispatcher/IDispatch';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
 import { fileExists } from '../../../utils/utils';
@@ -15,15 +15,22 @@ import { parser } from 'stream-json';
 import { streamObject } from 'stream-json/streamers/StreamObject';
 
 export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> extends BaseScannerTask<TDispatcher, TInputScannerAdapter> {
+  private rescanReport: StageReport = {
+    title: 'Rescan summary',
+    stage: ScannerStage.RESCAN,
+    entries: [],
+  };
+
   public getStageProperties(): Scanner.StageProperties {
     return {
       name: ScannerStage.RESCAN,
       label: 'Rescanning',
       isCritical: true,
+      stageReport: this.rescanReport,
     };
   }
 
-  public abstract reScan(resultsPath: string): Promise<void>;
+  public abstract reScan(resultsPath: string): Promise<RescanSummary>;
 
   public async init(): Promise<void> {
     log.info('%c[ SCANNER ]: Rescan started ', 'color: green');
@@ -101,12 +108,14 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
   public async done() {
     await this.project.open();
     await this.updateResultFile();
-    await this.reScan(`${this.project.getMyPath()}/result.json`);
-    this.project.getTree().updateFlags();
+    const { newFiles, modifiedFiles, deletedFiles } = await this.reScan(`${this.project.getMyPath()}/result.json`);
+    newFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'New file', severity: 'info' }));
+    modifiedFiles.forEach((f) => this.rescanReport.entries.push({ item: f.getPath(), message: 'Content changed', severity: 'info' }));
+    deletedFiles.forEach((p) => this.rescanReport.entries.push({ item: p, message: 'File deleted', severity: 'info' }));
     const newFileStatusResults = await rescanService.getNewResults();
     this.project.getTree().sync(newFileStatusResults);
     this.project.metadata.setScannerState(ScanState.FINISHED);
     log.info('%c[ SCANNER ]: Re-scan finished ', 'color: green');
-    this.project.save();
+    this.project.saveWithSnapshot();
   }
 }

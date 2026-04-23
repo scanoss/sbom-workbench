@@ -35,6 +35,7 @@ import { Tree } from './tree/Tree';
 import { Metadata } from './Metadata';
 import { modelProvider } from '../services/ModelProvider';
 import { NodeStatus } from './tree/Node';
+import File from './tree/File';
 import { createTreeSnapshotRef, writeTreeSnapshot } from './projectTreeSnapshot';
 
 describe('Project persistence schema v2', () => {
@@ -66,7 +67,7 @@ describe('Project persistence schema v2', () => {
     project.processedFiles = 0;
 
     const tree = new Tree('demo-project', tempDir, '/scan/root');
-    tree.build(['/src/a.ts']);
+    tree.build([new File('/src/a.ts', 'a.ts')]);
     project.setTree(tree);
 
     project.save();
@@ -80,7 +81,7 @@ describe('Project persistence schema v2', () => {
 
   it('open keeps backward compatibility with legacy embedded tree payload', async () => {
     const legacyTree = new Tree('legacy-root', tempDir, '/scan/root');
-    legacyTree.build(['/legacy/a.ts']);
+    legacyTree.build([new File('/legacy/a.ts', 'a.ts')]);
     const legacyPayload = {
       filesToScan: { '/legacy/a.ts': 'FULL_SCAN' },
       filesNotScanned: {},
@@ -105,7 +106,7 @@ describe('Project persistence schema v2', () => {
 
   it('open loads schemaVersion=2 state and tree snapshot sidecar', async () => {
     const tree = new Tree('snapshot-root', tempDir, '/scan/root');
-    tree.build(['/snapshot/a.ts']);
+    tree.build([new File('/snapshot/a.ts', 'a.ts')]);
     const file = tree.getNode('/snapshot/a.ts') as any;
     file.setAction('scan');
     file.setOriginal(NodeStatus.MATCH);

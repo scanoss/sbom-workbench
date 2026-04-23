@@ -45,15 +45,6 @@ export default class Folder extends Node {
     this.isBinaryFile = false;
   }
 
-  public order(): void {
-    this.children.sort((a: Node, b: Node) => {
-      if (a.getType() !== 'folder' && b.getType() === 'folder') return 1;
-      if (a.getType() === 'folder' && b.getType() !== 'folder') return -1;
-      return a.getPath().localeCompare(b.getPath());
-    });
-    this.children.forEach((c) => c.order());
-  }
-
   public addChild(node: Node): void {
     this.children.push(node);
   }
@@ -225,27 +216,6 @@ export default class Folder extends Node {
 
   public setOriginal(status: NodeStatus): void {
     this.original = status;
-  }
-
-  public getFiles(banned: BlackListAbstract = null): Array<any> {
-    const files: Array<any> = [];
-    if (banned && banned.evaluate(this)) return files;
-    const stack: Node[] = [...this.children];
-    while (stack.length > 0) {
-      const node = stack.pop();
-      if (banned && banned.evaluate(node)) continue;
-      if (node.getType() === 'folder') {
-        for (let i = node.getChildrenCount() - 1; i >= 0; i--) {
-          stack.push(node.getChild(i));
-        }
-      } else {
-        const result = node.getFiles(banned);
-        for (const f of result) {
-          files.push(f);
-        }
-      }
-    }
-    return files;
   }
 
   public summarize(root: string, summary: any): any {

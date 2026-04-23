@@ -34,6 +34,9 @@ export interface FileDTO {
   path: string;
   type: string;
   status: string;
+  md5_file: string | null;
+  identified: number;
+  ignored: number;
 }
 
 export interface LicenseDTO {

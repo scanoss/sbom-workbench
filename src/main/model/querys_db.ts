@@ -22,7 +22,7 @@ export class Queries {
     "CREATE TABLE IF NOT EXISTS licenses (id INTEGER PRIMARY KEY ASC, spdxid text default '', name text not null, fulltext text default '', url text default '',official INTEGER DEFAULT 1 ,UNIQUE(spdxid));";
 
   FILES_TABLE =
-    'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT UNIQUE,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
+    'CREATE TABLE IF NOT EXISTS files (fileId INTEGER PRIMARY KEY ASC,path TEXT UNIQUE,md5_file TEXT,identified INTEGER DEFAULT 0, ignored INTEGER DEFAULT 0, dirty INTEGER DEFAULT 0, type TEXT);';
 
   DEPENDENCY_TABLE =
     'CREATE TABLE IF NOT EXISTS dependencies (dependencyId INTEGER PRIMARY KEY ASC,fileId INTEGER ,purl TEXT, version TEXT, scope TEXT DEFAULT NULL, rejectedAt DATETIME DEFAULT NULL,licenses TEXT,component TEXT,url TEXT DEFAULT "",originalVersion TEXT,originalLicense TEXT,FOREIGN KEY(fileId) REFERENCES files(fileId) ON DELETE CASCADE,UNIQUE(purl,version,fileId));';
@@ -249,7 +249,7 @@ export class Queries {
   SQL_ALL_DETECTED_DEPENDENCIES = `SELECT f.path as file ,d.component,d.purl,d.version,d.originalLicense as licenses, d.url FROM dependencies d
   INNER JOIN files f ON f.fileId =  d.fileId;`;
 
-  SQL_GET_ALL_FILES = `SELECT f.path, r.md5_file, f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type FROM files f
+  SQL_GET_ALL_FILES = `SELECT f.path, f.fileId AS id,f.identified,f.ignored,(CASE WHEN f.identified=0 AND f.ignored=0 THEN 1 ELSE 0 END) AS pending, f.type, f.md5_file FROM files f
    LEFT JOIN results r ON f.fileId = r.fileId #FILTER;`;
 
   SQL_GET_ALL_RESULTS = `SELECT f.fileId AS id, r.md5_file ,f.type AS filter,f.path,f.identified,f.ignored,r.matched,r.idtype AS type,r.lines,r.oss_lines,r.file_url,fi.inventoryid, r.component AS componentName, r.url,comp.purl,comp.version, rl.spdxid

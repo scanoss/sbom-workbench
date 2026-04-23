@@ -1,27 +1,20 @@
 import { ScannerStage } from '../../../api/types';
 import { ITask } from '../Task';
 
-/**
- * Represents an individual error for a specific file or purl within a pipeline stage
- */
-export interface StageItemError {
-  /** The affected file path or purl */
+export interface StageReportEntry {
   item: string;
-  /** Error message describing what went wrong */
   message: string;
+  severity?: 'error' | 'warning' | 'info';
 }
 
 /**
- * Represents a collection of non-critical errors from a pipeline stage
- * These errors don't stop the scan but should be reported to the user at the end
+ * Represents a collection of messages from a pipeline stage reported to the user
+ * at the end of a scan.
  */
-export interface StageWarning {
-  /** Display title for the warning (e.g., "Dependency Analysis") */
+export interface StageReport {
   title: string;
-  /** The stage that generated these warnings */
   stage: ScannerStage;
-  /** List of individual errors with affected items */
-  errors: StageItemError[];
+  entries: StageReportEntry[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -61,7 +54,7 @@ export namespace Scanner {
     name: ScannerStage;
     label: string;
     isCritical: boolean;
-    warnings?: StageWarning;
+    stageReport?: StageReport;
   }
 
   export interface IPipelineTask extends ITask<void, boolean> {

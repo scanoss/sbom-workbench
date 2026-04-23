@@ -1,12 +1,12 @@
 import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 import { NodeStatus } from '../main/workspace/tree/Node';
-import { Scanner, StageWarning, StageItemError } from '../main/task/scanner/types';
+import { Scanner, StageReport, StageReportEntry, StageReportSeverity } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
-
-export type { StageWarning, StageItemError };
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
 import { CryptographicItem } from '../main/model/entity/Cryptography';
+
+export type { StageReport, StageReportEntry, StageReportSeverity };
 
 
 
@@ -496,5 +496,7 @@ export enum ProjectSource {
   /** Project created from direct scanning */
   SCAN = 'SCAN',
   /** Project created from imported scan results. result.json */
-  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS'
+  IMPORT_SCAN_RESULTS = 'IMPORT_SCAN_RESULTS',
+  /** Project created from an existing winnowing.wfp file */
+  WFP = 'WFP'
 }

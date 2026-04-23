@@ -127,6 +127,46 @@ export class DependencyModel extends Model {
     await call(SQLquery);
   }
 
+  public async getUserDecisionsSnapshot(): Promise<Array<any>> {
+    const call: any = util.promisify(this.connection.all.bind(this.connection));
+    const rows = await call(
+      `SELECT * FROM dependencies
+       WHERE rejectedAt IS NOT NULL
+          OR IFNULL(version, '') != IFNULL(originalVersion, '')
+          OR IFNULL(licenses, '') != IFNULL(originalLicense, '');`,
+    );
+    return rows;
+  }
+
+  public async applyUserDecisionsSnapshot(snapshot: Array<any>): Promise<void> {
+    if (snapshot.length === 0) return;
+    return new Promise<void>((resolve, reject) => {
+      this.connection.serialize(() => {
+        this.connection.run('begin transaction');
+        snapshot.forEach((s) => {
+          this.connection.run(
+            `UPDATE dependencies
+               SET rejectedAt = ?, scope = ?, version = ?, licenses = ?
+             WHERE purl = ?
+               AND IFNULL(originalVersion, '') = IFNULL(?, '')
+               AND IFNULL(originalLicense, '') = IFNULL(?, '');`,
+            s.rejectedAt,
+            s.scope,
+            s.version,
+            s.licenses,
+            s.purl,
+            s.originalVersion,
+            s.originalLicense,
+          );
+        });
+        this.connection.run('commit', (err: any) => {
+          if (!err) resolve();
+          else reject(err);
+        });
+      });
+    });
+  }
+
   public async getDependenciesFiles(): Promise<Array<Record<string, string>>> {
     const call:any = util.promisify(this.connection.all.bind(this.connection));
     const dependencyFiles = await call(
