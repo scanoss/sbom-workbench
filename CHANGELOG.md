@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused `ExportControlService.ts`
 ### Fixed
 - Fixed `import Workbench project`  
+- Preserved user decisions on dependencies across rescans
 
 ## [1.37.1] - 2026-04-09
 ### Fixed
