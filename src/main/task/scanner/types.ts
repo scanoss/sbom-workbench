@@ -1,30 +1,20 @@
 import { ScannerStage } from '../../../api/types';
 import { ITask } from '../Task';
 
-/**
- * Represents an individual error for a specific file or purl within a pipeline stage
- */
 export interface StageReportEntry {
-  /** The affected file path or purl */
   item: string;
-  /** Description for this entry — an error cause, or an informational note (e.g. "New file") */
   message: string;
+  severity?: 'error' | 'warning' | 'info';
 }
 
 /**
  * Represents a collection of messages from a pipeline stage reported to the user
- * at the end of a scan. Covers both non-critical errors and informational summaries
- * (e.g. list of files changed during a rescan).
+ * at the end of a scan.
  */
 export interface StageReport {
-  /** Display title for the warning (e.g., "Dependency Analysis") */
   title: string;
-  /** The stage that generated these warnings */
   stage: ScannerStage;
-  /** List of individual items with their associated message */
   entries: StageReportEntry[];
-  /** Controls how each item is rendered — errors show an "Error:" prefix, info does not. Defaults to 'error' when absent. */
-  severity?: 'error' | 'info';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
