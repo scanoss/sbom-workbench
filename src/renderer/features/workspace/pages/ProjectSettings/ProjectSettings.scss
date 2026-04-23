@@ -1,4 +1,6 @@
 #ProjectSettings {
+  overflow-y: unset;
+
   .app-content {
     form {
       min-height: 80vh;
@@ -16,7 +18,8 @@
       .settings-right-column {
         display: flex;
         flex-flow: column;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: 16px;
       }
     }
 
@@ -112,9 +115,8 @@
     justify-content: flex-end;
 
     position: fixed;
-    bottom: 16px;
-    right: 60px;
-
+    bottom: 32px;
+    right: 50px;
 
     .btn {
       padding: 12px 24px;
@@ -129,11 +131,6 @@
     }
   }
 
-  @media screen and (max-width: 1400px) {
-    .button-container {
-      position: inherit;
-    }
-  }
 
   .input-label {
     font-weight: 600;
