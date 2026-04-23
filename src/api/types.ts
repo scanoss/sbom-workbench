@@ -1,14 +1,12 @@
 import { IReportData, ISummary, ReportComponent } from 'main/services/ReportService';
 import { NodeStatus } from '../main/workspace/tree/Node';
-import { Scanner, StageReport, StageReportEntry, StageReportSeverity } from '../main/task/scanner/types';
+import { Scanner, StageReport, StageReportEntry } from '../main/task/scanner/types';
 import ScannerConfig = Scanner.ScannerConfig;
 import Folder from '../main/workspace/tree/Folder';
 import { Metadata } from '../main/workspace/Metadata';
 import { CryptographicItem } from '../main/model/entity/Cryptography';
 
-export type { StageReport, StageReportEntry, StageReportSeverity };
-
-
+export type { StageReport, StageReportEntry };
 
 export enum ScanState {
   CREATED = 'CREATED',
