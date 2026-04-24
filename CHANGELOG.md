@@ -5,23 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.38.0] - 2026-04-24
 ### Added
-- File MD5 is now computed during tree build and persisted to the `files.md5_file` column and the `tree.nodes.jsonl` snapshot
-- Added `ProjectSource.WFP` enum variant so winnowing-based projects are distinguishable from native code scans
-- New `warning` severity level for stage report entries
+- New option in the project creation settings to unpack **nested archives** (archives inside archives). When enabled, the scanner descends up to 3 levels deep by default; you can adjust the depth from the same setting. Archives nested deeper than the configured limit are skipped and reported in the post-scan dialog.
+- Rescan now reports which files were **added, modified, or removed** since the last scan, so you can see at a glance what changed.
 ### Changed
-- Refactored `Tree.build` to accept pre-constructed `File` nodes instead of path strings
-- Redesigned scan report dialog as a two-pane layout (stage sidebar + entry list) with severity counts in the header
-### Removed
-- Removed unused `ExportControlService.ts`
+- **Smarter rescans**: when a file's contents change between scans, its previous identification is automatically cleared so the new match can be reviewed. Previously, identifications could silently go stale if the underlying file changed.
+- Redesigned the post-scan dialog as a two-pane layout (stage list on the left, messages on the right) that now also surfaces warnings and informational messages from each scan stage, with severity counts (errors, warnings, info) in the header.
 ### Fixed
-- Fixed `import Workbench project`  
-- Preserved user decisions on dependencies across rescans
-
-## [1.38.0] - 2026-04-22
-### Added
-- Recursive archive-in-archive expansion with configurable depth (default 3) in project creation settings. Archives whose nesting exceeds the configured depth are reported in the post-scan warnings dialog.
+- Your identification and ignore decisions on **dependencies** are now preserved across rescans.
+- Exporting and re-importing a project created from a `.wfp` winnowing file now works correctly. Previously the project source was mis-tagged on import, causing failures or incorrect behavior when reopening the project. Existing WFP projects that ended up mis-tagged on disk are automatically corrected the next time they are opened.
+- Removing a project no longer produces a stream of log errors from the file logger still pointing at the deleted project directory.
+- Migration logs now go to the project's own `project.log` instead of the shared workspace `ws.log`, making it easier to diagnose problems on a specific project.
 
 ## [1.37.1] - 2026-04-09
 ### Fixed
@@ -242,3 +237,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.36.0]: https://github.com/scanoss/sbom-workbench/compare/v1.35.1...v1.36.0
 [1.37.0]: https://github.com/scanoss/sbom-workbench/compare/v1.36.0...v1.37.0
 [1.37.1]: https://github.com/scanoss/sbom-workbench/compare/v1.37.0...v1.37.1
+[1.38.0]: https://github.com/scanoss/sbom-workbench/compare/v1.37.1...v1.38.0
