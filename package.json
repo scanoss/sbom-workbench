@@ -162,7 +162,7 @@
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "^0.13.5",
     "rimraf": "^6.0.1",
-    "scanoss": "0.39.0",
+    "scanoss": "github:scanoss/scanoss.js#fix/SP-4350-skip-fh2-winnowing-HPSM-binary-files",
     "sort-paths": "^1.1.1",
     "source-map-support": "^0.5.19",
     "stream-json": "^1.9.1",
