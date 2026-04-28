@@ -90,6 +90,7 @@
   "FileNotLoad": "El fichero no pudo ser cargado",
   "RemoteFileNotLoad": "Fichero remoto del componente no pudo ser cargado",
   "FileTypeNotSupported": "Tipo de fichero no soportado para visualización",
+  "FileTooLarge": "El fichero es demasiado grande para mostrarse",
   "OverridePreviousWork": "Sobreescribir trabajo previo",
   "ChooseProjectToImport": "Seleccione un proyecto",
   "KeepOriginalUsage": "Mantener uso detectado",

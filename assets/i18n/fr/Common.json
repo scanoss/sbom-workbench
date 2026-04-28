@@ -90,6 +90,7 @@
   "FileNotLoad": "Le fichier n'a pas pu être chargé",
   "RemoteFileNotLoad": "Le fichier source distant n'a pas pu être chargé",
   "FileTypeNotSupported": "Ce type de fichier n'est pas pris en charge pour être affiché",
+  "FileTooLarge": "Le fichier est trop volumineux pour être affiché",
   "OverridePreviousWork": "Écraser le travail précédent",
   "ChooseProjectToImport": "Choisissez un projet pour importer les identifications",
   "KeepOriginalUsage": "Garder l'utilisation détectée",

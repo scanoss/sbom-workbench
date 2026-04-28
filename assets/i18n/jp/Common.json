@@ -89,6 +89,7 @@
   "FileNotLoad": "ファイルはロードできません",
   "RemoteFileNotLoad": "リモートソースファイルはロードできません",
   "FileTypeNotSupported": "このファイルの種類は閲覧できません",
+  "FileTooLarge": "ファイルが大きすぎて表示できません",
   "OverridePreviousWork": "前の作業を上書きします",
   "ChooseProjectToImport": "インポートされたIDのプロジェクトを選択",
   "KeepOriginalUsage": "検出されたUsageを保持する",

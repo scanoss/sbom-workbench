@@ -90,6 +90,7 @@
   "FileNotLoad": "File could not be loaded",
   "RemoteFileNotLoad": "Remote source file could not be loaded",
   "FileTypeNotSupported": "File type not supported for viewing",
+  "FileTooLarge": "File is too large to display",
   "OverridePreviousWork": "Override previous work",
   "ChooseProjectToImport": "Choose project to import identifications",
   "KeepOriginalUsage": "Keep detected usage",

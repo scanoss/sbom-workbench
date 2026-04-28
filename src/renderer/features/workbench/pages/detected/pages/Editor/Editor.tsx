@@ -89,6 +89,10 @@ const Editor = () => {
       setLocalFileContent({ content: null, error: false, loading: true });
       const content = await workbenchController.fetchLocalFile(path);
       if (content === FileType.BINARY) throw new Error(t('FileTypeNotSupported'));
+      if (content === FileType.TOO_LARGE) {
+        setLocalFileContent({ content: t('FileTooLarge'), error: true, loading: false });
+        return;
+      }
 
       setLocalFileContent({ content, error: false, loading: false });
     } catch (error: any) {

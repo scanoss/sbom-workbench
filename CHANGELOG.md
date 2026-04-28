@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.39.0] - 2026-04-28
+### Added
+- File viewer now caps loaded files at 250 MB and shows a distinct "File is too large to display" message instead of the generic "File could not be loaded" when the limit is exceeded.
 ### Fixed
 - Binary content now skips redundant hash computations for improved performance
 

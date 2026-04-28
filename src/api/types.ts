@@ -179,6 +179,7 @@ export interface ComponentGroup {
 
 export enum FileType {
   BINARY = 'binary',
+  TOO_LARGE = 'too_large',
 }
 
 export enum HashType {

@@ -18,6 +18,8 @@ import { projectService } from '../../main/services/ProjectService';
 const path = require('path');
 const isBinaryPath = require('is-binary-path');
 
+const MAX_FILE_SIZE = 250 * 1024 * 1024;
+
 function isAllowed(filePath: string) {
   const skip = new Set([
     '.exe',
@@ -66,6 +68,8 @@ api.handle(IpcChannels.FILE_GET_CONTENT, async (_event, filePath: string) => {
     filePath = path.resolve(path.join(basePath, filePath));
     if (!isAllowed(filePath)) {
       fileContent.content = FileType.BINARY;
+    } else if (fs.statSync(filePath).size > MAX_FILE_SIZE) {
+      fileContent.content = FileType.TOO_LARGE;
     } else {
       const file = fs.readFileSync(filePath).toString();
       fileContent.content = file;
