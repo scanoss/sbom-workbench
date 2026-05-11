@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import log from 'electron-log';
 
 export async function fileExists(filePath: string): Promise<boolean> {
   try {
@@ -24,14 +25,21 @@ export async function retryWithBackoff<T>(
   let lastErr: NodeJS.ErrnoException | null = null;
   for (let i = 0; i < attempts; i++) {
     try {
-      return await op();
+      const result = await op();
+      if (i > 0) {
+        log.info(`[retryWithBackoff] succeeded on attempt ${i + 1}/${attempts} (last error: ${lastErr?.code})`);
+      }
+      return result;
     } catch (err) {
       const e = err as NodeJS.ErrnoException;
       lastErr = e;
       if (!retryableCodes.includes(e.code ?? '')) throw e;
       if (i < attempts - 1) {
         const delay = baseDelayMs * 2 ** i;
+        log.warn(`[retryWithBackoff] ${e.code} on attempt ${i + 1}/${attempts}, retrying in ${delay}ms`);
         await new Promise((r) => { setTimeout(r, delay); });
+      } else {
+        log.error(`[retryWithBackoff] exhausted ${attempts} attempts, final error: ${e.code}`);
       }
     }
   }
