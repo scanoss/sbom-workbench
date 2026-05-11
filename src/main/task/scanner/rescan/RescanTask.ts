@@ -8,7 +8,8 @@ import { licenseService } from '../../../services/LicenseService';
 import { rescanService, RescanSummary } from '../../../services/RescanService';
 import { IDispatch } from '../dispatcher/IDispatch';
 import { IScannerInputAdapter } from '../adapter/IScannerInputAdapter';
-import { fileExists } from '../../../utils/utils';
+import { fileExists, retryWithBackoff } from '../../../utils/utils';
+import { finished } from 'stream/promises';
 import { utilModel } from '../../../model/UtilModel';
 import { EOL } from 'os';
 import { parser } from 'stream-json';
@@ -34,8 +35,10 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
 
   public async init(): Promise<void> {
     log.info('%c[ SCANNER ]: Rescan started ', 'color: green');
-    if (await fileExists(`${this.project.getMyPath()}/result.json`)) await fs.promises.unlink(`${this.project.getMyPath()}/result.json`);
-    if (await fileExists(`${this.project.getMyPath()}/winnowing.wfp`)) await fs.promises.unlink(`${this.project.getMyPath()}/winnowing.wfp`);
+    const resultPath = `${this.project.getMyPath()}/result.json`;
+    const wfpPath = `${this.project.getMyPath()}/winnowing.wfp`;
+    if (await fileExists(resultPath)) await retryWithBackoff(() => fs.promises.unlink(resultPath));
+    if (await fileExists(wfpPath)) await retryWithBackoff(() => fs.promises.unlink(wfpPath));
     await super.init();
   }
 
@@ -51,53 +54,55 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
   private async updateResultFile(){
     const resultPath = `${this.project.getMyPath()}/result.json`;
     const tempPath = `${this.project.getMyPath()}/result_temp.json`;
-
     const writeStream = fs.createWriteStream(tempPath);
-    writeStream.write(`{${EOL}`); // Start JSON object
+    const readStream = fs.createReadStream(resultPath);
 
-    let isFirst = true;
+    // Monitor both streams upfront so errors during the data phase are caught
+    const readStreamSettled = finished(readStream);
+    const writeStreamSettled = finished(writeStream);
 
-    const pipeline = fs.createReadStream(resultPath)
-      .pipe(parser())
-      .pipe(streamObject());
+    try {
+      writeStream.write(`{${EOL}`); // Start JSON object
 
-    pipeline.on('data', async ({ key, value }) => {
-      // Modify key to ensure it starts with '/'
-      const modifiedKey = key.startsWith('/') ? key : `/${key}`;
+      let isFirst = true;
+      const pipeline = readStream
+        .pipe(parser())
+        .pipe(streamObject());
 
-      // Write to output file
-      if (!isFirst) {
-        writeStream.write(`,${EOL}`);
-      }
-      isFirst = false;
+      pipeline.on('data', async ({ key, value }) => {
+        // Modify key to ensure it starts with '/'
+        const modifiedKey = key.startsWith('/') ? key : `/${key}`;
 
-      writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
+        // Write to output file
+        if (!isFirst) {
+          writeStream.write(`,${EOL}`);
+        }
+        isFirst = false;
 
-      await this.updateStatusFlagsOnFileTree({ [modifiedKey]: value});
-    });
+        writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
 
-    await new Promise<void>((resolve, reject) => {
-      pipeline.on('end', () => {
-        writeStream.write(`${EOL}}`); // Close JSON object
-        writeStream.end(() => {
-          // Rename temp file to original after write completes
-          fs.renameSync(tempPath, resultPath);
-          log.info('Finished parsing and writing SCANOSS raw results JSON');
-          resolve();
-        });
+        await this.updateStatusFlagsOnFileTree({ [modifiedKey]: value});
       });
 
-      pipeline.on('error', (err) => {
-        writeStream.end();
-        log.error('Error:', err);
-        reject(err);
-      });
+      // Wait for pipeline to finish, or either stream to error first
+      await Promise.race([finished(pipeline), readStreamSettled, writeStreamSettled]);
 
-      writeStream.on('error', (err) => {
-        log.error('Write error:', err);
-        reject(err);
-      });
-    });
+      writeStream.end(`${EOL}}`);
+
+      // Wait for both file descriptors to be released
+      await Promise.all([readStreamSettled, writeStreamSettled]);
+
+      // Rename with retry for transient sharing-violation errors (AV, SMB close lag)
+      await retryWithBackoff(() => fs.promises.rename(tempPath, resultPath));
+      log.info('Finished parsing and writing SCANOSS raw results JSON');
+    } catch (err) {
+      log.error('Error finalizing result.json:', err);
+      readStream.destroy();
+      writeStream.destroy();
+      readStreamSettled.catch(() => undefined);
+      writeStreamSettled.catch(() => undefined);
+      throw err;
+    }
   }
 
   protected async updateStatusFlagsOnFileTree(results: Record<string, any>){

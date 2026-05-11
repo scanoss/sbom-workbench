@@ -21,6 +21,8 @@ import { ImportTask } from '../import/ImportTask';
 import { parser } from 'stream-json';
 import { streamObject } from 'stream-json/streamers/StreamObject.js';
 import  { EOL } from 'os';
+import { retryWithBackoff } from '../../utils/utils';
+import { finished } from 'stream/promises';
 
 
 export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScannerAdapter extends IScannerInputAdapter> implements ScannerModule.IPipelineTask {
@@ -129,52 +131,55 @@ export abstract class BaseScannerTask<TDispatcher extends IDispatch, TInputScann
     const resultPath = `${this.project.getMyPath()}/result.json`;
     const tempPath = `${this.project.getMyPath()}/result_temp.json`;
     const writeStream = fs.createWriteStream(tempPath);
-    writeStream.write(`{${EOL}`); // Start JSON object
+    const readStream = fs.createReadStream(resultPath);
 
-    let isFirst = true;
+    // Monitor both streams upfront so errors during the data phase are caught
+    const readStreamSettled = finished(readStream);
+    const writeStreamSettled = finished(writeStream);
 
-    const pipeline = fs.createReadStream(resultPath)
-      .pipe(parser())
-      .pipe(streamObject());
+    try {
+      writeStream.write(`{${EOL}`); // Start JSON object
 
-    pipeline.on('data', ({ key, value }) => {
-      // Modify key to ensure it starts with '/'
-      const modifiedKey = key.startsWith('/') ? key : `/${key}`;
+      let isFirst = true;
+      const pipeline = readStream
+        .pipe(parser())
+        .pipe(streamObject());
 
-      // Write to output file
-      if (!isFirst) {
-        writeStream.write(`,${EOL}`);
-      }
-      isFirst = false;
+      pipeline.on('data', ({ key, value }) => {
+        // Modify key to ensure it starts with '/'
+        const modifiedKey = key.startsWith('/') ? key : `/${key}`;
 
-      writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
+        // Write to output file
+        if (!isFirst) {
+          writeStream.write(`,${EOL}`);
+        }
+        isFirst = false;
 
-      // Attach results to project tree
-      this.project.tree.attachResults({ [modifiedKey]: value } );
-    });
+        writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
 
-    await new Promise<void>((resolve, reject) => {
-      pipeline.on('end', () => {
-        writeStream.write(`${EOL}}`); // Close JSON object
-        writeStream.end(() => {
-          // Rename temp file to original after write completes
-          fs.renameSync(tempPath, resultPath);
-          log.info('Finished parsing and writing SCANOSS raw results JSON');
-          resolve();
-        });
+        // Attach results to project tree
+        this.project.tree.attachResults({ [modifiedKey]: value } );
       });
 
-      pipeline.on('error', (err) => {
-        writeStream.end();
-        log.error('Error:', err);
-        reject(err);
-      });
+      // Wait for pipeline to finish, or either stream to error first
+      await Promise.race([finished(pipeline), readStreamSettled, writeStreamSettled]);
 
-      writeStream.on('error', (err) => {
-        log.error('Write error:', err);
-        reject(err);
-      });
-    });
+      writeStream.end(`${EOL}}`);
+
+      // Wait for both file descriptors to be released
+      await Promise.all([readStreamSettled, writeStreamSettled]);
+
+      // Rename with retry for transient sharing-violation errors (AV, SMB close lag)
+      await retryWithBackoff(() => fs.promises.rename(tempPath, resultPath));
+      log.info('Finished parsing and writing SCANOSS raw results JSON');
+    } catch (err) {
+      log.error('Error finalizing result.json:', err);
+      readStream.destroy();
+      writeStream.destroy();
+      readStreamSettled.catch(() => undefined);
+      writeStreamSettled.catch(() => undefined);
+      throw err;
+    }
 
     // Import task
     const componentImportTask = new ImportTask(this.project);
