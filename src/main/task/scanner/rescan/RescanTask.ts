@@ -69,7 +69,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
         .pipe(parser())
         .pipe(streamObject());
 
-      pipeline.on('data', async ({ key, value }) => {
+      pipeline.on('data', ({ key, value }) => {
         // Modify key to ensure it starts with '/'
         const modifiedKey = key.startsWith('/') ? key : `/${key}`;
 
@@ -81,7 +81,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
 
         writeStream.write(`  "${modifiedKey}": ${JSON.stringify(value)}`);
 
-        await this.updateStatusFlagsOnFileTree({ [modifiedKey]: value});
+        this.updateStatusFlagsOnFileTree({ [modifiedKey]: value });
       });
 
       // Wait for pipeline to finish, or either stream to error first
@@ -105,7 +105,7 @@ export abstract class RescanTask<TDispatcher extends IDispatch, TInputScannerAda
     }
   }
 
-  protected async updateStatusFlagsOnFileTree(results: Record<string, any>){
+  protected updateStatusFlagsOnFileTree(results: Record<string, any>){
     this.project.tree.attachResults(results);
     this.project.tree.updateFlags();
   }
