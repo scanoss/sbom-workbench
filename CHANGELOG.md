@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.39.1] - 2026-05-12
+### Fixed
+- Fixed crash with "A JavaScript error occurred in the main process" at the end of scans and rescans when the project workspace lives on a network share (UNC/SMB). Transient sharing-violation errors during the final rename of `result.json` (e.g. antivirus scanning the temp file, slow file-handle release on SMB) are now absorbed by an exponential-backoff retry; persistent failures surface as a graceful "Scan Paused" message instead of crashing the main process. Each retry attempt is logged to `project.log` for diagnostics.
+
 ## [1.39.0] - 2026-04-28
 ### Added
 - File viewer now caps loaded files at 250 MB and shows a distinct "File is too large to display" message instead of the generic "File could not be loaded" when the limit is exceeded.
@@ -247,3 +251,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.37.1]: https://github.com/scanoss/sbom-workbench/compare/v1.37.0...v1.37.1
 [1.38.0]: https://github.com/scanoss/sbom-workbench/compare/v1.37.1...v1.38.0
 [1.39.0]: https://github.com/scanoss/sbom-workbench/compare/v1.38.0...v1.39.0
+[1.39.1]: https://github.com/scanoss/sbom-workbench/compare/v1.39.0...v1.39.1
