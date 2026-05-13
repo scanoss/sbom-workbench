@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.39.2] - 2026-05-13
+### Fixed
+- Fixed hidden settings on the new project screen
+### Changed
+- Enhance UI for project creation settings 
+- Refactored `ProjectSettings.tsx` file
+
 ## [1.39.1] - 2026-05-12
 ### Fixed
 - Fixed crash with "A JavaScript error occurred in the main process" at the end of scans and rescans when the project workspace lives on a network share (UNC/SMB). Transient sharing-violation errors during the final rename of `result.json` (e.g. antivirus scanning the temp file, slow file-handle release on SMB) are now absorbed by an exponential-backoff retry; persistent failures surface as a graceful "Scan Paused" message instead of crashing the main process. Each retry attempt is logged to `project.log` for diagnostics.
@@ -252,3 +259,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.38.0]: https://github.com/scanoss/sbom-workbench/compare/v1.37.1...v1.38.0
 [1.39.0]: https://github.com/scanoss/sbom-workbench/compare/v1.38.0...v1.39.0
 [1.39.1]: https://github.com/scanoss/sbom-workbench/compare/v1.39.0...v1.39.1
+[1.39.2]: https://github.com/scanoss/sbom-workbench/compare/v1.39.1...v1.39.2

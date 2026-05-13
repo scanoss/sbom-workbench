@@ -128,5 +128,6 @@
   "PipelineStageDependenciesHint": "パッケージマネージャファイルから宣言された依存関係を分析・検出します",
   "PipelineStageVulnerabilitiesHint": "検出されたコンポーネントの既知の脆弱性を検索します",
   "PipelineStageCryptographyHint": "ソースコード内の暗号アルゴリズムと実装をスキャンします",
-  "PipelineStageSearchIndexHint": "プロジェクトファイル内のキーワード検索用インデックスを作成します"
+  "PipelineStageSearchIndexHint": "プロジェクトファイル内のキーワード検索用インデックスを作成します",
+  "MoreOptions": "その他のオプション"
 }

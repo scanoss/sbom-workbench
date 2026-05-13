@@ -1,96 +1,231 @@
 #ProjectSettings {
   overflow-y: unset;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 0;
+
+  .app-header {
+    position: static;
+    flex: 0 0 auto;
+  }
 
   .app-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
     form {
-      min-height: 80vh;
-      margin-bottom: 1rem;
+      flex: 1 1 auto;
+      min-height: 0;
+      margin-bottom: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
     }
 
-    .grid-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
+    .ps-body-wrap {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+    }
 
-      .settings-right-column {
-        display: flex;
-        flex-flow: column;
-        justify-content: flex-start;
-        gap: 16px;
+    .ps-body {
+      flex: 1 1 auto;
+      width: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 6px 5px 24px;
+      scrollbar-gutter: stable;
+    }
+
+    // Soft fade gradients signal scrollable content above/below.
+    .scroll-fade {
+      position: absolute;
+      left: 0;
+      right: 0;
+      pointer-events: none;
+      height: 56px;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      z-index: 2;
+
+      &.top {
+        top: 0;
+        background: linear-gradient(
+          180deg,
+          var(--background-color-primary) 0%,
+          rgba(228, 228, 231, 0.85) 40%,
+          rgba(228, 228, 231, 0) 100%
+        );
+      }
+
+      &.bot {
+        bottom: 0;
+        background: linear-gradient(
+          0deg,
+          var(--background-color-primary) 0%,
+          rgba(228, 228, 231, 0.85) 40%,
+          rgba(228, 228, 231, 0) 100%
+        );
       }
     }
 
-    .form-container {
-      .project-license-container {
-        .input-container {
-          transform-origin: 0;
+    .ps-body-wrap[data-can-up='1'] .scroll-fade.top { opacity: 1; }
+    .ps-body-wrap[data-can-down='1'] .scroll-fade.bot { opacity: 1; }
 
-          &-license {
-            margin-top: 2em;
-          }
+    // "More options" pill — appears when there's content below the fold.
+    .scroll-pill {
+      position: absolute;
+      left: 50%;
+      bottom: 12px;
+      z-index: 3;
+      transform: translate(-50%, 6px);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 26px;
+      padding: 0 12px 0 10px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(17, 19, 23, 0.82);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
 
-          .input-label-add-container {
-            display: flex;
-            align-items: center;
-          }
+      svg {
+        width: 14px;
+        height: 14px;
+      }
 
-          .project-name-container {
-            max-width: 380px;
-          }
+      &:hover { background: rgba(17, 19, 23, 0.92); }
+    }
 
-          .input-text-container {
-            margin-top: 0.5rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+    .ps-body-wrap[data-can-down='1'] .scroll-pill {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+  }
 
-            .input-autocomplete {
-              height: 40px;
-            }
+  // Two-column grid that never wraps: minmax(0, 1fr) lets long content shrink
+  // instead of pushing the column past the viewport.
+  .grid-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px 32px;
+    align-items: start;
 
-            .icon {
-              margin-left: 4px;
-            }
+    .settings-left-column,
+    .settings-right-column {
+      display: flex;
+      flex-flow: column;
+      justify-content: flex-start;
+      gap: 16px;
+      min-width: 0;
+    }
 
-          }
+    .settings-left-column {
+      gap: 25px;
+    }
+  }
 
-          .error-message {
-            color: red;
-            height: 30px;
-            margin-top: 6px;
-          }
+  .form-container {
+    // Each input "block" (Project Name, License) is a flex item; the parent
+    // gap controls inter-field spacing so it lines up with the api-subcontainer
+    // below — Project Name → License now matches Knowledgebase → SBOM Token.
+    .project-license-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      .input-container {
+        transform-origin: 0;
+
+        // Spacing now provided by the parent gap; was margin-top: 2em.
+        &-license {
+          margin-top: 0;
         }
-      }
 
-      .api-conections-container {
-        margin-top: 5px;
-        .api-subcontainer {
+        .input-label-add-container {
           display: flex;
-          flex-direction: column;
+          align-items: center;
+        }
 
-          .api-conections-label-container {
-            .api-conections-label {
-              font-size: 20px;
-            }
+        .project-name-container {
+          max-width: 380px;
+        }
+
+        .input-text-container {
+          margin-top: 0.5rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .input-autocomplete {
+            height: 40px;
           }
+
+          .icon {
+            margin-left: 4px;
+          }
+        }
+
+        // Natural height when empty so the empty error slot doesn't add to
+        // the gap between Project Name and License.
+        .error-message {
+          color: red;
+          min-height: 0;
+          margin-top: 6px;
+        }
+      }
+    }
+
+    .api-conections-container {
+      margin-top: 5px;
+
+      // Section title sits outside .api-subcontainer so the field gap doesn't
+      // apply between it and the first field. A small bottom margin gives a
+      // tight title-to-content rhythm, matching the Scanner Settings section.
+      .api-conections-label-container {
+        margin-bottom: 8px;
+
+        .api-conections-label {
+          font-size: 20px;
         }
       }
 
-      .context-files-info {
+      .api-subcontainer {
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        margin-top: 24px;
+        gap: 24px;
+      }
+    }
 
-        a{
-          cursor: pointer;
-        }
-        .MuiAlert-message {
-          white-space: pre-line;
-        }
+    .context-files-info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 24px;
+
+      a {
+        cursor: pointer;
+      }
+
+      .MuiAlert-message {
+        white-space: pre-line;
       }
     }
   }
@@ -104,19 +239,26 @@
     .label-icon {
       margin-bottom: 12px;
     }
+
     .MuiSvgIcon-root {
       margin-right: 15px;
     }
   }
 
-
+  // Sticky footer pinned to the bottom of the page. Replaces the previous
+  // position:fixed button that floated over content.
   .button-container {
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
-
-    position: fixed;
-    bottom: 32px;
-    right: 50px;
+    gap: 10px;
+    padding: 12px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    background: linear-gradient(
+      180deg,
+      rgba(228, 228, 231, 0.6),
+      var(--background-color-primary)
+    );
 
     .btn {
       padding: 12px 24px;
@@ -130,7 +272,6 @@
       font-size: 24px;
     }
   }
-
 
   .input-label {
     font-weight: 600;

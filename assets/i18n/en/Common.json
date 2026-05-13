@@ -136,5 +136,6 @@
   "PipelineStageDependenciesHint": "Analyze and detect declared dependencies from package manager files",
   "PipelineStageVulnerabilitiesHint": "Search for known vulnerabilities in detected components",
   "PipelineStageCryptographyHint": "Scan for cryptographic algorithms and implementations in source code",
-  "PipelineStageSearchIndexHint": "Create a search index for keyword searching within project files"
+  "PipelineStageSearchIndexHint": "Create a search index for keyword searching within project files",
+  "MoreOptions": "More options"
 }

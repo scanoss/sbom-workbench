@@ -1,23 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Checkbox,
-  FormControlLabel,
-  FormHelperText,
-  IconButton,
-  Link,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-  Tooltip,
-} from '@mui/material';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { Button, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { Add, WarningAmber } from '@mui/icons-material';
-import { Trans, useTranslation } from 'react-i18next';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectWorkspaceState, setNewProject, setScanPath } from '@store/workspace-store/workspaceSlice';
 import { SettingsFileInfo, INewProject } from '@api/types';
 import { userSettingService } from '@api/services/userSetting.service';
@@ -25,14 +13,15 @@ import { workspaceService } from '@api/services/workspace.service';
 import { ResponseStatus } from '@api/Response';
 import { DialogContext, IDialogContext } from '@context/DialogProvider';
 import AppConfig from '@config/AppConfigModule';
-import { useDispatch, useSelector } from 'react-redux';
-import FormGroup from '@mui/material/FormGroup';
-import LicenseSelector from '@components/LicenseSelector/LicenseSelector';
 import { Scanner } from '../../../../../main/task/scanner/types';
+import ProjectInfoFields from './sections/ProjectInfoFields';
+import ApiConnectionFields from './sections/ApiConnectionFields';
+import ScannerOptions from './sections/ScannerOptions';
+import PipelineStagesField from './sections/PipelineStagesField';
+import ContextFilesInfoAlert from './sections/ContextFilesInfoAlert';
+
 import ScannerSource = Scanner.ScannerSource;
-import ScannerType = Scanner.PipelineStage;
 import PipelineStage = Scanner.PipelineStage;
-import appConfigModule from '@config/AppConfigModule';
 
 const ProjectSettings = () => {
   const navigate = useNavigate();
@@ -40,7 +29,7 @@ const ProjectSettings = () => {
   const { t } = useTranslation();
 
   const { projects, scanPath, settings } = useSelector(selectWorkspaceState);
-  const showConfigurationOptions = scanPath?.source === Scanner.ScannerSource.CODE || scanPath?.source === Scanner.ScannerSource.WFP;
+  const showConfigurationOptions = scanPath?.source === ScannerSource.CODE || scanPath?.source === ScannerSource.WFP;
 
   const dialogCtrl = useContext(DialogContext) as IDialogContext;
 
@@ -61,10 +50,10 @@ const ProjectSettings = () => {
       mode: Scanner.ScannerMode.SCAN,
       source: scanPath?.source || ScannerSource.CODE,
       pipelineStages: [
-        ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [ScannerType.CODE] : []),
-        ScannerType.DEPENDENCIES,
-        ScannerType.VULNERABILITIES,
-        ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
+        ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [PipelineStage.CODE] : []),
+        PipelineStage.DEPENDENCIES,
+        PipelineStage.VULNERABILITIES,
+        ...(scanPath?.source === ScannerSource.CODE ? [PipelineStage.SEARCH_INDEX] : []),
       ],
       obfuscate: false,
       allExtensions: false,
@@ -77,7 +66,43 @@ const ProjectSettings = () => {
   const [projectNameExists, setProjectNameExists] = useState(false);
   const [projectNameReserved, setProjectNameReserved] = useState(false);
   const [showPipelineMinWarning, setShowPipelineMinWarning] = useState(false);
-  const [showVulnerabilityAloneWarning, setShowVulnerabilityAloneWarning] = useState(false);
+
+  // Vulnerability scanning needs detected components, which come from either
+  // CODE (file/snippet) or DEPENDENCIES detection. Blocks the Continue
+  // button when VULNERABILITIES is selected without a data-producing prerequisite.
+  const { pipelineStages } = projectSettings.scannerConfig;
+  const vulnerabilityRequiresPrereq = pipelineStages.includes(PipelineStage.VULNERABILITIES)
+    && !pipelineStages.includes(PipelineStage.CODE)
+    && !pipelineStages.includes(PipelineStage.DEPENDENCIES);
+
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return undefined;
+    const update = () => {
+      const max = el.scrollHeight - el.clientHeight;
+      setCanScrollUp(el.scrollTop > 2);
+      setCanScrollDown(el.scrollTop < max - 2);
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro.disconnect();
+    };
+  }, []);
+
+  const scrollBodyDown = () => {
+    const el = bodyRef.current;
+    if (!el) return;
+    el.scrollBy({ top: el.clientHeight * 0.85, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     init();
@@ -101,11 +126,11 @@ const ProjectSettings = () => {
     const defaultApiKey = !!apiUrlKey.APIS?.[apiUrlKey.DEFAULT_API_INDEX]?.API_KEY;
     setHasApiKey(defaultApiKey);
     const defaultTypes = [
-      ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [ScannerType.CODE] : []),
-      ScannerType.DEPENDENCIES,
-      ScannerType.VULNERABILITIES,
-      ...(scanPath?.source === ScannerSource.CODE ? [ScannerType.SEARCH_INDEX] : []),
-      ...(defaultApiKey ? [ScannerType.CRYPTOGRAPHY] : []),
+      ...(scanPath?.source !== ScannerSource.IMPORTED_RESULTS_RAW ? [PipelineStage.CODE] : []),
+      PipelineStage.DEPENDENCIES,
+      PipelineStage.VULNERABILITIES,
+      ...(scanPath?.source === ScannerSource.CODE ? [PipelineStage.SEARCH_INDEX] : []),
+      ...(defaultApiKey ? [PipelineStage.CRYPTOGRAPHY] : []),
     ];
 
     setProjectSettings({
@@ -130,13 +155,11 @@ const ProjectSettings = () => {
   };
 
   const onOpenWorkRoot = () => {
-    const { path } = scanPath;
-    window.shell.openPath(path);
+    window.shell.openPath(scanPath.path);
   };
 
   const onOpenFile = (filepath: string) => {
-    const { path } = scanPath;
-    const absolutePath = window.path.resolve(path, filepath);
+    const absolutePath = window.path.resolve(scanPath.path, filepath);
     window.shell.openPath(absolutePath);
   };
 
@@ -146,20 +169,13 @@ const ProjectSettings = () => {
     const found = projects.find(
       (project) => project.name.trim().toLowerCase() === projectSettings.name.trim().toLowerCase(),
     );
-
-    const isReserved = projectSettings.name.trim().toLowerCase() === appConfigModule.SCANOSS_SCAN_SOURCES_FOLDER_NAME;
-
+    const isReserved = projectSettings.name.trim().toLowerCase() === AppConfig.SCANOSS_SCAN_SOURCES_FOLDER_NAME;
     // eslint-disable-next-line no-control-regex
     const re = /^[^\s^\x00-\x1f\\?*:"";<>|/.][^\x00-\x1f\\?*:"";<>|/]*[^\s^\x00-\x1f\\?*:"";<>|/.]+$/;
 
     setProjectNameExists(!!found);
     setProjectNameReserved(isReserved);
-
-    if (projectSettings.name.trim() !== '' && re.test(projectSettings.name)) {
-      setProjectValidName(true);
-    } else {
-      setProjectValidName(false);
-    }
+    setProjectValidName(projectSettings.name.trim() !== '' && re.test(projectSettings.name));
   }, [projectSettings.name, projects]);
 
   const submit = async () => {
@@ -178,12 +194,8 @@ const ProjectSettings = () => {
     if (response && response.action === ResponseStatus.OK) {
       setLicenses([
         ...licenses,
-        {
-          spdxid: response.data.spdxid,
-          name: response.data.name,
-        },
+        { spdxid: response.data.spdxid, name: response.data.name },
       ]);
-
       setProjectSettings({
         ...projectSettings,
         default_license: response.data.spdxid,
@@ -191,103 +203,66 @@ const ProjectSettings = () => {
     }
   };
 
-  const onDecompressHandler = (checked: boolean) => {
-    const newType: Array<ScannerType> = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== PipelineStage.UNZIP);
-    if (checked) newType.push(PipelineStage.UNZIP);
+  const patchScannerConfig = (patch: Partial<Scanner.ScannerConfig>) => {
     setProjectSettings({
       ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        pipelineStages: newType,
-        recursiveDecompress: checked ? projectSettings.scannerConfig.recursiveDecompress : false,
-      },
+      scannerConfig: { ...projectSettings.scannerConfig, ...patch },
     });
   };
 
-  const onRecursiveDecompressHandler = (checked: boolean) => {
-    setProjectSettings({
-      ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        recursiveDecompress: checked,
-      },
+  const onDecompressToggle = (checked: boolean) => {
+    const next: PipelineStage[] = pipelineStages.filter((s) => s !== PipelineStage.UNZIP);
+    if (checked) next.push(PipelineStage.UNZIP);
+    patchScannerConfig({
+      pipelineStages: next,
+      recursiveDecompress: checked ? projectSettings.scannerConfig.recursiveDecompress : false,
     });
   };
 
-  const onMaxDecompressDepthHandler = (value: string) => {
+  const onMaxDecompressDepthChange = (value: string) => {
     const parsed = parseInt(value, 10);
     const next = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 20) : 1;
+    patchScannerConfig({ maxDecompressDepth: next });
+  };
+
+  const onApiSelectionChange = (selected: { URL: string; API_KEY: string } | null) => {
+    const selectedApiKey = selected === null
+      ? !!apis?.[settings.DEFAULT_API_INDEX]?.API_KEY
+      : !!selected.API_KEY;
+    setHasApiKey(selectedApiKey);
+
+    const updatedStages: PipelineStage[] = pipelineStages.filter((s) => s !== PipelineStage.CRYPTOGRAPHY);
+    if (selectedApiKey) updatedStages.push(PipelineStage.CRYPTOGRAPHY);
+
     setProjectSettings({
       ...projectSettings,
+      api: selected?.URL,
+      api_key: selected?.API_KEY,
       scannerConfig: {
         ...projectSettings.scannerConfig,
-        maxDecompressDepth: next,
+        pipelineStages: updatedStages,
       },
     });
   };
 
-  const onObfuscateHandler = (checked: boolean) => {
-    setProjectSettings({
-      ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        obfuscate: checked,
-      },
-    });
-  };
+  const onPipelineStageToggle = (type: PipelineStage, checked: boolean) => {
+    const next = pipelineStages.filter((s) => s !== type);
+    if (checked) next.push(type);
 
-  const onHPSMhandler = (checked: boolean) => {
-    setProjectSettings({
-      ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        hpsm: checked,
-      },
-    });
-  };
-
-  const onAllExtensionsHandler = (checked: boolean) => {
-    setProjectSettings({
-      ...projectSettings,
-      scannerConfig: {
-        ...projectSettings.scannerConfig,
-        allExtensions: checked,
-      },
-    });
-  };
-
-  const onPipelineStageHandler = (type: ScannerType, checked: boolean) => {
-    const newType = projectSettings.scannerConfig.pipelineStages.filter((t) => t !== type);
-    if (checked) newType.push(type);
-
-    // When source is CODE, at least one option must remain enabled
-    if (scanPath?.source === ScannerSource.CODE && newType.length === 0) {
+    if (scanPath?.source === ScannerSource.CODE && next.length === 0) {
       setShowPipelineMinWarning(true);
       return;
     }
     setShowPipelineMinWarning(false);
 
-    // Warn when only VULNERABILITIES is selected (needs CODE or DEPENDENCIES to scan)
-    setShowVulnerabilityAloneWarning(
-      newType.length === 1 && newType[0] === ScannerType.VULNERABILITIES
-    );
-
-    const updatedConfig = {
-      ...projectSettings.scannerConfig,
-      pipelineStages: newType,
-    };
-
-    // When CODE scanning is disabled, reset obfuscate, hpsm, and allExtensions
-    if (type === ScannerType.CODE && !checked) {
-      updatedConfig.obfuscate = false;
-      updatedConfig.hpsm = false;
-      updatedConfig.allExtensions = false;
+    const patch: Partial<Scanner.ScannerConfig> = { pipelineStages: next };
+    // When CODE is turned off, the CODE-gated options must be reset too.
+    if (type === PipelineStage.CODE && !checked) {
+      patch.obfuscate = false;
+      patch.hpsm = false;
+      patch.allExtensions = false;
     }
-
-    setProjectSettings({
-      ...projectSettings,
-      scannerConfig: updatedConfig,
-    });
+    patchScannerConfig(patch);
   };
 
   return (
@@ -295,11 +270,7 @@ const ProjectSettings = () => {
       <header className="app-header">
         <div>
           <h4 className="header-subtitle back">
-            <IconButton
-              tabIndex={-1}
-              onClick={() => navigate(-1)}
-              component="span"
-            >
+            <IconButton tabIndex={-1} onClick={() => navigate(-1)} component="span">
               <ArrowBackIcon />
             </IconButton>
             <span className="text-uppercase">{t('Title:ProjectSettings')}</span>
@@ -308,453 +279,71 @@ const ProjectSettings = () => {
         </div>
       </header>
       <div className="app-content">
-        <form onSubmit={(e) => handleClose(e)}>
-          <div className="grid-layout form-container mt-1">
-            <div className="">
-              <div className="project-license-container">
-                <div className="input-container">
-                  <label className="input-label">{t('Title:ProjectName')}</label>
-                  <Paper className="input-text-container project-name-container">
-                    <TextField
-                      spellCheck={false}
-                      error={projectNameExists || projectNameReserved || !projectValidName}
-                      fullWidth
-                      value={projectSettings.name}
-                      InputProps={{ style: { fontSize: 20, fontWeight: 500 } }}
-                      onChange={(e) => setProjectSettings({
-                        ...projectSettings,
-                        name: e.target.value,
-                      })}
+        <form onSubmit={handleClose}>
+          <div
+            className="ps-body-wrap"
+            data-can-up={canScrollUp ? '1' : '0'}
+            data-can-down={canScrollDown ? '1' : '0'}
+          >
+            <div className="scroll-fade top" aria-hidden="true" />
+            <div className="scroll-fade bot" aria-hidden="true" />
+            <button
+              type="button"
+              className="scroll-pill"
+              onClick={scrollBodyDown}
+              aria-label={t('Common:MoreOptions') || 'More options'}
+            >
+              <KeyboardArrowDownIcon fontSize="inherit" />
+              <span>{t('Common:MoreOptions') || 'More options'}</span>
+            </button>
+            <div className="ps-body" ref={bodyRef}>
+              <div className="grid-layout form-container mt-1">
+                <div className="settings-left-column">
+                  <ProjectInfoFields
+                    settings={projectSettings}
+                    licenses={licenses}
+                    nameIsValid={projectValidName}
+                    nameExists={projectNameExists}
+                    nameReserved={projectNameReserved}
+                    onNameChange={(name) => setProjectSettings({ ...projectSettings, name })}
+                    onLicenseChange={(spdxid) => setProjectSettings({ ...projectSettings, default_license: spdxid })}
+                    onOpenLicenseDialog={openLicenseDialog}
+                  />
+                  <ApiConnectionFields
+                    apis={apis}
+                    showConfigurationOptions={showConfigurationOptions}
+                    onApiSelectionChange={onApiSelectionChange}
+                    onTokenChange={(token) => setProjectSettings({ ...projectSettings, token })}
+                  />
+                  {scanPath?.source === ScannerSource.CODE && (
+                    <ScannerOptions
+                      scannerConfig={projectSettings.scannerConfig}
+                      onDecompressToggle={onDecompressToggle}
+                      onRecursiveDecompressToggle={(checked) => patchScannerConfig({ recursiveDecompress: checked })}
+                      onMaxDecompressDepthChange={onMaxDecompressDepthChange}
+                      onObfuscateToggle={(checked) => patchScannerConfig({ obfuscate: checked })}
+                      onHpsmToggle={(checked) => patchScannerConfig({ hpsm: checked })}
+                      onAllExtensionsToggle={(checked) => patchScannerConfig({ allExtensions: checked })}
                     />
-                  </Paper>
-                  <div className="error-message">
-                    {projectNameExists && t('Common:ProjectNameAlreadyExists')}
-                    {projectNameReserved && t('Common:ProjectNameReserved')}
-                    {!projectValidName && t('Common:ProjectNameInvalid')}
-                  </div>
+                  )}
                 </div>
-
-                <div className="input-container input-container-license mt-1 mb-3">
-                  <div className="input-label-add-container">
-                    <label className="input-label">
-                      {t('Title:License')}
-                      <Tooltip title={t('Tooltip:AddNewLicense')}>
-                        <IconButton tabIndex={-1} color="inherit" size="small" onClick={openLicenseDialog}>
-                          <Add fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                      <span className="optional">
-                        -
-                        {' '}
-                        {t('Common:Optional')}
-                      </span>
-                    </label>
-                  </div>
-                  <div className="input-text-container license-input-container">
-                    <LicenseSelector
-                      options={licenses}
-                      disableClearable={false}
-                      onChange={(e, value) => setProjectSettings({
-                        ...projectSettings,
-                        default_license: value?.spdxid,
-                      })}
-                      value={licenses?.find((item) => item.spdxid === projectSettings?.default_license) || {}}
-                      selectOnFocus
-                      clearOnBlur
-                      handleHomeEndKeys
-                    />
-                  </div>
+                <div className="grid-item settings-right-column">
+                  <PipelineStagesField
+                    pipelineStages={pipelineStages}
+                    source={scanPath?.source}
+                    hasApiKey={hasApiKey}
+                    showPipelineMinWarning={showPipelineMinWarning}
+                    vulnerabilityRequiresPrereq={vulnerabilityRequiresPrereq}
+                    onToggle={onPipelineStageToggle}
+                  />
+                  <ContextFilesInfoAlert
+                    visible={showConfigurationOptions}
+                    info={settingsFileInfo}
+                    onReload={onReload}
+                    onOpenWorkRoot={onOpenWorkRoot}
+                    onOpenFile={onOpenFile}
+                  />
                 </div>
-              </div>
-              <div className="api-conections-container mt-5">
-                <div className="api-subcontainer">
-                  {(AppConfig.FF_ENABLE_API_CONNECTION_SETTINGS && showConfigurationOptions) && (
-                    <>
-                      <div className="api-conections-label-container mb-3">
-                        <label className="input-label">{t('Title:APIConnections')}</label>
-                      </div>
-                      <div className="label-input-container">
-                        <div className="label-icon">
-                          <label className="input-label h3">
-                            {t('Title:KnowledgebaseAPI')}
-                            <span className="optional">
-                              {' '}
-                              -
-                              {' '}
-                              {t('Common:Optional')}
-                            </span>
-                          </label>
-                        </div>
-                        <Paper>
-                          <Select
-                            size="small"
-                            onChange={(e: any) => {
-                              const selectedApiKey = e.target?.value === 0
-                                ? !!apis?.[settings.DEFAULT_API_INDEX]?.API_KEY
-                                : !!e.target?.value.API_KEY;
-                              setHasApiKey(selectedApiKey);
-
-                              const updatedStages: Array<PipelineStage> = projectSettings.scannerConfig.pipelineStages.filter(
-                                (t) => t !== PipelineStage.CRYPTOGRAPHY,
-                              );
-                              if (selectedApiKey) {
-                                updatedStages.push(PipelineStage.CRYPTOGRAPHY);
-                              }
-
-                              setProjectSettings({
-                                ...projectSettings,
-                                api: e.target?.value.URL,
-                                api_key: e.target?.value.API_KEY,
-                                scannerConfig: {
-                                  ...projectSettings.scannerConfig,
-                                  pipelineStages: updatedStages,
-                                },
-                              });
-                            }}
-                            defaultValue={0}
-                            fullWidth
-                            disableUnderline
-                          >
-                            <MenuItem value={0}>
-                              <span className="item-default">{t('Common:UseDefaultSettings')}</span>
-                            </MenuItem>
-                            ;
-                            {apis.slice(1).map((api) => (
-                              <MenuItem value={api} key={api.key}>
-                                <span>
-                                  {api.URL}
-                                </span>
-                                {api.API_KEY && (
-                                    <span className="pl-1" style={{ color: '#6c6c6e' }}>
-                                      {`(${('*'.repeat(8))})`}
-                                    </span>
-                                )}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </Paper>
-                      </div>
-                    </>
-                  )}
-                  <div className="label-input-container mt-5">
-                    <div className="label-icon">
-                      <label className="input-label h3">
-                        {t('Title:SBOMLedgerToken')}
-                        {' '}
-                        <span className="optional">
-                          -
-                          {t('Common:Optional')}
-                        </span>
-                      </label>
-                    </div>
-                    <Paper>
-                      <TextField
-                        size="small"
-                        name="token"
-                        placeholder={t('Common:UseDefaultSettings')}
-                        fullWidth
-                        onChange={(e) => setProjectSettings({
-                          ...projectSettings,
-                          token: e.target.value.trim(),
-                        })}
-                      />
-                    </Paper>
-                  </div>
-                </div>
-              </div>
-              { scanPath?.source === Scanner.ScannerSource.CODE && (
-                <div className="mt-5">
-                  <label className="input-label">{t('Title:ScannerSettings')}</label>
-                  <FormGroup>
-                    <FormControlLabel
-                      control={<Checkbox checked={projectSettings.scannerConfig.pipelineStages.includes(PipelineStage.UNZIP)} />}
-                      label={t('DecompressArchivesLabel')}
-                      onChange={(event, checked) => onDecompressHandler(checked)}
-                    />
-                    <FormHelperText className="helper">
-                      {t('DecompressArchivesHint')}
-                    </FormHelperText>
-                  </FormGroup>
-
-                  <FormGroup sx={{ pl: 4, my: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'nowrap' }}>
-                      <Tooltip title={t('ExpandNestedArchivesHint')}>
-                        <FormControlLabel
-                          sx={{ mr: 0, '& .MuiFormControlLabel-label': { whiteSpace: 'nowrap' } }}
-                          control={(
-                            <Checkbox
-                              size="small"
-                              sx={{ py: 0 }}
-                              disabled={!projectSettings.scannerConfig.pipelineStages.includes(PipelineStage.UNZIP)}
-                              checked={projectSettings.scannerConfig.recursiveDecompress || false}
-                            />
-                          )}
-                          label={t('ExpandNestedArchivesLabel')}
-                          onChange={(event, checked) => onRecursiveDecompressHandler(checked)}
-                        />
-                      </Tooltip>
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 8,
-                          visibility: projectSettings.scannerConfig.recursiveDecompress ? 'visible' : 'hidden',
-                        }}
-                      >
-                        <label htmlFor="maxDecompressDepth" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
-                          {t('MaxDecompressDepthLabel')}
-                        </label>
-                        <TextField
-                          id="maxDecompressDepth"
-                          type="number"
-                          size="small"
-                          variant="outlined"
-                          sx={{ backgroundColor: '#fff', borderRadius: 1 }}
-                          value={projectSettings.scannerConfig.maxDecompressDepth ?? 3}
-                          inputProps={{ min: 1, max: 20, style: { width: 60, paddingTop: 4, paddingBottom: 4 } }}
-                          onChange={(e) => onMaxDecompressDepthHandler(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  </FormGroup>
-
-                  <FormGroup>
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
-                          checked={projectSettings.scannerConfig.obfuscate}
-                        />
-                      )}
-                      label={t('ObfuscateFilePaths')}
-                      onChange={(event, checked) => onObfuscateHandler(checked)}
-                    />
-                    <FormHelperText className="helper">
-                      {t('ObfuscateFilePathsHint')}
-                    </FormHelperText>
-                  </FormGroup>
-
-                  <FormGroup>
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
-                          checked={projectSettings.scannerConfig.hpsm || false}
-                        />
-                      )}
-                      label={t('EnableHPSM')}
-                      onChange={(event, checked) => onHPSMhandler(checked)}
-                    />
-                    <FormHelperText className="helper">
-                      {t('HPSMHint')}
-                    </FormHelperText>
-                  </FormGroup>
-
-                  <FormGroup>
-                    <FormControlLabel
-                      control={(
-                        <Checkbox
-                          disabled={!projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
-                          checked={projectSettings.scannerConfig.allExtensions}
-                        />
-                      )}
-                      label={t('IncludeAllFileTypes')}
-                      onChange={(event, checked) => onAllExtensionsHandler(checked)}
-                    />
-                    <FormHelperText className="helper">
-                      {t('IncludeAllFileTypesHint')}
-                    </FormHelperText>
-                  </FormGroup>
-                </div>
-              )}
-
-            </div>
-            <div className="grid-item settings-right-column">
-              <div>
-                <label className="input-label">{t('Title:PipelineStages')}</label>
-                <FormGroup>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE)}
-                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.CODE, checked)}
-                        disabled={scanPath?.source === ScannerSource.WFP || scanPath?.source === ScannerSource.IMPORTED_RESULTS_RAW}
-                      />
-                    )}
-                    label={t('PipelineStageCode')}
-                  />
-                  <FormHelperText className="helper">
-                    {t('PipelineStageCodeHint')}
-                  </FormHelperText>
-                  {projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CODE) && (
-                  <FormHelperText className="helper" style={{
-                    padding: '6px',
-                    marginTop: '5px',
-                    border: 'solid 1px #F59E0B',
-                    borderRadius: '4px',
-                    color: '#92400E',
-                    fontSize: '13px',
-                    fontWeight: 400,
-                    backgroundColor: '#FFF3CD',
-                  }}>
-                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
-                    {t('PipelineStageCodeWarning')}
-                  </FormHelperText>
-                  )}
-                </FormGroup>
-                <FormGroup>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.DEPENDENCIES)}
-                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.DEPENDENCIES, checked)}
-                      />
-                    )}
-                    label={t('PipelineStageDependencies')}
-                  />
-                  <FormHelperText className="helper">
-                    {t('PipelineStageDependenciesHint')}
-                  </FormHelperText>
-                </FormGroup>
-                <FormGroup>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.VULNERABILITIES)}
-                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.VULNERABILITIES, checked)}
-                      />
-                    )}
-                    label={t('PipelineStageVulnerabilities')}
-                  />
-                  <FormHelperText className="helper">
-                    {t('PipelineStageVulnerabilitiesHint')}
-                  </FormHelperText>
-                </FormGroup>
-                <FormGroup>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        disabled={!hasApiKey}
-                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.CRYPTOGRAPHY)}
-                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.CRYPTOGRAPHY, checked)}
-                      />
-                    )}
-                    label={t('PipelineStageCryptography')}
-                  />
-                  <FormHelperText className="helper">
-                    {t('PipelineStageCryptographyHint')}
-                  </FormHelperText>
-                </FormGroup>
-                <FormGroup>
-                  <FormControlLabel
-                    control={(
-                      <Checkbox
-                        disabled={scanPath?.source !== ScannerSource.CODE}
-                        checked={projectSettings.scannerConfig.pipelineStages.includes(ScannerType.SEARCH_INDEX)}
-                        onChange={(_, checked) => onPipelineStageHandler(ScannerType.SEARCH_INDEX, checked)}
-                      />
-                    )}
-                    label={t('PipelineStageSearchIndex')}
-                  />
-                  <FormHelperText className="helper">
-                    {t('PipelineStageSearchIndexHint')}
-                  </FormHelperText>
-                </FormGroup>
-                {showPipelineMinWarning && (
-                  <FormHelperText className="helper" style={{
-                    padding: '6px',
-                    marginTop: '20px',
-                    marginBottom: '5px',
-                    border: 'solid 1px #F59E0B',
-                    borderRadius: '4px',
-                    color: '#92400E',
-                    fontSize: '13px',
-                    fontWeight: 400,
-                    marginLeft: '0px',
-                    backgroundColor: '#FFF3CD',
-                  }}>
-                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
-                    {t('PipelineStageMinWarning')}
-                  </FormHelperText>
-                )}
-                {showVulnerabilityAloneWarning && (
-                  <FormHelperText className="helper" style={{
-                    padding: '6px',
-                    marginTop: '20px',
-                    marginBottom: '5px',
-                    border: 'solid 1px #F59E0B',
-                    borderRadius: '4px',
-                    color: '#92400E',
-                    fontSize: '13px',
-                    fontWeight: 400,
-                    marginLeft: '0px',
-                    backgroundColor: '#FFF3CD',
-                  }}>
-                    <WarningAmber style={{ fontSize: '16px', marginRight: '4px', verticalAlign: 'text-bottom' }} />
-                    {t('PipelineStageVulnerabilityAloneWarning')}
-                  </FormHelperText>
-                )}
-              </div>
-              <div className="context-files-info">
-                { showConfigurationOptions && settingsFileInfo.type === 'none' && (
-                  <Alert
-                    severity="info"
-                    action={(
-                      <Button color="inherit" size="small" onClick={onReload}>
-                        RELOAD
-                      </Button>
-                  )}
-                  >
-                    <Trans
-                      i18nKey="Common:NoConfigFileFoundOptional"
-                      components={{
-                        1: <Link className="cursor-pointer" color="inherit" onClick={onOpenWorkRoot} />,
-                        2: <strong />,
-                        3: <Link href={AppConfig.SCANOSS_SETTINGS_DOCS_URL} target="_blank" rel="noopener noreferrer" color="inherit" />
-                      }}
-                    />
-                  </Alert>
-                )}
-
-                { showConfigurationOptions && settingsFileInfo.type === 'legacy' && (
-                  <Alert
-                    severity="warning"
-                    action={(
-                      <Button color="inherit" size="small" onClick={onReload}>
-                        RELOAD
-                      </Button>
-                  )}
-                  >
-                    <Trans
-                      i18nKey="Common:LegacyConfigFileDetected"
-                      values={{ fileName: settingsFileInfo.fileName }}
-                      components={{
-                        1: <Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(settingsFileInfo.fileName)} />,
-                        2: <strong />,
-                        3: <Link href={AppConfig.SCANOSS_SETTINGS_DOCS_URL} target="_blank" rel="noopener noreferrer" color="inherit" />
-                      }}
-                    />
-                  </Alert>
-                )}
-
-                { showConfigurationOptions && settingsFileInfo.type === 'standard' && settingsFileInfo.fileName && (
-                  <Alert
-                    severity="success"
-                    action={(
-                      <Button color="inherit" size="small" onClick={onReload}>
-                        RELOAD
-                      </Button>
-                  )}
-                  >
-                    <Trans
-                      i18nKey="Common:ScanossSettingsFileFound"
-                      values={{ fileName: settingsFileInfo.fileName }}
-                      components={{
-                        1: <Link className="cursor-pointer" color="inherit" onClick={() => onOpenFile(settingsFileInfo.fileName)} />
-                      }}
-                    />
-                  </Alert>
-                )}
               </div>
             </div>
           </div>
@@ -764,7 +353,7 @@ const ProjectSettings = () => {
               variant="contained"
               color="primary"
               type="submit"
-              disabled={!projectValidName || projectNameExists || projectNameReserved}
+              disabled={!projectValidName || projectNameExists || projectNameReserved || vulnerabilityRequiresPrereq}
             >
               {t('Button:Continue')}
             </Button>

@@ -110,5 +110,6 @@
   "PipelineStageDependenciesHint": "分析并检测包管理器文件中声明的依赖项",
   "PipelineStageVulnerabilitiesHint": "搜索已检测组件中的已知漏洞",
   "PipelineStageCryptographyHint": "扫描源代码中的加密算法和实现",
-  "PipelineStageSearchIndexHint": "创建搜索索引以在项目文件中搜索关键字"
+  "PipelineStageSearchIndexHint": "创建搜索索引以在项目文件中搜索关键字",
+  "MoreOptions": "更多选项"
 }
