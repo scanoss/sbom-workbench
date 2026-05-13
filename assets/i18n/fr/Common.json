@@ -135,5 +135,6 @@
   "PipelineStageDependenciesHint": "Analyser et détecter les dépendances déclarées dans les fichiers du gestionnaire de paquet",
   "PipelineStageVulnerabilitiesHint": "Rechercher les vulnerabilités connues dans les composants détectés",
   "PipelineStageCryptographyHint": "Rechercher des algorithmes cryptographiques et leur implémentation dans le code source",
-  "PipelineStageSearchIndexHint": "Créer un index de recherche pour la recherche par mots-clés dans les fichiers du projet"
+  "PipelineStageSearchIndexHint": "Créer un index de recherche pour la recherche par mots-clés dans les fichiers du projet",
+  "MoreOptions": "Plus d'options"
 }
