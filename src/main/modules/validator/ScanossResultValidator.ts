@@ -109,19 +109,29 @@ export class ScanossResultValidator {
       'file_hash': result.file_hash,
       'file_url': result.file_url,
       'id': result.id,
-      'latest': result.latest,
       'lines': result.lines,
       'matched': result.matched,
       'oss_lines': result.oss_lines,
       'source_hash': result.source_hash,
       'status': result.status,
       'vendor': result.vendor,
-      'version': result.version,
     };
 
     for (const [field, value] of Object.entries(requiredStrings)) {
       if (!value || typeof value !== 'string') {
         this.addError(`${prefix}`, `required '${field}' field must be provided`, value);
+      }
+    }
+
+    // Fields that must exist and be strings, but are allowed to be empty
+    const optionalStrings = {
+      'latest': result.latest,
+      'version': result.version,
+    };
+
+    for (const [field, value] of Object.entries(optionalStrings)) {
+      if (typeof value !== 'string') {
+        this.addError(`${prefix}`, `required '${field}' field must be a string`, value);
       }
     }
 
