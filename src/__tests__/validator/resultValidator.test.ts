@@ -583,5 +583,63 @@ describe('result validator', () => {
     expect(r.isValid).toEqual(true);
   });
 
+  it("valid result, empty 'version' value", async () => {
+    const result = {
+      "backend/app.js": [
+        {
+          "component": "ecommerce-store",
+          "file": "backend/app.js",
+          "file_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "file_url": "https://api.scanoss.com/file_contents/39b0d5191c20e23c8360a79a97ecec31",
+          "id": "file",
+          "latest": "a8dcdb2",
+          "licenses": [],
+          "lines": "all",
+          "matched": "100%",
+          "oss_lines": "all",
+          "purl": [
+            "pkg:github/hacetheworld/ecommerce-store"
+          ],
+          "source_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "status": "pending",
+          "vendor": "hacetheworld",
+          "version": ""
+        }
+      ]};
+
+    const resultValidator = new ScanossResultValidator();
+    const r = resultValidator.validate(result);
+    expect(r.isValid).toEqual(true);
+  });
+
+  it("valid result, empty 'latest' value", async () => {
+    const result = {
+      "backend/app.js": [
+        {
+          "component": "ecommerce-store",
+          "file": "backend/app.js",
+          "file_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "file_url": "https://api.scanoss.com/file_contents/39b0d5191c20e23c8360a79a97ecec31",
+          "id": "file",
+          "latest": "",
+          "licenses": [],
+          "lines": "all",
+          "matched": "100%",
+          "oss_lines": "all",
+          "purl": [
+            "pkg:github/hacetheworld/ecommerce-store"
+          ],
+          "source_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "status": "pending",
+          "vendor": "hacetheworld",
+          "version": "a8dcdb2"
+        }
+      ]};
+
+    const resultValidator = new ScanossResultValidator();
+    const r = resultValidator.validate(result);
+    expect(r.isValid).toEqual(true);
+  });
+
 
 });
