@@ -77,6 +77,8 @@
   "File": "Fichier",
   "Snippet": "Snippet",
   "PreRequisite": "Prérequis",
+  "CreateUsage": "Créer <highlight>\"{{value}}\"</highlight>",
+  "SelectOrTypeUsage": "Sélectionner ou saisir pour ajouter",
   "NComponentWillNotIdentified_one": "{{count}} composant ne sera pas identifié car il ne dispose pas de licence déclarée avec le composant. Veuillez l'identifier manuellement.",
   "NComponentWillNotIdentified_other": "{{count}} composants ne seront pas identifiés car ils ne disposent pas de licence déclarée avec le composant. Veuillez les identifier manuellement.",
   "DependenciesDeclaredIdentifyManual": "Les dépendances déclarées dans les fichiers du gestionnaire de paquets ne seront pas acceptées. Veuillez les identifier manuellement.",

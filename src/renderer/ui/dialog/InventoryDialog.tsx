@@ -6,8 +6,6 @@ import {
   Paper,
   DialogActions,
   Button,
-  Select,
-  MenuItem,
   TextField,
   IconButton,
   PaperProps, Box
@@ -17,16 +15,18 @@ import AddIcon from '@mui/icons-material/Add';
 import React, {useEffect, useState, useContext, useRef} from 'react';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import Alert from '@mui/material/Alert';
-import { Inventory } from '@api/types';
+import { DEFAULT_INVENTORY_USAGES, Inventory } from '@api/types';
 import { InventoryForm } from '@context/types';
 import { componentService } from '@api/services/component.service';
 import { licenseService } from '@api/services/license.service';
 import { DialogContext, InventoryDialogOptions } from '@context/DialogProvider';
 import { ResponseStatus } from '@api/Response';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectComponentState } from '@store/component-store/componentSlice';
 import { selectNavigationState } from '@store/navigation-store/navigationSlice';
-import { useTranslation } from 'react-i18next';
+import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
+import { setSettings } from '@store/workspace-store/workspaceThunks';
+import { Trans, useTranslation } from 'react-i18next';
 import Draggable from 'react-draggable';
 import { useTheme } from '@mui/material';
 
@@ -63,8 +63,11 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
   const dialogCtrl = useContext<any>(DialogContext);
   const { t } = useTranslation();
 
+  const dispatch = useDispatch();
   const { recents } = useSelector(selectComponentState);
   const { isFilterActive } = useSelector(selectNavigationState);
+  const { settings } = useSelector(selectWorkspaceState);
+  const usages = settings?.USAGES ?? DEFAULT_INVENTORY_USAGES;
 
   const { open, inventory, options, onClose, onCancel } = props;
   const [form, setForm] = useState<Partial<InventoryForm>>(inventory);
@@ -210,6 +213,56 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
       ...form,
       [name]: value,
     });
+  };
+
+  // Localized labels for the legacy canonical usages; custom usages display verbatim.
+  const usageLabel = (usage: string): string => {
+    switch (usage) {
+      case 'file': return t('File');
+      case 'snippet': return t('Snippet');
+      case 'pre-requisite': return t('PreRequisite');
+      case 'keep': return t('KeepOriginalUsage');
+      default: return usage;
+    }
+  };
+
+  const isDefaultUsage = (usage: string): boolean => usage === 'keep' || DEFAULT_INVENTORY_USAGES.includes(usage);
+
+  // Keeps long usage names on a single line with an ellipsis inside the dropdown options.
+  const ellipsisStyle: React.CSSProperties = {
+    flexGrow: 1,
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  };
+
+  const usageOptions: any[] = (options.keepOriginalOption ? ['keep', ...usages] : usages);
+
+  const addUsage = (name: string) => {
+    const value = name.trim();
+    if (!value) return;
+    if (value !== 'keep' && !usages.some((u) => u.toLowerCase() === value.toLowerCase())) {
+      dispatch(setSettings({ ...settings, USAGES: [...usages, value] }));
+    }
+    setForm({ ...form, usage: value });
+  };
+
+  const deleteUsage = (e, name: string) => {
+    e.stopPropagation();
+    dispatch(setSettings({ ...settings, USAGES: usages.filter((u) => u !== name) }));
+    if (form.usage === name) setForm({ ...form, usage: 'file' });
+  };
+
+  // Filters the usage options by the typed text and appends a "create" entry when
+  // the input does not match an existing usage.
+  const filterUsageOptions = (opts: any[], params: { inputValue: string }): any[] => {
+    const input = params.inputValue.trim();
+    const filtered = opts.filter((o) => typeof o === 'string'
+      && usageLabel(o).toLowerCase().includes(input.toLowerCase()));
+    const exists = usageOptions.some((o) => typeof o === 'string' && o.toLowerCase() === input.toLowerCase());
+    if (input !== '' && !exists) filtered.push({ inputValue: input });
+    return filtered;
   };
 
   /**
@@ -560,27 +613,85 @@ export const InventoryDialog = (props: InventoryDialogProps) => {
           <div className="dialog-row" sx={{ display: 'grid', gridTemplateColumns: '0.75fr 1fr', gridGap: '20px' }}>
             <div className="dialog-form-field">
               <label className="dialog-form-field-label">
-                {t('Title:Usage')}
+                {t('Title:Usage')}{' '}
+                <span className="optional">- {t('SelectOrTypeUsage')}</span>
               </label>
               <Paper className="dialog-form-field-control">
-                <Select
-                  name="usage"
+                <Autocomplete
                   size="small"
                   fullWidth
+                  freeSolo
+                  selectOnFocus
+                  clearOnBlur
+                  handleHomeEndKeys
+                  disableClearable
+                  options={usageOptions}
                   value={form?.usage || 'file'}
-                  sx={form?.usage === 'keep' ? {
-                    '& .MuiInputBase-input': {
-                      fontStyle: 'italic',
-                      color: 'gray',
-                    }
-                  } : {}}
-                  onChange={(e) => inputHandler(e)}
-                >
-                  { options.keepOriginalOption && <MenuItem value="keep" sx={{fontStyle: 'italic', color: 'gray'}}>{t('KeepOriginalUsage')}</MenuItem> }
-                  <MenuItem value="file">{t('File')}</MenuItem>
-                  <MenuItem value="snippet">{t('Snippet')}</MenuItem>
-                  <MenuItem value="pre-requisite">{t('PreRequisite')}</MenuItem>
-                </Select>
+                  isOptionEqualToValue={(option, value) => option === value}
+                  getOptionLabel={(option) => (typeof option === 'string' ? usageLabel(option) : option.inputValue)}
+                  filterOptions={filterUsageOptions}
+                  renderOption={(props, option) => (
+                    typeof option === 'string' ? (
+                      <li {...props} key={option} style={option === 'keep' ? { fontStyle: 'italic', color: 'gray' } : {}}>
+                        <span style={ellipsisStyle} title={usageLabel(option)}>{usageLabel(option)}</span>
+                        {!isDefaultUsage(option) && (
+                          <IconButton
+                            size="small"
+                            tabIndex={-1}
+                            title={t('Tooltip:DeleteUsage')}
+                            onClick={(e) => deleteUsage(e, option)}
+                          >
+                            <CloseIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                      </li>
+                    ) : (
+                      <li {...props} key={`add-${option.inputValue}`}>
+                        <Box
+                          component="span"
+                          sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: 18,
+                            height: 18,
+                            mr: 1,
+                            borderRadius: 1,
+                            flexShrink: 0,
+                            bgcolor: 'primary.main',
+                            color: '#fff',
+                          }}
+                        >
+                          <AddIcon sx={{ fontSize: 14 }} />
+                        </Box>
+                        <span style={ellipsisStyle} title={option.inputValue}>
+                          <Trans
+                            i18nKey="Common:CreateUsage"
+                            values={{ value: option.inputValue }}
+                            components={{ highlight: <span style={{ color: theme.palette.primary.main, fontWeight: 600 }} /> }}
+                          />
+                        </span>
+                      </li>
+                    )
+                  )}
+                  onChange={(e, value) => {
+                    if (!value) return;
+                    addUsage(typeof value === 'string' ? value : value.inputValue);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="usage"
+                      placeholder={t('SelectOrTypeUsage')}
+                      sx={form?.usage === 'keep' ? {
+                        '& .MuiInputBase-input': {
+                          fontStyle: 'italic',
+                          color: 'gray',
+                        }
+                      } : {}}
+                    />
+                  )}
+                />
               </Paper>
             </div>
 
