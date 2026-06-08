@@ -23,6 +23,7 @@
   "NoOriginalFilesWith": "オリジナルファイルなし \"{{searchQuery}}\"",
   "LoadingLocalFile": "ローカルファイルのロード",
   "LoadingRemoteFile": "リモートファイルのロード",
+  "SnippetMatchCount": "スニペットの一致 <strong>{{current}}</strong> / {{total}}",
   "ProjectImportedCantDisplay": "プロジェクトインポート! ローカルソースファイルは存在しません.",
   "ProjectWFPCantDisplay": "WFPからプロジェクトファイル作成. ローカルソースファイルは表示しません",
   "AllValidDependenciesAccepted": "全有効依存物は承認されます.",

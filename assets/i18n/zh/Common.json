@@ -23,6 +23,7 @@
   "NoOriginalFilesWith": "找不到自研文件\"{{searchQuery}}\"",
   "LoadingLocalFile": "加载本地文件",
   "LoadingRemoteFile": "加载远程文件",
+  "SnippetMatchCount": "代码片段匹配 第 <strong>{{current}}</strong> 个，共 {{total}} 个",
   "ProjectImportedCantDisplay": "// 该项目已导入。 无法显示源文件。",
   "AllValidDependenciesAccepted": "将接受所有有效的待定依赖项。",
   "AllValidDependenciesAcceptedSubtitle": "那些缺少版本或许可证详细信息的依赖项将不被接受。",

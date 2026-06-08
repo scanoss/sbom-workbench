@@ -63,6 +63,60 @@
   grid-gap: 10px;
 }
 
+.match-nav {
+  display: flex;
+  align-items: stretch;
+  width: fit-content;
+  margin: 18px -1px -6px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 1px 0 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.12);
+  color: var(--color-font);
+  position: relative;
+  z-index: 10;
+
+  .MuiIconButton-root {
+    color: var(--text-color-primary);
+    padding: 4px 8px;
+    border-radius: 0;
+
+    i {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &.Mui-disabled {
+      color: $ignored-gray;
+    }
+  }
+
+  .match-nav-center {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .match-nav-label {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-font);
+    white-space: nowrap;
+
+    strong {
+      font-weight: 700;
+    }
+  }
+}
+
 .editors {
   display: grid;
   overflow-y: visible !important;

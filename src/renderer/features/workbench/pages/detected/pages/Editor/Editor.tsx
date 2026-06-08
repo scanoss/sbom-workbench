@@ -18,13 +18,14 @@ import { selectNavigationState } from '@store/navigation-store/navigationSlice';
 import * as FileUtils from '@shared/utils/file-utils';
 import * as SearchUtils from '@shared/utils/search-utils';
 import useSearchParams from '@hooks/useSearchParams';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import Breadcrumb from '../../../../components/Breadcrumb/Breadcrumb';
 import MatchInfoCard, { MATCH_INFO_CARD_ACTIONS } from '../../../../components/MatchInfoCard/MatchInfoCard';
 import FileToolbar, { ToolbarActions } from '../../../../components/FileToolbar/FileToolbar';
 import { workbenchController } from '../../../../../../controllers/workbench-controller';
-import CodeViewer from '../../../../components/CodeViewer/CodeViewer';
+import { IconButton } from '@mui/material';
+import CodeViewer, { revealLinesAligned } from '../../../../components/CodeViewer/CodeViewer';
 import { CodeViewerManager } from './CodeViewerManager';
 import NoMatchFound from '../../../../components/NoMatchFound/NoMatchFound';
 
@@ -63,6 +64,30 @@ const Editor = () => {
   const [currentMatch, setCurrentMatch] = useState<Record<string, any> | null>(null);
   const [remoteFileContent, setRemoteFileContent] = useState<FileContent | null>(null);
   const [isDiffView, setIsDiffView] = useState<boolean>(false);
+  const [matchRangeIndex, setMatchRangeIndex] = useState<number>(0);
+
+  // Start line of each highlighted range, e.g. "98-121,140-150" -> [98, 140].
+  const parseRangeStarts = (ranges?: string | null): number[] =>
+    (ranges || '')
+      .split(',')
+      .map((range) => parseInt(range.split('-')[0], 10))
+      .filter((n) => !Number.isNaN(n));
+
+  const localMatchStarts = parseRangeStarts(currentMatch?.lines);
+  const remoteMatchStarts = parseRangeStarts(currentMatch?.oss_lines);
+
+  // Re-align both editors on a match range, regardless of how far either was scrolled.
+  const goToMatch = (index: number) => {
+    if (localMatchStarts.length === 0) return;
+    const i = Math.min(Math.max(index, 0), localMatchStarts.length - 1);
+    setMatchRangeIndex(i);
+
+    const targets = [{ id: CodeViewerManager.LEFT, line: localMatchStarts[i] }];
+    if (isDiffView) {
+      targets.push({ id: CodeViewerManager.RIGHT, line: remoteMatchStarts[i] ?? localMatchStarts[i] });
+    }
+    revealLinesAligned(targets);
+  };
 
   const init = async () => {
     setMatchInfo(null);
@@ -202,6 +227,10 @@ const Editor = () => {
   }, [matchInfo]);
 
   useEffect(() => {
+    setMatchRangeIndex(0);
+  }, [currentMatch]);
+
+  useEffect(() => {
     if (currentMatch) {
       const enableDiff = (currentMatch?.type == 'snippet' && sourceCodePath !== null);
       setIsDiffView(enableDiff);
@@ -320,6 +349,38 @@ const Editor = () => {
                 && matchInfo?.length === 0 && <NoMatchFound identifyHandler={onNoMatchIdentifyPressed} showLabel />
             )}
           </div>
+
+          {isDiffView && currentMatch && localMatchStarts.length > 0 && (
+            <div className="match-nav">
+              <IconButton
+                size="small"
+                disableRipple
+                title={t('Tooltip:PreviousMatch')}
+                disabled={matchRangeIndex <= 0}
+                onClick={() => goToMatch(matchRangeIndex - 1)}
+              >
+                <i className="ri-arrow-up-s-line" />
+              </IconButton>
+              <span className="match-nav-center">
+                <span className="match-nav-label">
+                  <Trans
+                    i18nKey="Common:SnippetMatchCount"
+                    components={{ strong: <strong /> }}
+                    values={{ current: matchRangeIndex + 1, total: localMatchStarts.length }}
+                  />
+                </span>
+              </span>
+              <IconButton
+                size="small"
+                disableRipple
+                title={t('Tooltip:NextMatch')}
+                disabled={localMatchStarts.length > 1 && matchRangeIndex >= localMatchStarts.length - 1}
+                onClick={() => goToMatch(matchRangeIndex + 1)}
+              >
+                <i className="ri-arrow-down-s-line" />
+              </IconButton>
+            </div>
+          )}
         </header>
       </header>
 

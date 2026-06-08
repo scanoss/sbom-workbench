@@ -34,6 +34,8 @@
   "SearchForComponentsOnline": "Search for components online",
   "AddNewCustomComponent": "Add new custom component",
   "AddNewVersion": "Add new version",
+  "PreviousMatch": "Previous match",
+  "NextMatch": "Next match",
   "FindInFile": "Find in file",
   "CopyFilePath": "Copy file path",
   "OpenFileInFolder": "Open file in folder",

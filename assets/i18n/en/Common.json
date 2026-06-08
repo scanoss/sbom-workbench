@@ -23,6 +23,7 @@
   "NoOriginalFilesWith": "No original files found with \"{{searchQuery}}\"",
   "LoadingLocalFile": "Loading local file",
   "LoadingRemoteFile": "Loading remote file",
+  "SnippetMatchCount": "Snippet match <strong>{{current}}</strong> of {{total}}",
   "ProjectImportedCantDisplay": "Imported Project! Local source file not available.",
   "ProjectWFPCantDisplay": "Project created from WFP. Local source file cannot be displayed",
   "AllValidDependenciesAccepted": "All valid pending dependencies will be accepted.",
