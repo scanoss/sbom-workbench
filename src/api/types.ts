@@ -47,6 +47,7 @@ export interface IWorkspaceCfg {
   SCANNER_POST_SIZE: number;
   SCANNER_CONCURRENCY_LIMIT: number;
   MULTIUSER_LOCK_TIMEOUT: number;
+  USAGES: string[];
 }
 
 export interface WorkspaceData {
@@ -269,6 +270,18 @@ export enum FileUsageType {
   FILE = 'file',
   DEPENDENCY = 'dependency',
 }
+
+// Non-deletable usage values offered in the inventory dialog. The settings catalog
+// (IWorkspaceCfg.USAGES) is seeded with these and users may append their own.
+export const DEFAULT_INVENTORY_USAGES = [
+  'file',
+  'snippet',
+  'pre-requisite',
+  'Dynamic library',
+  'Original code',
+  'Separate work',
+  'Other (Development tool)',
+];
 
 export enum ComponentSource {
   ENGINE = 'engine',
