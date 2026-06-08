@@ -23,6 +23,7 @@
   "NoOriginalFilesWith": "Aucun fichier développé en interne trouvé contenant \"{{searchQuery}}\"",
   "LoadingLocalFile": "Chargement du fichier local",
   "LoadingRemoteFile": "Chargement du fichier distant",
+  "SnippetMatchCount": "Correspondance de snippet <strong>{{current}}</strong> sur {{total}}",
   "ProjectImportedCantDisplay": "Projet importé ! Le fichier source local n'est pas disponible.",
   "ProjectWFPCantDisplay": "Projet créé depuis WFP. Le fichier source local ne peut pas être affiché",
   "AllValidDependenciesAccepted": "Toutes les dépendances valides en attente seront acceptées.",

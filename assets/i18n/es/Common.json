@@ -23,6 +23,7 @@
   "NoOriginalFilesWith": "No se encontraron ficheros originales con \"{searchQuery}}\"",
   "LoadingLocalFile": "Cargando fichero local",
   "LoadingRemoteFile": "Cargando fichero remoto",
+  "SnippetMatchCount": "Coincidencia de snippet <strong>{{current}}</strong> de {{total}}",
   "ProjectImportedCantDisplay": "Este proyecto fue importado. El fichero de origen no se puede mostrar.",
   "ProjectWFPCantDisplay": "Este proyecto fue creado desde un WFP. El fichero de origen no se puede mostrar.",
   "AllValidDependenciesAccepted": "Todas las dependencias pendientes válidas serán aceptadas",

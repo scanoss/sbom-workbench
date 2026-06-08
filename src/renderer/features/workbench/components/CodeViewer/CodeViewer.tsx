@@ -2,6 +2,26 @@ import React, { useEffect } from 'react';
 import * as monaco from 'monaco-editor';
 import CodeViewerManagerInstance from '../../pages/detected/pages/Editor/CodeViewerManager';
 
+// Shared across the synced editor pair so the scroll one editor applies to the
+// other doesn't bounce back and drift. A single flag is enough: only one diff
+// pair is ever active at a time.
+let isSyncingScroll = false;
+
+// Reveal a line on each editor of a synced pair at once, without the scroll-sync
+// dragging one editor off the line we just placed the other on. Lets an outside
+// control (e.g. the match navigator) re-align both panes on a match.
+export const revealLinesAligned = (targets: Array<{ id: string; line: number }>) => {
+  isSyncingScroll = true;
+  targets.forEach(({ id, line }) => {
+    CodeViewerManagerInstance.get(id)?.revealLineNearTop(line);
+  });
+  // The programmatic scroll may settle on the next frame; keep sync suppressed
+  // until then so it doesn't reach the synced editor's handler.
+  requestAnimationFrame(() => {
+    isSyncingScroll = false;
+  });
+};
+
 export interface HighLighted {
   match: string;
   count: number;
@@ -34,7 +54,21 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
   const scrollLineDecorations = React.useRef<string[]>([]);
   const highlightDecorations = React.useRef<string[]>([]);
   const scrollDisposable = React.useRef<monaco.IDisposable>(null);
-  const isSyncingScroll = React.useRef(false);
+  const suppressScrollSync = React.useRef(false);
+  const lastScrollTop = React.useRef(0);
+
+  // Run a programmatic scroll (reveal, model reset) without propagating it to the
+  // synced editor, so each editor can reveal its own match without overriding the other.
+  const withoutScrollSync = (fn: () => void) => {
+    suppressScrollSync.current = true;
+    fn();
+    // The scroll event from a programmatic change may fire on the next frame; keep
+    // sync suppressed until then so it doesn't reach the synced editor's handler.
+    requestAnimationFrame(() => {
+      suppressScrollSync.current = false;
+    });
+  };
+
   const initMonaco = () => {
     const ref = editorContainerRef.current;
     if (ref) {
@@ -115,7 +149,7 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
       if (model) model.dispose();
 
       const nModel = monaco.editor.createModel(value, language);
-      mEditor.setModel(nModel);
+      withoutScrollSync(() => mEditor.setModel(nModel));
       // mEditor.focus();
       // mEditor.layout({} as monaco.editor.IDimension);
     }
@@ -148,7 +182,12 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
                     isWholeLine: true,
                     className: 'lineHighlightDecoration',
                     linesDecorationsClassName: 'lineRangeDecoration',
-
+                    // Keep the match location visible on the scrollbar so it can still
+                    // be found (and clicked to jump back) after scrolling away.
+                    overviewRuler: {
+                      color: 'rgba(58, 91, 185, 0.8)',
+                      position: monaco.editor.OverviewRulerLane.Full,
+                    },
                   },
                 },
               ];
@@ -160,7 +199,7 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
           decorations
         );
 
-        editor.current.revealLineNearTop(decorations[0].range.startLineNumber);
+        withoutScrollSync(() => editor.current.revealLineNearTop(decorations[0].range.startLineNumber));
       } else {
         // Clear all decorations when highlight is null or 'all'
         highlightDecorations.current = editor.current.deltaDecorations(
@@ -242,7 +281,7 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
       mEditor.deltaDecorations([], matches);
 
       if (matches.length > 0) {
-        mEditor.revealRangeNearTop(matches[0].range);
+        withoutScrollSync(() => mEditor.revealRangeNearTop(matches[0].range));
       }
 
       // Call the callback with the matched terms
@@ -269,13 +308,20 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
     }
 
     if (syncScrollWith && editor.current) {
+      lastScrollTop.current = editor.current.getScrollTop();
       scrollDisposable.current = editor.current.onDidScrollChange((e) => {
-        if (isSyncingScroll.current) return;
+        // Track the delta so we always know how far this editor moved, even while
+        // a programmatic reveal keeps lastScrollTop up to date for the next user scroll.
+        const delta = e.scrollTop - lastScrollTop.current;
+        lastScrollTop.current = e.scrollTop;
+        if (isSyncingScroll || suppressScrollSync.current || delta === 0) return;
         const target = CodeViewerManagerInstance.get(syncScrollWith);
         if (target) {
-          isSyncingScroll.current = true;
-          target.setScrollTop(e.scrollTop);
-          isSyncingScroll.current = false;
+          isSyncingScroll = true;
+          // Move the other editor by the same delta instead of to the same absolute
+          // position, so each side stays aligned on its own match after scrolling.
+          target.setScrollTop(target.getScrollTop() + delta);
+          isSyncingScroll = false;
         }
       });
     }
@@ -323,8 +369,10 @@ const CodeViewer = ({ id, value, language, highlight, highlights, highlightMatch
         }]
       );
 
-      editor.current.revealLineNearTop(scrollToLine);
-      editor.current.setPosition({ lineNumber: scrollToLine, column: 1 });
+      withoutScrollSync(() => {
+        editor.current.revealLineNearTop(scrollToLine);
+        editor.current.setPosition({ lineNumber: scrollToLine, column: 1 });
+      });
       editor.current.focus();
     }
   }, [scrollToLine]);

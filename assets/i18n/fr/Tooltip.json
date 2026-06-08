@@ -34,6 +34,8 @@
   "SearchForComponentsOnline": "Rechercher des composants en ligne",
   "AddNewCustomComponent": "Ajouter un nouveau composant personnalisé",
   "AddNewVersion": "Ajouter une nouvelle version",
+  "PreviousMatch": "Correspondance précédente",
+  "NextMatch": "Correspondance suivante",
   "FindInFile": "Rechercher dans le fichier",
   "CopyFilePath": "Copier le chemin du fichier",
   "OpenFileInFolder": "Ouvrir le fichier dans le dossier",

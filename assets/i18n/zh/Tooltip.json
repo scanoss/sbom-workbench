@@ -34,6 +34,8 @@
   "SearchForComponentsOnline": "在线搜索组件",
   "AddNewCustomComponent": "添加新的自定义组件",
   "AddNewVersion": "添加新版本",
+  "PreviousMatch": "上一个匹配",
+  "NextMatch": "下一个匹配",
   "FindInFile": "在文件中查找",
   "CopyFilePath": "复制文件路径",
   "OpenFileInFolder": "打开文件夹中的文件",

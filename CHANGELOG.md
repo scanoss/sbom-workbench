@@ -6,8 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Snippet compare view now has a match navigator that re centers both editors on the snippet match, with previous/next controls to step through files that have more than one snippet match.
 ### Fixed
 - Importing a `result.json` no longer fails when a result has an empty `version` or `latest` value.
+- Snippet match highlight in the compare view no longer disappears after scrolling: the match is now marked on the scrollbar, and scrolling one editor keeps the other aligned on its corresponding match.
 
 ## [1.39.2] - 2026-05-13
 ### Fixed
