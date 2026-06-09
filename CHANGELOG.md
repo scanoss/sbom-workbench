@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Importing a `result.json` no longer fails when a result has an empty `version` or `latest` value.
 - Snippet match highlight in the compare view no longer disappears after scrolling: the match is now marked on the scrollbar, and scrolling one editor keeps the other aligned on its corresponding match.
+- Dependency scanning no longer crashes when a project is scanned with **Include all file types** enabled.
 
 ## [1.39.2] - 2026-05-13
 ### Fixed

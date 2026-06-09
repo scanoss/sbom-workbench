@@ -3,7 +3,7 @@ import { ScannerFactory } from '../ScannerFactory';
 import fs from 'fs';
 import log from 'electron-log';
 import i18next from 'i18next';
-import { BlackListDependencies } from '../../../workspace/tree/blackList/BlackListDependencies';
+import { BlackListDependencies, DependencyFilterRule } from '../../../workspace/tree/blackList/BlackListDependencies';
 import { Project } from '../../../workspace/Project';
 import { dependencyService } from '../../../services/DependencyService';
 import { Scanner } from '../types';
@@ -34,12 +34,30 @@ export class DependencyTask implements Scanner.IPipelineTask {
     return true;
   }
 
+  /**
+   * Reads the folder-filter rules used to exclude paths from dependency scanning.
+   *
+   * `filter.json` is written during indexing only when project-level file filtering
+   * is active. When a project is scanned with "Include all file types" enabled the
+   * file is never created, so there are no rules to apply: an empty list is returned
+   * (nothing excluded) instead of letting a missing file crash the dependency stage.
+   */
+  private async loadDependencyFilterRules(): Promise<DependencyFilterRule[]> {
+    const filterPath = `${this.project.metadata.getMyPath()}/filter.json`;
+    if (!fs.existsSync(filterPath)) {
+      log.info('[ DependencyTask ]: filter.json not found, skipping dependency filters (all extensions enabled)');
+      return [];
+    }
+    const raw = await fs.promises.readFile(filterPath, 'utf8');
+    return JSON.parse(raw).filters ?? [];
+  }
+
   private async scanDependencies() {
     try {
       const allFiles = [];
       const rootPath = this.project.metadata.getScanRoot();
       const collector = new CollectFilesVisitor(
-        new BlackListDependencies(`${this.project.metadata.getMyPath()}/filter.json`),
+        new BlackListDependencies(await this.loadDependencyFilterRules()),
       );
       this.project.tree.getRootFolder().accept<void>(collector);
       collector.files.forEach((f) => {
