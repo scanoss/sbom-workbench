@@ -5,8 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.40.0] - 2026-06-09
 ### Added
+- The inventory **usage** options are now a configurable catalog. It ships with non-deletable defaults (file, snippet, pre-requisite, Dynamic library, Original code, Separate work, Other (Development tool)) and lets you create your own usages on the fly from the identify dialog and delete custom ones. Custom usages are saved in the workspace settings and shared across projects.
 - Snippet compare view now has a match navigator that re centers both editors on the snippet match, with previous/next controls to step through files that have more than one snippet match.
 ### Fixed
 - Importing a `result.json` no longer fails when a result has an empty `version` or `latest` value.
@@ -265,3 +266,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.39.0]: https://github.com/scanoss/sbom-workbench/compare/v1.38.0...v1.39.0
 [1.39.1]: https://github.com/scanoss/sbom-workbench/compare/v1.39.0...v1.39.1
 [1.39.2]: https://github.com/scanoss/sbom-workbench/compare/v1.39.1...v1.39.2
+[1.40.0]: https://github.com/scanoss/sbom-workbench/compare/v1.39.2...v1.40.0
