@@ -36,6 +36,7 @@
   "AddNewVersion": "新しいバージョンを追加",
   "PreviousMatch": "前の一致",
   "NextMatch": "次の一致",
+  "DeleteUsage": "用途を削除",
   "FindInFile": "ファイル内を検索",
   "CopyFilePath": "ファイルパスをコピー",
   "OpenFileInFolder": "フォルダ内でファイルを開く",

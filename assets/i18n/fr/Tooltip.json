@@ -36,6 +36,7 @@
   "AddNewVersion": "Ajouter une nouvelle version",
   "PreviousMatch": "Correspondance précédente",
   "NextMatch": "Correspondance suivante",
+  "DeleteUsage": "Supprimer l'usage",
   "FindInFile": "Rechercher dans le fichier",
   "CopyFilePath": "Copier le chemin du fichier",
   "OpenFileInFolder": "Ouvrir le fichier dans le dossier",

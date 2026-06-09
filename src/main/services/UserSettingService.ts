@@ -3,7 +3,7 @@ import { app } from 'electron';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { IWorkspaceCfg } from '../../api/types';
+import { DEFAULT_INVENTORY_USAGES, IWorkspaceCfg } from '../../api/types';
 import { wsUtils } from '../workspace/WsUtils/WsUtils';
 import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
@@ -34,7 +34,7 @@ class UserSettingService {
         NAME: 'My Workspace',
         PATH: toPosix(path.join(os.homedir(), AppConfig.DEFAULT_WORKSPACE_NAME)),
         DESCRIPTION: '',
-        SCAN_SOURCES: ''
+        SCAN_SOURCES: '',
       },
     ],
     SCAN_MODE: 'FULL_SCAN',
@@ -51,6 +51,7 @@ class UserSettingService {
     SCANNER_POST_SIZE: null,
     SCANNER_TIMEOUT: null,
     MULTIUSER_LOCK_TIMEOUT: AppConfig.DEFAULT_MULTIUSER_LOCK_TIMEOUT,
+    USAGES: [...DEFAULT_INVENTORY_USAGES],
   };
 
   constructor() {
