@@ -105,6 +105,19 @@ export class ExportRepositoryMock implements ExportRepository {
         url_hash: '7f25711ba80970b0de14230872becfc8',
         download_url: 'https://github.com/gentoo/gentoo/archive/53bd330.zip',
       },
+      {
+        // Manually identified file with no scan match (no-match/filtered): no detected license,
+        // only a concluded license. Must still appear as a package in the SBOM.
+        component: 'scanner.c',
+        purl: 'pkg:github/scanoss/scanner.c',
+        version: 'v1.3.3',
+        vendor: null,
+        detected_licenses: '',
+        concluded_licenses: 'GPL-2.0-only',
+        url: 'https://github.com/scanoss/scanner.c',
+        url_hash: null,
+        download_url: null,
+      },
     ]);
   }
 
@@ -585,6 +598,25 @@ export class ExportRepositoryMock implements ExportRepository {
         detected_url: '',
         concluded_url: '',
         comment: '',
+      },
+      {
+        // Manually identified file with no scan match (no-match/filtered): no detected fields,
+        // only concluded fields are populated.
+        inventory_id: 7,
+        path: '/src/no_match_identified.c',
+        usage: 'file',
+        detected_component: '',
+        concluded_component: 'scanner.c',
+        detected_purl: '',
+        concluded_purl: 'pkg:github/scanoss/scanner.c',
+        detected_version: '',
+        concluded_version: 'v1.3.3',
+        latest_version: '',
+        detected_license: '',
+        concluded_license: 'GPL-2.0-only',
+        detected_url: '',
+        concluded_url: 'https://github.com/scanoss/scanner.c',
+        comment: 'manually identified no-match file',
       },
     ]);
   }
