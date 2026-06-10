@@ -105,6 +105,17 @@ describe('SBOM CSV Tests', () => {
     expect(row6[colIndex.detected_license]).toBe('BSD-2-Clause AND GPL-2.0-only');
     expect(row6[colIndex.concluded_license]).toBe('GPL-2.0-only');
     expect(row6[colIndex.comment]).toBe('inventory 3');
+
+    // A manually identified file with no scan match (no-match/filtered) has empty detected
+    // fields but must still appear in the identified report.
+    const noMatchRow = lines
+      .map((line) => line.split(',').map((column) => column.trim()))
+      .find((columns) => columns[colIndex.path] === '/src/no_match_identified.c');
+    expect(noMatchRow).toBeDefined();
+    expect(noMatchRow[colIndex.detected_purl]).toBe('');
+    expect(noMatchRow[colIndex.concluded_purl]).toBe('pkg:github/scanoss/scanner.c');
+    expect(noMatchRow[colIndex.concluded_version]).toBe('v1.3.3');
+    expect(noMatchRow[colIndex.concluded_license]).toBe('GPL-2.0-only');
   });
 
   it('SBOM CSV detected export test', async () => {

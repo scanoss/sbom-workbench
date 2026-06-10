@@ -80,16 +80,21 @@ export class SBOMCsv extends Format {
       const validDetectedPurl = isValidPurl(comp.detected_purl);
       const validConcludedPurl = isValidPurl(comp.concluded_purl);
 
-      if (!validDetectedPurl && comp.detected_purl !== '') {
+      if (!validDetectedPurl && comp.detected_purl) {
         invalidPurls.add(comp.detected_purl);
       }
 
-      if (!validConcludedPurl && comp.concluded_purl !== '') {
+      if (!validConcludedPurl && comp.concluded_purl) {
         invalidPurls.add(comp.concluded_purl);
       }
 
-      // Not evaluate validConcludedPurl condition on detected report
-      if (validDetectedPurl && (validConcludedPurl || this.source === ExportSource.DETECTED)) {
+      // Detected reports require a valid detected PURL. Identified reports require a valid
+      // concluded PURL; the detected PURL may be empty for files with no scan match
+      // (no-match/filtered) that were manually identified.
+      const include = this.source === ExportSource.DETECTED
+        ? validDetectedPurl
+        : validConcludedPurl && (validDetectedPurl || !comp.detected_purl);
+      if (include) {
         reportData.push(comp);
       }
     });

@@ -95,10 +95,17 @@ describe('SPDX Lite tests', () => {
     expect(spdxLite.creationInfo.creators[0].includes(`Tool: ${AppConfig.APP_NAME}`)).toBe(true);
     expect(spdxLite.creationInfo.creators[2]).toEqual(`Organization: ${AppConfig.ORGANIZATION_NAME}`);
     expect(spdxLite.creationInfo.comment).toEqual('SBOM Build information - SBOM Type: Build');
-    expect(spdxLite.documentDescribes.length).toEqual(2);
+    expect(spdxLite.documentDescribes.length).toEqual(3);
 
     expect(spdxLite.packages[0].versionInfo).toEqual('1.2.0');
     expect(spdxLite.packages[1].licenseConcluded).toEqual('Beerware');
+
+    // A manually identified file with no scan match (no-match/filtered) still appears as a
+    // package: its declared (detected) license is NOASSERTION but the concluded license is kept.
+    expect(spdxLite.packages[2].name).toEqual('pkg:github/scanoss/scanner.c');
+    expect(spdxLite.packages[2].versionInfo).toEqual('v1.3.3');
+    expect(spdxLite.packages[2].licenseDeclared).toEqual('NOASSERTION');
+    expect(spdxLite.packages[2].licenseConcluded).toEqual('GPL-2.0-only');
 
     // check if right download location is set when no download location is coming from the engine
     expect(spdxLite.packages[0].downloadLocation).toEqual('https://github.com/gentoo/gentoo');

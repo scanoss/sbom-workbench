@@ -853,7 +853,7 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
   INNER JOIN file_inventories fi ON i.id = fi.inventoryid
   INNER JOIN files f ON f.fileId = fi.fileId
   INNER JOIN component_versions cv ON cv.id = i.cvid
-  INNER JOIN results r ON f.fileId = r.fileId
+  LEFT JOIN results r ON f.fileId = r.fileId
   UNION
   SELECT i.id as inventory_id,
          f.path,
