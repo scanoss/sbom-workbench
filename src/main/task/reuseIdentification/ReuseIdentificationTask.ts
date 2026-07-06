@@ -52,15 +52,18 @@ export class ReuseIdentificationTask implements ITask<void, Array<Inventory>> {
   private async createNewInventories(fileMapper: Map<string, Array<number>>, componentMapper: Map<string, number>): Promise<Array<Inventory>> {
     const inventoryMapper = new Map<string, any>();
     for (const md5 of Object.keys(this.reuseIdentification.inventoryKnowledgeExtraction)) {
+      const files = fileMapper.get(md5);
+      // Skip md5 hashes with no matching local files (e.g. files already identified when not overwriting)
+      if (!files || files.length === 0) continue;
       const {
         purl, version, url, notes, usage, spdxid,
       } = this.reuseIdentification.inventoryKnowledgeExtraction[md5].inventories[0];
       const key = `${purl}${version}${notes}${spdxid}${usage}${url}`;
       if (inventoryMapper.has(key)) {
-        inventoryMapper.get(key).files = inventoryMapper.get(key).files.concat(...fileMapper.get(md5));
+        inventoryMapper.get(key).files = inventoryMapper.get(key).files.concat(files);
       } else {
         const newInventory = {
-          files: fileMapper.get(md5), cvid: componentMapper.get(`${purl}${version}`), notes, usage, url, spdxid,
+          files, cvid: componentMapper.get(`${purl}${version}`), notes, usage, url, spdxid,
         };
         inventoryMapper.set(key, newInventory);
       }
