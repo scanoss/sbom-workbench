@@ -78,5 +78,6 @@
   "IgnoreCertificateErrors": "忽略證書頒發機構錯誤",
   "Local": "本地",
   "Components": "组件",
+  "Dependencies": "依赖项",
   "PipelineStages": "管道阶段"
 }

@@ -382,16 +382,39 @@ export interface ExternalFile {
   path: string;
 }
 
+export interface DependencyExtraction {
+  purl: string;
+  version: string;
+  licenses: string;
+  component: string;
+  scope: string;
+  url: string;
+}
+
+export interface DependencyKnowledgeExtraction {
+  [key: string]: {
+    dependencies: Array<DependencyExtraction>;
+    localFiles: Array<string>;
+  };
+}
+
+export interface ProjectKnowledgeExtractionResult {
+  inventories: InventoryKnowledgeExtraction;
+  dependencies: DependencyKnowledgeExtraction;
+}
+
 export interface ExtractFromProjectDTO {
   override: boolean;
   source: IProject[];
   target: IProject;
   folder: string;
   md5File?: string;
+  includeDependencies?: boolean;
 }
 
 export interface ReuseIdentificationTaskDTO {
   inventoryKnowledgeExtraction: InventoryKnowledgeExtraction;
+  dependencyKnowledgeExtraction?: DependencyKnowledgeExtraction;
   overwrite: boolean;
   path?: string;
   type: InventorySourceType;

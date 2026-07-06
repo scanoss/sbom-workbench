@@ -4,10 +4,10 @@ import {
   FileTreeViewMode,
   INewProject,
   Inventory,
-  InventoryKnowledgeExtraction,
   IProject,
   IWorkbenchFilter,
   ProjectAccessMode,
+  ProjectKnowledgeExtractionResult,
   ProjectOpenResponse,
   ReuseIdentificationTaskDTO,
 } from '../types';
@@ -85,7 +85,7 @@ class ProjectService extends BaseService {
     return this.response(response);
   }
 
-  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction> {
+  public async extractInventoryKnowledge(param: ExtractFromProjectDTO): Promise<ProjectKnowledgeExtractionResult> {
     const response = await window.electron.ipcRenderer.invoke(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, param);
     return this.response(response);
   }

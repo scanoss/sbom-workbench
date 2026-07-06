@@ -1,7 +1,7 @@
 import os from 'os';
 import * as util from 'util';
 import log from 'electron-log';
-import { ExtractFromProjectDTO, INewProject, IProject, Inventory, InventoryKnowledgeExtraction, LOCK, ProjectAccessMode, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
+import { ExtractFromProjectDTO, INewProject, IProject, Inventory, LOCK, ProjectAccessMode, ProjectKnowledgeExtractionResult, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
 import { Project } from '../workspace/Project';
 import { workspace } from '../workspace/Workspace';
 import { modelProvider } from './ModelProvider';
@@ -11,6 +11,7 @@ import { ProjectFilterPath } from '../workspace/filters/ProjectFilterPath';
 import { ScannerPipelineFactory } from '../task/scanner/scannerPipelineFactory/ScannerPipelineFactory';
 import { ProjectKnowledgeExtractor } from '../modules/projectKnowledge/ProjectKnowledgeExtractor';
 import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdentificationTask';
+import { ReuseDependencyIdentificationTask } from '../task/reuseIdentification/ReuseDependencyIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
 import path from 'path';
 
@@ -157,7 +158,7 @@ class ProjectService {
     }
   }
 
-  public async extractProjectKnowledgeInventoryData(param: ExtractFromProjectDTO): Promise<InventoryKnowledgeExtraction> {
+  public async extractProjectKnowledgeInventoryData(param: ExtractFromProjectDTO): Promise<ProjectKnowledgeExtractionResult> {
     const projectKnowledgeExtractor = new ProjectKnowledgeExtractor(param);
     const inventoryKnowledgeData = await projectKnowledgeExtractor.extractInventoryData();
     return inventoryKnowledgeData;
@@ -165,6 +166,13 @@ class ProjectService {
 
   public async acceptInventoryKnowledge(param: ReuseIdentificationTaskDTO): Promise<Array<Inventory>> {
     const inventories = await new ReuseIdentificationTask(param).run();
+    if (param.dependencyKnowledgeExtraction && Object.keys(param.dependencyKnowledgeExtraction).length > 0) {
+      await new ReuseDependencyIdentificationTask({
+        dependencyKnowledgeExtraction: param.dependencyKnowledgeExtraction,
+        overwrite: param.overwrite,
+        path: param.path,
+      }).run();
+    }
     return inventories;
   }
 

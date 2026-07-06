@@ -4,6 +4,8 @@
     "Date": "日期",
     "TotalFiles": "全部文件",
     "Component": "组件",
+    "Manifest": "清单文件",
+    "Scope": "范围",
     "Severity": "严重程度",
     "CVSSSeverity": "CVSS严重程度",
     "CVE": "CVE",

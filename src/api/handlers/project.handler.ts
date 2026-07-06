@@ -5,10 +5,10 @@ import {
   FileTreeViewMode,
   INewProject,
   Inventory,
-  InventoryKnowledgeExtraction,
   IProject,
   IWorkbenchFilter,
   ProjectAccessMode,
+  ProjectKnowledgeExtractionResult,
   ProjectOpenResponse,
   ReuseIdentificationTaskDTO,
 } from '../types';
@@ -21,6 +21,7 @@ import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
 import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
 import { projectService } from '../../main/services/ProjectService';
+import { treeService } from '../../main/services/TreeService';
 import api from '../api';
 import { modelProvider } from '../../main/services/ModelProvider';
 
@@ -205,10 +206,10 @@ api.handle(IpcChannels.PROJECT_CREATE, async (_event, projectDTO: INewProject) =
 
 api.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param: ExtractFromProjectDTO) => {
   try {
-    const inventoryKnowledgeExtraction: InventoryKnowledgeExtraction = await projectService.extractProjectKnowledgeInventoryData(param);
+    const projectKnowledgeExtraction: ProjectKnowledgeExtractionResult = await projectService.extractProjectKnowledgeInventoryData(param);
     return Response.ok({
       message: 'Project extraction successfully',
-      data: inventoryKnowledgeExtraction,
+      data: projectKnowledgeExtraction,
     });
   } catch (error: any) {
     log.error('[PROJECT_EXTRACT_INVENTORY_KNOWLEDGE]', error);
@@ -219,6 +220,9 @@ api.handle(IpcChannels.PROJECT_EXTRACT_INVENTORY_KNOWLEDGE, async (_event, param
 api.handle(IpcChannels.PROJECT_ACCEPT_INVENTORY_KNOWLEDGE, async (_event, param: ReuseIdentificationTaskDTO) => {
   try {
     const inventories: Array<Inventory> = await projectService.acceptInventoryKnowledge(param);
+    if (param.dependencyKnowledgeExtraction && Object.keys(param.dependencyKnowledgeExtraction).length > 0) {
+      treeService.updateDependencyStatusOnTree();
+    }
     return Response.ok({
       message: 'Project extraction successfully',
       data: inventories,

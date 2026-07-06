@@ -20,6 +20,8 @@
     "Algorithm": "Algorithm",
     "Strength ": "Strength",
     "File": "File",
+    "Manifest": "Manifest",
+    "Scope": "Scope",
     "Dependencies ": "Dependencies",
     "Cryptography": "Cryptography",
     "Type": "Type",

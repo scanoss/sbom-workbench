@@ -97,5 +97,6 @@
   "IgnoreCertificateErrors": "Ignorer les erreurs de l'autorité de certification",
   "Local": "Local",
   "Components": "Composants",
+  "Dependencies": "Dépendances",
   "PipelineStages": "Étapes du pipeline"
 }

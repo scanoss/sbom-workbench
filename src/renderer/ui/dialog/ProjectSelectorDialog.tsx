@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import {
   Box,
-  Button, CircularProgress,
+  Button, Checkbox, CircularProgress,
   Dialog,
   DialogContent, FormControlLabel,
   Grid,
@@ -20,9 +20,10 @@ import { useTranslation } from 'react-i18next';
 import { selectWorkspaceState } from '@store/workspace-store/workspaceSlice';
 import { DataGrid } from '@mui/x-data-grid';
 import {
-  InventoryKnowledgeExtraction,
   InventorySourceType,
-  IProject, ScanState
+  IProject,
+  ProjectKnowledgeExtractionResult,
+  ScanState
 } from '@api/types';
 import { projectService } from '@api/services/project.service';
 import { DialogContext } from '@context/DialogProvider';
@@ -41,17 +42,36 @@ interface IProjectSelectorDialog {
   onCancel: () => void;
 }
 
+const tableHeaderStyle = {
+  fontWeight: 600,
+  fontSize: '0.875rem',
+  lineHeight: '1.5rem',
+  color: 'rgba(0, 0, 0, 0.87)',
+  textTransform: 'capitalize' as const,
+  height: '100%',
+  alignItems: 'center',
+  display: 'flex',
+};
+
+const tableRowStyle = {
+  fontWeight: 400,
+  fontSize: '0.75rem',
+  borderBottom: '1px solid rgba(224, 224, 224, 1)',
+  color: 'rgba(0, 0, 0, 0.87)',
+};
+
 export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   const dialogCtrl = useContext<any>(DialogContext);
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { data, error, loading, execute } = useApi<InventoryKnowledgeExtraction>();
+  const { data, error, loading, execute } = useApi<ProjectKnowledgeExtractionResult>();
 
   const { open,  params, onClose, onCancel } = props;
 
   const steps = [t('Title:SelectProject'), t('Title:PreviewIdentifications')];
   const [activeStep, setActiveStep] = React.useState(0);
   const [override, setOverride] = React.useState<boolean>(true);
+  const [includeDependencies, setIncludeDependencies] = React.useState<boolean>(false);
 
 
   const { projects, currentProject } = useSelector(selectWorkspaceState);
@@ -65,6 +85,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
 
   const [selected, setSelected] = React.useState<IProject[]>([]);
   const [items, setItems] = React.useState<any[]>([]);
+  const [depItems, setDepItems] = React.useState<any[]>([]);
 
   const preview = async () => {
     await execute( () => projectService.extractInventoryKnowledge({
@@ -73,6 +94,7 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
       md5File: params?.md5File,
       source: [...selected],
       target: {...currentProject},
+      includeDependencies,
     }))
   }
 
@@ -82,7 +104,8 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
     try {
       dialog.present();
       await dispatch(acceptInventoryKnowledge({
-        inventoryKnowledgeExtraction: data,
+        inventoryKnowledgeExtraction: data.inventories,
+        dependencyKnowledgeExtraction: includeDependencies ? data.dependencies : undefined,
         overwrite: override,
         type: InventorySourceType.PATH,
         path: params?.folder
@@ -111,25 +134,32 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
   };
 
   const isValid = () => {
-    return data && Object.keys(data).length && !loading;
+    return data && (Object.keys(data.inventories).length || Object.keys(data.dependencies).length) && !loading;
   };
 
   useEffect(() => {
     const newItems = [];
+    const newDepItems = [];
     if (data) {
-      Object.keys(data).forEach(key => {
-        data[key].inventories.forEach(inv => {
-          newItems.push({key, files: data[key].localFiles.join(', '), ...inv})
+      Object.keys(data.inventories).forEach(key => {
+        data.inventories[key].inventories.forEach(inv => {
+          newItems.push({key, files: data.inventories[key].localFiles.join(', '), ...inv})
+        });
+      });
+      Object.keys(data.dependencies).forEach(key => {
+        data.dependencies[key].dependencies.forEach(dep => {
+          newDepItems.push({key, files: data.dependencies[key].localFiles.join(', '), ...dep})
         });
       });
     }
     setItems(newItems);
+    setDepItems(newDepItems);
 
   }, [data]);
 
   useEffect(() => {
     if (activeStep !== 0 ) preview()
-  }, [override])
+  }, [override, includeDependencies])
 
   return (
     <Dialog
@@ -234,13 +264,25 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
         )}
 
         {activeStep === 1 && (
-          <Grid >
+          <Grid sx={{ height: 'auto !important' }}>
               <div className="list-container">
 
                 <header className="d-flex space-between mt-1">
                   {/* <div className="ml-2 font-medium">{t('NProjectsSelected', { count: selected.length})}</div> */}
                   <div className="ml-2 font-medium"><small>Matches from <span className="color-primary">{selected[0].name}</span></small></div>
-                  <div>
+                  <div className="d-flex">
+                    <FormControlLabel
+                      className="ml-1 mb-2"
+                      control={
+                        <Checkbox
+                          onChange={(e) => setIncludeDependencies(e.target.checked)}
+                          checked={includeDependencies}
+                          size="small"
+                          color="primary"
+                        />
+                      }
+                      label={<small>{t('IncludeDependencies')}</small>}
+                    />
                     <FormControlLabel
                       className="override-toggle-switch ml-1 mb-2"
                       control={
@@ -256,7 +298,8 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                   </div>
                 </header>
 
-                <Paper style={{ height: 250, width: '100%', overflow: 'hidden' }}>
+                {includeDependencies && <div className="ml-2 mt-1 font-medium"><small>{t('Title:Components')}</small></div>}
+                <Paper style={{ height: includeDependencies ? 150 : 250, width: '100%', overflow: 'hidden' }}>
                   <>
                   <AutoSizer>
                   {({ height, width }) => (
@@ -267,22 +310,8 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                       headerHeight={40}
                       rowCount={items.length}
                       rowGetter={({index}) => items[index]}
-                      headerStyle={{
-                        fontWeight: 600,
-                        fontSize: '0.875rem',
-                        lineHeight: '1.5rem',
-                        color: 'rgba(0, 0, 0, 0.87)',
-                        textTransform: 'capitalize',
-                        height: '100%',
-                        alignItems: 'center',
-                        display: 'flex',
-                      }}
-                      rowStyle={{
-                        fontWeight: 400,
-                        fontSize: '0.75rem',
-                        borderBottom: '1px solid rgba(224, 224, 224, 1)',
-                        color: 'rgba(0, 0, 0, 0.87)',
-                      }}
+                      headerStyle={tableHeaderStyle}
+                      rowStyle={tableRowStyle}
                     >
                       <Column label={t('Table:Header:LocalFile')} dataKey="files" width={250} flexGrow={0} flexShrink={0} />
                       <Column label={t('Table:Header:Component')} dataKey="name" width={100} flexGrow={0} flexShrink={0} />
@@ -300,6 +329,43 @@ export const ProjectSelectorDialog = (props: IProjectSelectorDialog) => {
                   }
                   </>
                 </Paper>
+
+                {includeDependencies && (
+                  <>
+                    <div className="ml-2 mt-2 font-medium"><small>{t('Title:Dependencies')}</small></div>
+                    <Paper style={{ height: 150, width: '100%', overflow: 'hidden' }}>
+                      <>
+                      <AutoSizer>
+                      {({ height, width }) => (
+                        <Table
+                          height={height}
+                          width={width}
+                          rowHeight={28}
+                          headerHeight={40}
+                          rowCount={depItems.length}
+                          rowGetter={({index}) => depItems[index]}
+                          headerStyle={tableHeaderStyle}
+                          rowStyle={tableRowStyle}
+                        >
+                          <Column label={t('Table:Header:Manifest')} dataKey="files" width={200} flexGrow={0} flexShrink={0} />
+                          <Column label={t('Table:Header:Component')} dataKey="component" width={100} flexGrow={0} flexShrink={0} />
+                          <Column label={t('Table:Header:PURL')} dataKey="purl" />
+                          <Column label={t('Table:Header:Version')} dataKey="version" width={70} flexGrow={0} flexShrink={0}/>
+                          <Column label={t('Table:Header:License')} dataKey="licenses" width={70} flexGrow={0} flexShrink={0} />
+                          <Column label={t('Table:Header:Scope')} dataKey="scope" width={70} flexGrow={0} flexShrink={0} />
+                        </Table>
+                      )}
+                      </AutoSizer>
+
+                      {depItems.length === 0 &&
+                          <div className="text-center mt-10 pt-10">
+                            {t('Title:NoMatchFound')}
+                          </div>
+                      }
+                      </>
+                    </Paper>
+                  </>
+                )}
               </div>
           </Grid>
         )}

@@ -360,8 +360,8 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
 
   SQL_VULNERABILITY_DELETE_ALL = 'DELETE FROM vulnerability;';
 
-  SQL_GET_KNOWLEDGE_INVENTORIES = `SELECT fdb.md5_file, fdb.purl, fdb.version, fdb.url, fdb.name, fdb.spdxid AS inventoryLicense, fdb.usage, fdb.notes, fdb.licenseName,fdb.path, target.path as targetFiles FROM (SELECT r.md5_file, f.path FROM files f INNER JOIN results r ON r.fileId = f.fileId) as target,
-    (SELECT aux.results.md5_file, aux.component_versions.purl, aux.component_versions.version, aux.component_versions.url, aux.component_versions.name,
+  SQL_GET_KNOWLEDGE_INVENTORIES = `SELECT target.file_md5 AS md5_file, fdb.purl, fdb.version, fdb.url, fdb.name, fdb.spdxid AS inventoryLicense, fdb.usage, fdb.notes, fdb.licenseName,fdb.path, target.path as targetFiles FROM (SELECT r.md5_file, f.md5_file AS file_md5, f.path FROM files f INNER JOIN results r ON r.fileId = f.fileId) as target,
+    (SELECT aux.results.md5_file, aux.files.md5_file AS file_md5, aux.component_versions.purl, aux.component_versions.version, aux.component_versions.url, aux.component_versions.name,
      aux.inventories.spdxid, aux.inventories.usage, aux.inventories.notes, aux.licenses.name as licenseName, aux.files.path
     FROM  aux.results
     INNER JOIN aux.files ON aux.files.fileId = aux.results.fileId
@@ -369,7 +369,16 @@ FROM files f LEFT JOIN results r ON (r.fileId=f.fileId) #FILTER ;`;
     INNER JOIN aux.inventories ON aux.file_inventories.inventoryid = aux.inventories.id
     INNER JOIN aux.component_versions ON aux.component_versions.id = aux.inventories.cvid
     INNER JOIN aux.licenses ON aux.licenses.spdxid = aux.inventories.spdxid ) as fdb
-    WHERE target.md5_file = fdb.md5_file`;
+    WHERE target.md5_file = fdb.md5_file AND target.file_md5 = fdb.file_md5`;
+
+  SQL_GET_KNOWLEDGE_DEPENDENCIES = `SELECT fdb.path, fdb.purl, fdb.version, fdb.licenses, fdb.component, fdb.scope, fdb.url FROM (SELECT DISTINCT f.path FROM files f) as target,
+    (SELECT aux.files.path, aux.dependencies.purl, aux.dependencies.version, aux.dependencies.licenses, aux.dependencies.component, aux.dependencies.scope, aux.dependencies.url
+    FROM aux.dependencies
+    INNER JOIN aux.files ON aux.files.fileId = aux.dependencies.fileId
+    INNER JOIN aux.component_versions cv ON cv.purl = aux.dependencies.purl AND cv.version = aux.dependencies.version
+    INNER JOIN aux.inventories i ON cv.id = i.cvid AND i.source = 'declared' AND i.usage = 'dependency'
+    WHERE aux.dependencies.rejectedAt IS NULL ) as fdb
+    WHERE target.path = fdb.path`;
 
   /** ************************************************************** */
   /*                                                                 */

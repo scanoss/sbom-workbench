@@ -209,7 +209,7 @@ class DependencyService {
         if (componentMapper.has(`${d.purl}@${d.version}`)) {
           const comp = componentMapper.get(`${d.purl}@${d.version}`);
           const newLicensesToAttach = comp.licenses.filter((license) => !licenseMapper.has(license.spdxid)).map((filteredLicense) => filteredLicense.id);
-          attach.push({ compid: comp.compid, license: newLicensesToAttach });
+          attach.push({ compid: comp.compid, licenses: newLicensesToAttach });
         }
       });
 
@@ -237,7 +237,7 @@ class DependencyService {
         const newComponents = await modelProvider.model.component.bulkImport(Array.from(newComponentsMapper.values()));
 
         // Adapt structure to attach new components to licenses
-        const newComponentLicenses = newComponents.map((c) => { return { compid: c.compid, licenses: c.licenses }; });
+        const newComponentLicenses = newComponents.map((c) => { return { compid: c.compid, licenses: c.licenses || [] }; });
 
         attach = [...attach, ...newComponentLicenses];
 
