@@ -4,6 +4,8 @@
     "Date": "Fecha",
     "TotalFiles": "Cantidad de ficheros",
     "Component": "Componente",
+    "Manifest": "Manifiesto",
+    "Scope": "Ámbito",
     "Severity": "Severidad",
     "CVSSSeverity": "Severidad CVSS",
     "CVE": "CVE",

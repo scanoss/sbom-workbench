@@ -95,6 +95,7 @@
   "FileTypeNotSupported": "Tipo de fichero no soportado para visualización",
   "FileTooLarge": "El fichero es demasiado grande para mostrarse",
   "OverridePreviousWork": "Sobreescribir trabajo previo",
+  "IncludeDependencies": "Incluir dependencias",
   "ChooseProjectToImport": "Seleccione un proyecto",
   "KeepOriginalUsage": "Mantener uso detectado",
   "PreRequiste": "Pre-Requisito",

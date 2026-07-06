@@ -4,6 +4,8 @@
     "Date": "Date",
     "TotalFiles": "Fichiers totaux",
     "Component": "Composant",
+    "Manifest": "Manifeste",
+    "Scope": "Portée",
     "Severity": "Sévérité",
     "CVE": "CVE",
     "Source": "Source",

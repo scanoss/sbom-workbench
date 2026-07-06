@@ -1,7 +1,7 @@
 import path from 'path';
-import { ExtractFromProjectDTO, FileStatusType, InventoryKnowledgeExtraction } from '../../../api/types';
+import { ExtractFromProjectDTO, FileStatusType, ProjectKnowledgeExtractionResult } from '../../../api/types';
 import { ProjectKnowledgeModel } from '../../model/project/models/ProjectKnowledgeModel';
-import { inventoryToInventoryKnowledgeExtraction } from './projectKnowledgeAdapters/projectKnowledgeAdapter';
+import { dependencyToDependencyKnowledgeExtraction, inventoryToInventoryKnowledgeExtraction } from './projectKnowledgeAdapters/projectKnowledgeAdapter';
 import { QueryBuilderCreator } from '../../model/queryBuilder/QueryBuilderCreator';
 import { modelProvider } from '../../services/ModelProvider';
 import { workspace } from '../../workspace/Workspace';
@@ -20,20 +20,24 @@ export class ProjectKnowledgeExtractor {
   * @brief extracts the inventory data from external projects
   * @return InventoryKnowledgeExtraction
   * */
-  public async extractInventoryData():Promise<InventoryKnowledgeExtraction> {
+  public async extractInventoryData():Promise<ProjectKnowledgeExtractionResult> {
     const model = new ProjectKnowledgeModel(path.join(workspace.getMyPath(), this.projectKnowledgeExtractor.target.work_root, 'scan_db'));
     const projectInventories = [];
+    const projectDependencies = [];
     const filesToProcess = await this.getFilesToProcess();
     for (let i = 0; i < this.projectKnowledgeExtractor.source.length; i += 1) {
-      const project = {
-        projectName: this.projectKnowledgeExtractor.source[i].name,
-        inventories: [],
-      };
-      const inventories: any = await model.extractProjectInventoryData(path.join(workspace.getMyPath(), this.projectKnowledgeExtractor.source[i].work_root, 'scan_db'), filesToProcess, this.projectKnowledgeExtractor.md5File);
-      project.inventories = inventories;
-      projectInventories.push(project);
+      const sourceScanDb = path.join(workspace.getMyPath(), this.projectKnowledgeExtractor.source[i].work_root, 'scan_db');
+      const inventories: any = await model.extractProjectInventoryData(sourceScanDb, filesToProcess, this.projectKnowledgeExtractor.md5File);
+      projectInventories.push({ projectName: this.projectKnowledgeExtractor.source[i].name, inventories });
+      if (this.projectKnowledgeExtractor.includeDependencies) {
+        const dependencies: any = await model.extractProjectDependencyData(sourceScanDb, this.projectKnowledgeExtractor.folder);
+        projectDependencies.push({ projectName: this.projectKnowledgeExtractor.source[i].name, dependencies });
+      }
     }
-    return inventoryToInventoryKnowledgeExtraction(projectInventories);
+    return {
+      inventories: inventoryToInventoryKnowledgeExtraction(projectInventories),
+      dependencies: this.projectKnowledgeExtractor.includeDependencies ? dependencyToDependencyKnowledgeExtraction(projectDependencies) : {},
+    };
   }
 
   /**

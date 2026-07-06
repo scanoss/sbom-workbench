@@ -84,5 +84,6 @@
   "IgnoreCertificateErrors": "認証局エラーを無視する",
   "Local": "ローカル",
   "Components": "コンポーネント",
+  "Dependencies": "依存関係",
   "PipelineStages": "パイプラインステージ"
 }

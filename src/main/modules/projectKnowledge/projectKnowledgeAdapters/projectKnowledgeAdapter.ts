@@ -1,4 +1,4 @@
-import { ExternalFile, InventoryExtraction, InventoryKnowledgeExtraction } from "../../../../api/types";
+import { DependencyExtraction, DependencyKnowledgeExtraction, ExternalFile, InventoryExtraction, InventoryKnowledgeExtraction } from "../../../../api/types";
 
 export function inventoryToInventoryKnowledgeExtraction(inputData: any): InventoryKnowledgeExtraction{
   const inventoryMapper= new Map<string,{
@@ -58,4 +58,41 @@ export function inventoryToInventoryKnowledgeExtraction(inputData: any): Invento
     };
   }
   return Object.fromEntries(inventoryMapper);
+}
+
+export function dependencyToDependencyKnowledgeExtraction(inputData: any): DependencyKnowledgeExtraction {
+  const dependencyMapper = new Map<string, {
+    dependencies: Array<DependencyExtraction>,
+    localFiles: Array<string>
+  }>();
+
+  function isSameDependency(dependencies: Array<DependencyExtraction>, dep: any): boolean {
+    return dependencies.findIndex((d) => d.purl === dep.purl && d.version === dep.version
+      && d.licenses === dep.licenses && d.scope === dep.scope) >= 0;
+  }
+
+  function dependencyExtraction(dep: any): DependencyExtraction {
+    return {
+      purl: dep.purl,
+      version: dep.version,
+      licenses: dep.licenses,
+      component: dep.component,
+      scope: dep.scope,
+      url: dep.url,
+    };
+  }
+
+  inputData.forEach((project) => {
+    project.dependencies.forEach((dep) => {
+      // Dependencies are correlated by manifest path (manifest content changes over time, so md5 is unreliable)
+      if (!dependencyMapper.has(dep.path)) {
+        dependencyMapper.set(dep.path, { dependencies: [dependencyExtraction(dep)], localFiles: [dep.path] });
+      } else {
+        const extracted = dependencyMapper.get(dep.path);
+        if (!isSameDependency(extracted.dependencies, dep)) extracted.dependencies.push(dependencyExtraction(dep));
+      }
+    });
+  });
+
+  return Object.fromEntries(dependencyMapper);
 }

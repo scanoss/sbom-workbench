@@ -38,6 +38,16 @@ export class ProjectKnowledgeModel {
     return inventories;
   }
 
+  public async extractProjectDependencyData(projectPath: string, folder: string){
+    const db = await this.openDb();
+    const call = await this.attach(db,projectPath);
+    const query = `${queries.SQL_GET_KNOWLEDGE_DEPENDENCIES} AND target.path LIKE '${folder}%';`;
+    const dependencies = await this.getInventories(db,query);
+    await call(`DETACH DATABASE aux`);
+    db.close();
+    return dependencies;
+  }
+
   private async getInventories(db:sqlite3.Database, query:string){
     const callInventories = util.promisify(db.all.bind(db));
     const inventories = await callInventories(query);

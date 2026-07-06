@@ -94,6 +94,7 @@
   "FileTypeNotSupported": "このファイルの種類は閲覧できません",
   "FileTooLarge": "ファイルが大きすぎて表示できません",
   "OverridePreviousWork": "前の作業を上書きします",
+  "IncludeDependencies": "依存関係を含める",
   "ChooseProjectToImport": "インポートされたIDのプロジェクトを選択",
   "KeepOriginalUsage": "検出されたUsageを保持する",
   "PreRequiste": "前条件",

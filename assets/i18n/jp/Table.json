@@ -4,6 +4,8 @@
     "Date": "日付",
     "TotalFiles": "全ファイル",
     "Component": "コンポーネント",
+    "Manifest": "マニフェスト",
+    "Scope": "スコープ",
     "Severity": "深刻度合",
     "CVSSSeverity": "CVSS深刻度",
     "CVE": "CVE",
