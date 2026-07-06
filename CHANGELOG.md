@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.41.0] - 2026-07-06
+### Added
+- **Import dependency identifications from another project.** The "Import identifications from…" flow now has an **Include dependencies** option that previews the source project's declared dependency identifications in a dedicated table and imports them alongside file/component identifications. Dependencies are matched by manifest path and PURL, and honor the same **Override previous work** toggle.
+### Fixed
+- Fixed a crash when importing identifications from another project.
+- Fixed a crash when accepting a dependency that has no license.
+
 ## [1.40.1] - 2026-06-10
 ### Fixed
 - Files with **no-match** or **filtered** status that were manually identified are now included in the CSV report.
@@ -273,3 +280,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.39.2]: https://github.com/scanoss/sbom-workbench/compare/v1.39.1...v1.39.2
 [1.40.0]: https://github.com/scanoss/sbom-workbench/compare/v1.39.2...v1.40.0
 [1.40.1]: https://github.com/scanoss/sbom-workbench/compare/v1.40.0...v1.40.1
+[1.41.0]: https://github.com/scanoss/sbom-workbench/compare/v1.40.1...v1.41.0
