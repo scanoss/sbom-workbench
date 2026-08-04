@@ -31,8 +31,9 @@ class ResultService {
     const queryBuilder = QueryBuilderCreator.create({ filePath: path });
     const components: any = await modelProvider.model.component.getAll(queryBuilder);
     results.forEach((result) => {
-      if (result.version) result.component = components.find((component) => component.purl === result.purl && component.version === result.version);
-      else result.component = null;
+      result.component = components.find(
+        (component) => component.purl === result.purl && component.version === result.version,
+      ) ?? null;
     });
     return results;
   }

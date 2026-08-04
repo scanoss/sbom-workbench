@@ -107,7 +107,14 @@ export interface TestContext {
     obfuscate?: boolean;
     hpsm?: boolean;
     allExtensions?: boolean;
+    scanRoot?: string;
   }): any;
+
+  /**
+   * Write a result.json to import and return its path, ready to be handed to
+   * makeProject({ source: IMPORTED_RESULTS_RAW, scanRoot }).
+   */
+  writeImportedResults(results: Record<string, unknown[]>): string;
 
   /** Configure what the (mocked) engine will return for the next scan in this ctx. */
   mockScanResults(spec: ScanSpec): void;
@@ -158,11 +165,20 @@ export async function createTestContext(): Promise<TestContext> {
     try { rmSync(fullPath, { force: true }); } catch { /* ignore */ }
   }
 
+  function writeImportedResults(results: Record<string, unknown[]>): string {
+    const importDir = join(projectDir, 'imported');
+    mkdirSync(importDir, { recursive: true });
+    const importPath = join(importDir, 'result.json');
+    writeFileSync(importPath, JSON.stringify(results, null, 2));
+    return importPath;
+  }
+
   return {
     projectDir,
     sourceDir,
     writeSourceFiles,
     deleteSourceFile,
+    writeImportedResults,
 
     makeProject(opts = {}) {
       return makeTestProject({ projectDir, ...opts });

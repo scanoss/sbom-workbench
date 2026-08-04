@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.41.1] - 2026-08-04
+### Fixed
+- Components whose PURL was **replaced** through the settings file are now shown when importing a `result.json`. Replaced matches come back from the scanner without a version, and those were being dropped, so the component was missing from the detected components list and its files showed no component in the match detail.
+- Importing a `result.json` no longer fails when a replaced PURL has no vendor, which is the case for any PURL without a namespace (`pkg:npm/express`, `pkg:pypi/requests`, ...).
+
 ## [1.41.0] - 2026-07-06
 ### Added
 - **Import dependency identifications from another project.** The "Import identifications from…" flow now has an **Include dependencies** option that previews the source project's declared dependency identifications in a dedicated table and imports them alongside file/component identifications. Dependencies are matched by manifest path and PURL, and honor the same **Override previous work** toggle.
@@ -281,3 +286,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.40.0]: https://github.com/scanoss/sbom-workbench/compare/v1.39.2...v1.40.0
 [1.40.1]: https://github.com/scanoss/sbom-workbench/compare/v1.40.0...v1.40.1
 [1.41.0]: https://github.com/scanoss/sbom-workbench/compare/v1.40.1...v1.41.0
+[1.41.1]: https://github.com/scanoss/sbom-workbench/compare/v1.41.0...v1.41.1

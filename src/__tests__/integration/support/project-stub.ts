@@ -19,6 +19,8 @@ export interface MakeTestProjectOpts {
   obfuscate?: boolean;
   hpsm?: boolean;
   allExtensions?: boolean;
+  /** Overrides the scan root. Raw result imports point it at a result.json file. */
+  scanRoot?: string;
 }
 
 export function makeTestProject(opts: MakeTestProjectOpts): any {
@@ -31,7 +33,7 @@ export function makeTestProject(opts: MakeTestProjectOpts): any {
     hpsm = false,
     allExtensions = true,
   } = opts;
-  const sourceDir = join(projectDir, 'source');
+  const scanRoot = opts.scanRoot ?? join(projectDir, 'source');
 
   // Single mutable scanner config so tests can flip individual fields
   // (typically `mode`) between scans without rebuilding the project.
@@ -47,7 +49,7 @@ export function makeTestProject(opts: MakeTestProjectOpts): any {
   const metadata = {
     getName: () => 'test-project',
     getMyPath: () => projectDir,
-    getScanRoot: () => sourceDir,
+    getScanRoot: () => scanRoot,
     getWorkRoot: () => projectDir,
     getVersion: () => '1.0.0',
     getApi: () => '',
@@ -69,7 +71,7 @@ export function makeTestProject(opts: MakeTestProjectOpts): any {
     processedFiles: 0,
 
     getMyPath: () => projectDir,
-    getScanRoot: () => sourceDir,
+    getScanRoot: () => scanRoot,
     getApi: () => '',
     getApiKey: () => '',
     getDto: () => ({ scannerConfig: { obfuscate, hpsm } }),

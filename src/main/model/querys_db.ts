@@ -203,8 +203,10 @@ export class Queries {
   SQL_GET_SUMMARY_BY_PURL =
     'SELECT SUM(identified) AS identified,SUM(pending) AS pending,SUM(ignored) AS ignored FROM summary WHERE purl=? GROUP BY purl;';
 
+  // Versionless matches are kept: a purl replaced through the settings file comes back
+  // from the engine without a version and still has to be shown as a component.
   SQL_GET_UNIQUE_COMPONENT =
-    "SELECT DISTINCT purl,version,component AS name,url FROM results WHERE version!='' AND dirty=0;";
+    'SELECT DISTINCT purl,version,component AS name,url FROM results WHERE dirty=0;';
 
   SQL_DELETE_INVENTORY_BY_ID = 'DELETE FROM inventories WHERE id =?';
 

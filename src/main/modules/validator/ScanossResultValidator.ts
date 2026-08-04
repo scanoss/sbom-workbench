@@ -102,7 +102,10 @@ export class ScanossResultValidator {
       return;
     }
 
-    // Required string fields
+    // Required string fields. 'vendor' is deliberately not one of them: a purl
+    // replaced through the settings file only has a vendor when the replacement
+    // purl carries a namespace, and the component identity lives in 'component'
+    // and 'purl' anyway.
     const requiredStrings = {
       'component': result.component,
       'file': result.file,
@@ -114,7 +117,6 @@ export class ScanossResultValidator {
       'oss_lines': result.oss_lines,
       'source_hash': result.source_hash,
       'status': result.status,
-      'vendor': result.vendor,
     };
 
     for (const [field, value] of Object.entries(requiredStrings)) {

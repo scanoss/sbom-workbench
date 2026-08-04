@@ -612,6 +612,37 @@ describe('result validator', () => {
     expect(r.isValid).toEqual(true);
   });
 
+  it("valid result, null 'vendor' value", async () => {
+    // A purl replaced through the settings file takes its vendor from the
+    // replacement purl namespace, which namespace-less purls do not have.
+    const result = {
+      "backend/app.js": [
+        {
+          "component": "express",
+          "file": "backend/app.js",
+          "file_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "file_url": "https://api.scanoss.com/file_contents/39b0d5191c20e23c8360a79a97ecec31",
+          "id": "file",
+          "latest": "",
+          "licenses": [],
+          "lines": "all",
+          "matched": "100%",
+          "oss_lines": "all",
+          "purl": [
+            "pkg:npm/express"
+          ],
+          "source_hash": "39b0d5191c20e23c8360a79a97ecec31",
+          "status": "identified",
+          "vendor": null,
+          "version": ""
+        }
+      ]};
+
+    const resultValidator = new ScanossResultValidator();
+    const r = resultValidator.validate(result);
+    expect(r.isValid).toEqual(true);
+  });
+
   it("valid result, empty 'latest' value", async () => {
     const result = {
       "backend/app.js": [
