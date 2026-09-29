@@ -1,4 +1,6 @@
+import fs from 'fs';
 import log from 'electron-log';
+import path from 'path';
 import sqlite3 from 'sqlite3';
 import {
   ExtractFromProjectDTO,
@@ -19,7 +21,10 @@ import { ProjectFilterPath } from '../../main/workspace/filters/ProjectFilterPat
 import { Project } from '../../main/workspace/Project';
 import { workspace } from '../../main/workspace/Workspace';
 import { dependencyService } from '../../main/services/DependencyService';
-import { searcher } from '../../main/modules/searchEngine/searcher/Searcher';
+import { readIndexVersion, searcher } from '../../main/modules/searchEngine/searcher/Searcher';
+import { IndexTask } from '../../main/task/search/indexTask/IndexTask';
+import { Scanner } from '../../main/task/scanner/types';
+import { SEARCH_INDEX_VERSION } from '../../shared/utils/search-utils';
 import { projectService } from '../../main/services/ProjectService';
 import { treeService } from '../../main/services/TreeService';
 import api from '../api';
@@ -31,6 +36,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
 
   const p: Project = await workspace.openProject(new ProjectFilterPath(payload.path));
   searcher.closeIndex();
+  if (payload.mode !== ProjectAccessMode.READ_ONLY) rebuildOutdatedSearchIndex(p);
   // await projectService.lockProject(p.getProjectName(), mode);
   const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),
@@ -50,6 +56,28 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
     data: response,
   };
 });
+
+const rebuildingIndexes = new Set<string>();
+
+/**
+ * Rebuilds in background a keyword index created with an older config. Without source code the old one is kept.
+ */
+function rebuildOutdatedSearchIndex(p: Project) {
+  try {
+    const stages = p.metadata.getScannerConfig()?.pipelineStages ?? [];
+    if (!stages.includes(Scanner.PipelineStage.SEARCH_INDEX)) return;
+    if (readIndexVersion(path.join(p.getMyPath(), 'dictionary')) >= SEARCH_INDEX_VERSION) return;
+    if (!p.getSourceCodePath() || !fs.existsSync(projectService.getSourceCodeBasePath())) return;
+    if (rebuildingIndexes.has(p.getMyPath())) return;
+    rebuildingIndexes.add(p.getMyPath());
+    log.info('[ SEARCH INDEX ]: rebuilding outdated keyword index');
+    new IndexTask(p).run()
+      .finally(() => rebuildingIndexes.delete(p.getMyPath()))
+      .catch((e) => log.error('[ SEARCH INDEX ]: rebuild failed', e));
+  } catch (e) {
+    log.error('[ SEARCH INDEX ]: rebuild failed', e);
+  }
+}
 
 function getUserHome() {
   // Return the value using process.env
