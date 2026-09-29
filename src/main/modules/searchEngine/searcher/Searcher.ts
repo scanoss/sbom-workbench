@@ -34,8 +34,8 @@ class Searcher {
 
   public search(params: ISearcher): number[] {
     if (this.index) {
-      const results = this.index.search(params.query, params.params ? params.params : null);
-      return results;
+      // flexsearch returns undefined when the offset is past the last hit.
+      return this.index.search(params.query, params.params ? params.params : null) ?? [];
     }
     return [];
   }

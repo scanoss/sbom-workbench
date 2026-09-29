@@ -116,6 +116,7 @@ describe('keyword search index', () => {
     searcher.loadIndex(legacy);
     expect(searcher.getVersion()).toBe(1);
     expect(searcher.search({ query: 'copyright' })).toEqual([1]);
+    expect(searcher.search({ query: 'copyright', params: { offset: 500, limit: 500 } })).toEqual([]);
     searcher.closeIndex();
     searcher.loadIndex(dictionary);
   });
