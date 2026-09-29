@@ -100,6 +100,16 @@ describe('keyword search index', () => {
     expect(search(getQueryTerms('日本語').join(' '))).toEqual([ids['/docs/intl.md']]);
   });
 
+  it('removes temp folders left by a crashed save', async () => {
+    const other = path.join(root, 'other');
+    fs.mkdirSync(other);
+    const orphan = path.join(other, 'dictionary.1-1.tmp');
+    fs.mkdirSync(orphan);
+    const indexer = new Indexer();
+    await indexer.saveIndex(await indexer.index([{ fileId: 1, path: '/LICENSE' }], source), path.join(other, 'dictionary'));
+    expect(fs.readdirSync(other)).toEqual(['dictionary']);
+  });
+
   it('requires every term of a multi-term query', () => {
     expect(search('copyright permission')).toEqual([ids['/LICENSE']]);
   });

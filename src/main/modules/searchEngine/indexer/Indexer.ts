@@ -66,7 +66,9 @@ export class Indexer {
 
   public async saveIndex(index: any, pathToDictionary: string) {
     // Written aside and swapped in, so a search never loads a half-written dictionary.
-    const tmpPath = `${pathToDictionary.replace(/[\\/]+$/, '')}.${process.pid}-${Date.now()}.tmp`;
+    const dictionaryPath = pathToDictionary.replace(/[\\/]+$/, '');
+    this.removeOrphanTmpFolders(dictionaryPath);
+    const tmpPath = `${dictionaryPath}.${process.pid}-${Date.now()}.tmp`;
     fs.mkdirSync(tmpPath);
     const writes: Promise<void>[] = [];
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
@@ -79,6 +81,19 @@ export class Indexer {
     );
     fs.rmSync(pathToDictionary, { recursive: true, force: true });
     fs.renameSync(tmpPath, pathToDictionary);
+  }
+
+  /**
+   * Removes temp folders left by a crashed save of a previous app run. This process's
+   * folders may belong to a save still in progress, so they are kept.
+   */
+  private removeOrphanTmpFolders(dictionaryPath: string) {
+    const parent = path.dirname(dictionaryPath);
+    const prefix = `${path.basename(dictionaryPath)}.`;
+    const ownPrefix = `${prefix}${process.pid}-`;
+    fs.readdirSync(parent)
+      .filter((f) => f.startsWith(prefix) && f.endsWith('.tmp') && !f.startsWith(ownPrefix))
+      .forEach((f) => fs.rmSync(path.join(parent, f), { recursive: true, force: true }));
   }
 
   private sendToUI(eventName, data: any) {

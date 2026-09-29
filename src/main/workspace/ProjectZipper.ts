@@ -49,7 +49,7 @@ export class ProjectZipper {
     const dirContent = await fs.promises.readdir(projectPath);
     for (const file of dirContent) {
       // Skip dictionaries still being written by the indexer.
-      if (file !== 'metadata.json' && !file.endsWith('.tmp')) {
+      if (file !== 'metadata.json' && !/^dictionary\..+\.tmp$/.test(file)) {
         if (file !== 'dictionary') {
           zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
         } else {
