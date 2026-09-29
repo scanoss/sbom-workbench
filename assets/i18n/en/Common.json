@@ -35,6 +35,7 @@
   "NGroups_one": "{{count}} group",
   "NGroups_other": "{{count}} groups",
   "SearchByKeywords": "Search by keywords",
+  "SearchMinKeywordLength": "Keywords need at least 3 characters",
   "NFilesSelected_one": "{{count}} file selected",
   "NFilesSelected_other": "{{count}} files selected",
   "NProjectsSelected_one": "{{count}} project selected",

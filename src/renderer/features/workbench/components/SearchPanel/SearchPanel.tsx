@@ -279,6 +279,9 @@ const SearchPanel = () => {
               <KeywordGroupMenu onValueChange={handleGroupKeyword} open={isOpenGroupKeywordDialog} close={closeMenu}></KeywordGroupMenu>
             </div>
           </div>
+          {value.length > 0 && value.every((term) => term.length < SearchUtils.NGRAM_SIZE) && (
+            <small className="d-block mt-1">{t('SearchMinKeywordLength')}</small>
+          )}
         </div>
       </header>
       <main className="panel-body" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>

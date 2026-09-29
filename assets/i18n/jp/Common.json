@@ -35,6 +35,7 @@
   "NGroups_one": "{{count}} グループ",
   "NGroups_other": "{{count}} グループ",
   "SearchByKeywords": "キーボード検索",
+  "SearchMinKeywordLength": "キーワードは3文字以上必要です",
   "NFilesSelected_one": "{{count}} ファイルが選択",
   "NFilesSelected_other": "{{count}} ファイルが選択",
   "NProjectsSelected_one": "{{count}} プロジェクトが選択",
