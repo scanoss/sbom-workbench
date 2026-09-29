@@ -15,6 +15,7 @@ import {
   getQueryTerms,
   isExactTrigramQuery,
   NGRAM_SIZE,
+  SEARCH_INDEX_FOLDER,
   SEARCH_INDEX_VERSION,
 } from '../../../../shared/utils/search-utils';
 
@@ -23,35 +24,23 @@ const VERIFY_CHUNK_SIZE = 1000;
 // Files verified between yields to the event loop, so large searches don't freeze IPC.
 const VERIFY_YIELD_EVERY = 50;
 
-interface SearchState {
-  key: string;
-  candidates: number[];
-  cursor: number;
-  verified: ISearchResult[];
-}
-
 export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
-  // Keeps verified hits across pages of the same query.
-  private static state: SearchState | null = null;
-
   private search = searcher;
-
-  private readonly DICTIONARY_FOLDER = 'dictionary';
 
   private isFinished: boolean;
 
   constructor() {
-    this.search.loadIndex(path.join(workspace.getOpenProject().getMyPath(), this.DICTIONARY_FOLDER));
+    this.search.loadIndex(path.join(workspace.getOpenProject().getMyPath(), SEARCH_INDEX_FOLDER));
     this.isFinished = false;
   }
 
   public async run(params: ISearchTask): Promise<Array<ISearchResult>> {
-    if (!params.params?.limit || !params.params) {
+    if (!params.params?.limit) {
       const limit = AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT;
       params.params = { ...params.params, limit };
     }
     const results = this.search.getVersion() >= SEARCH_INDEX_VERSION
-      ? await this.searchTrigrams(params)
+      ? await this.searchVerified(params)
       : await this.searchLegacy(params);
     const files = results.reduce((acc, curr) => {
       if (!acc[curr.path]) acc[curr.path] = curr;
@@ -68,21 +57,20 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
     return modelProvider.model.file.getAllBySearch(QueryBuilderCreator.create({ fileId: fileIds }));
   }
 
-  private async searchTrigrams(params: ISearchTask): Promise<Array<ISearchResult>> {
+  private async searchVerified(params: ISearchTask): Promise<Array<ISearchResult>> {
     const terms = getQueryTerms(params.query ?? '');
     const indexTerms = terms.filter((t) => t.length >= NGRAM_SIZE);
     if (indexTerms.length === 0) return [];
 
     const offset = params.params.offset ?? 0;
     const end = offset + params.params.limit;
-    // The index may be rebuilt between pages, so the version is part of the key.
-    const key = [workspace.getOpenProject().getMyPath(), this.search.getVersion(), ...terms].join('\n');
+    const key = terms.join(' ');
 
-    let { state } = SearchTask;
-    if (offset === 0 || !state || state.key !== key) {
+    let state = offset === 0 ? null : this.search.getVerifiedSearch(key);
+    if (!state) {
       const candidates = this.search.search({ query: indexTerms.join(' '), params: { limit: Number.MAX_SAFE_INTEGER } });
-      state = { key, candidates, cursor: 0, verified: [] };
-      SearchTask.state = state;
+      state = { terms: key, candidates, cursor: 0, verified: [] };
+      this.search.setVerifiedSearch(state);
     }
 
     const basePath = workspace.getOpenProject().getSourceCodePath() ? projectService.getSourceCodeBasePath() : null;

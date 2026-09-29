@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { ISearcher } from './ISearcher';
+import { ISearchResult } from '../../../task/search/searchTask/ISearchResult';
 import {
   getLegacySearchConfig,
   getSearchConfig,
@@ -11,6 +12,16 @@ import {
 const { Index }  = require('flexsearch');
 
 const INDEX_IDLE_CLOSE_MS = 60000;
+
+/**
+ * Verification progress of one query, kept so later pages continue where the previous one stopped.
+ */
+export interface VerifiedSearch {
+  terms: string;
+  candidates: number[];
+  cursor: number;
+  verified: ISearchResult[];
+}
 
 /**
  * Returns the version of the dictionary stored at the given path. Missing dictionaries or version files read as legacy.
@@ -31,10 +42,13 @@ class Searcher {
 
   private closeTimer: NodeJS.Timeout | null;
 
+  private verifiedSearch: VerifiedSearch | null;
+
   constructor() {
     this.index = null;
     this.version = LEGACY_INDEX_VERSION;
     this.closeTimer = null;
+    this.verifiedSearch = null;
   }
 
   public search(params: ISearcher): number[] {
@@ -47,6 +61,17 @@ class Searcher {
 
   public getVersion(): number {
     return this.version;
+  }
+
+  /**
+   * Returns the cached verification of a query. It lives as long as the loaded index.
+   */
+  public getVerifiedSearch(terms: string): VerifiedSearch | null {
+    return this.verifiedSearch?.terms === terms ? this.verifiedSearch : null;
+  }
+
+  public setVerifiedSearch(verifiedSearch: VerifiedSearch) {
+    this.verifiedSearch = verifiedSearch;
   }
 
   public loadIndex(pathToDictionary: string) {
@@ -74,6 +99,7 @@ class Searcher {
     this.closeTimer = null;
     this.index = null;
     this.version = LEGACY_INDEX_VERSION;
+    this.verifiedSearch = null;
   }
 }
 
