@@ -1,4 +1,5 @@
 import os from 'os';
+import fs from 'fs';
 import * as util from 'util';
 import log from 'electron-log';
 import { ExtractFromProjectDTO, INewProject, IProject, Inventory, LOCK, ProjectAccessMode, ProjectKnowledgeExtractionResult, ProjectState, ReuseIdentificationTaskDTO } from '../../api/types';
@@ -14,8 +15,12 @@ import { ReuseIdentificationTask } from '../task/reuseIdentification/ReuseIdenti
 import { ReuseDependencyIdentificationTask } from '../task/reuseIdentification/ReuseDependencyIdentificationTask';
 import ScannerMode = Scanner.ScannerMode;
 import path from 'path';
+import { IndexTask } from '../task/search/indexTask/IndexTask';
+import { readIndexVersion } from '../modules/searchEngine/searcher/Searcher';
+import { SEARCH_INDEX_FOLDER, SEARCH_INDEX_VERSION } from '../../shared/utils/search-utils';
 
 class ProjectService {
+  private rebuildingSearchIndexes = new Set<string>();
 
   public async close(): Promise<IProject> {
     const p = workspace.getOpenProject();
@@ -174,6 +179,29 @@ class ProjectService {
       }).run();
     }
     return inventories;
+  }
+
+  /**
+   * Rebuilds in background a keyword index created with an older config. Without source code the old one is kept.
+   * @returns The running rebuild, or null when none was started
+   */
+  public rebuildOutdatedSearchIndex(p: Project): Promise<void> | null {
+    try {
+      const stages = p.metadata.getScannerConfig()?.pipelineStages ?? [];
+      if (!stages.includes(Scanner.PipelineStage.SEARCH_INDEX)) return null;
+      if (readIndexVersion(path.join(p.getMyPath(), SEARCH_INDEX_FOLDER)) >= SEARCH_INDEX_VERSION) return null;
+      if (!p.getSourceCodePath() || !fs.existsSync(this.getSourceCodeBasePath())) return null;
+      if (this.rebuildingSearchIndexes.has(p.getMyPath())) return null;
+      this.rebuildingSearchIndexes.add(p.getMyPath());
+      log.info('[ SEARCH INDEX ]: rebuilding outdated keyword index');
+      return new IndexTask(p).run()
+        .then(() => undefined)
+        .catch((e) => log.error('[ SEARCH INDEX ]: rebuild failed', e))
+        .finally(() => this.rebuildingSearchIndexes.delete(p.getMyPath()));
+    } catch (e) {
+      log.error('[ SEARCH INDEX ]: rebuild failed', e);
+      return null;
+    }
   }
 
   private getBaseSourcePath(){
