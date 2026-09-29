@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { searcher } from '../../../modules/searchEngine/searcher/Searcher';
-import { readTextFile } from '../../../modules/searchEngine/indexer/Indexer';
 import { workspace } from '../../../workspace/Workspace';
 import { ITask } from '../../Task';
 import { modelProvider } from '../../../services/ModelProvider';
@@ -10,6 +9,7 @@ import { ISearchTask } from './ISearchTask';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import { AppConfigDefault } from '../../../../config/AppConfigDefault';
 import { ISearchResult } from './ISearchResult';
+import { readTextFile } from '../../../utils/utils';
 import {
   containsAllTerms,
   getQueryTerms,

@@ -6,31 +6,19 @@ import { IIndexer } from './IIndexer';
 import { IpcChannels } from '../../../../api/ipc-channels';
 import { getSearchConfig, SEARCH_INDEX_VERSION, SEARCH_INDEX_VERSION_FILE } from '../../../../shared/utils/search-utils';
 import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
+import { readTextFile } from '../../../utils/utils';
 
 const { Index } = require('flexsearch');
 
-const BINARY_SNIFF_BYTES = 8000;
-
-/**
- * Returns the text content of a file, or null for binaries. UTF-16 files are detected by their BOM.
- */
-export const readTextFile = (filePath: string): string | null => {
-  const buffer = fs.readFileSync(filePath);
-  if (buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe) return buffer.toString('utf16le', 2);
-  if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
-    return Buffer.from(buffer.subarray(2, buffer.length - (buffer.length % 2))).swap16().toString('utf16le');
-  }
-  if (buffer.subarray(0, BINARY_SNIFF_BYTES).includes(0)) return null;
-  return buffer.toString('utf-8');
-};
+const BYTES_PER_MB = 1024 * 1024;
 
 export class Indexer {
   private MAX_FILE_SIZE_MB = 100;
 
   private shouldStopIndexing(): boolean {
     const HEAP_BUFFER_MB = 200;
-    const MAX_HEAP_SIZE_MB = getHeapStatistics().heap_size_limit / (1024 * 1024);
-    const currentHeapMB = process.memoryUsage().heapUsed / (1024 * 1024);
+    const MAX_HEAP_SIZE_MB = getHeapStatistics().heap_size_limit / BYTES_PER_MB;
+    const currentHeapMB = process.memoryUsage().heapUsed / BYTES_PER_MB;
 
     return (MAX_HEAP_SIZE_MB - currentHeapMB) < HEAP_BUFFER_MB;
   }
@@ -49,7 +37,7 @@ export class Indexer {
       }
       try {
         const absoluteFilePath = path.join(basePath, files[i].path);
-        const fileSizeMB = (await fs.promises.stat(absoluteFilePath)).size / (1024 * 1024);
+        const fileSizeMB = (await fs.promises.stat(absoluteFilePath)).size / BYTES_PER_MB;
         if (fileSizeMB > this.MAX_FILE_SIZE_MB) {
           log.warn(`[ Indexer ]: skipping large file ${files[i].path} (${fileSizeMB.toFixed(2)}MB)`);
           // eslint-disable-next-line no-continue
@@ -65,7 +53,7 @@ export class Indexer {
   }
 
   public async saveIndex(index: any, pathToDictionary: string) {
-    // Written aside and swapped in, so a search never loads a half-written dictionary.
+    // Written aside and swapped in, so a failed or interrupted save never replaces the current dictionary.
     const dictionaryPath = pathToDictionary.replace(/[\\/]+$/, '');
     this.removeOrphanTmpFolders(dictionaryPath);
     const tmpPath = `${dictionaryPath}.${process.pid}-${Date.now()}.tmp`;
