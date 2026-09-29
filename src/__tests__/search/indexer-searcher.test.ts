@@ -183,6 +183,25 @@ describe('keyword index blacklist', () => {
     });
   });
 
+  it('skips every binary that the old extension list covered, in any case', () => {
+    const all = new BlackListKeyWordIndex({ allExtensions: true });
+    ['.jpg', '.png', '.gif', '.woff', '.woff2', '.rar', '.jar', '.PNG', '.Jar'].forEach((ext) => {
+      expect(all.evaluate(node(`/assets/file${ext}`))).toBe(true);
+    });
+  });
+
+  it('skips notebooks in any case unless all file types are included', () => {
+    expect(new BlackListKeyWordIndex().evaluate(node('/nb/Analysis.IPYNB'))).toBe(true);
+    expect(new BlackListKeyWordIndex({ allExtensions: true }).evaluate(node('/nb/Analysis.IPYNB'))).toBe(false);
+  });
+
+  it('keeps text files and folders named like binaries', () => {
+    const defaults = new BlackListKeyWordIndex();
+    expect(defaults.evaluate(node('/src/main.c'))).toBe(false);
+    expect(defaults.evaluate(node('/license'))).toBe(false);
+    expect(defaults.evaluate(node('/icons.png', 'folder'))).toBe(false);
+  });
+
   it('always skips binaries and never skips the root', () => {
     const all = new BlackListKeyWordIndex({ allExtensions: true });
     expect(all.evaluate(node('/logo.png'))).toBe(true);
