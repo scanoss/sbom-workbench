@@ -48,7 +48,8 @@ export class ProjectZipper {
     // Before zipping, the api and api key needs to be removed from metadata.
     const dirContent = await fs.promises.readdir(projectPath);
     for (const file of dirContent) {
-      if (file !== 'metadata.json') {
+      // Skip dictionaries still being written by the indexer.
+      if (file !== 'metadata.json' && !file.endsWith('.tmp')) {
         if (file !== 'dictionary') {
           zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
         } else {
