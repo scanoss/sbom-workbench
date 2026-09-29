@@ -6,6 +6,7 @@ import os from 'os';
 import path from 'path';
 import { Indexer } from '../../main/modules/searchEngine/indexer/Indexer';
 import { readIndexVersion, searcher } from '../../main/modules/searchEngine/searcher/Searcher';
+import { BlackListKeyWordIndex } from '../../main/workspace/tree/blackList/BlackListKeyWordIndex';
 import {
   containsAllTerms,
   getLegacySearchConfig,
@@ -156,5 +157,30 @@ describe('query helpers', () => {
   it('verifies substrings case-insensitively', () => {
     expect(containsAllTerms('SPDX-FileCopyrightText', ['copyright', 'text'])).toBe(true);
     expect(containsAllTerms('copy the right way', ['copyright'])).toBe(false);
+  });
+});
+
+describe('keyword index blacklist', () => {
+  const node = (nodePath: string, type = 'file') => ({
+    getPath: () => nodePath,
+    getLabel: () => path.basename(nodePath),
+    getType: () => type,
+  }) as any;
+
+  it('skips vendor, dot and notebook files unless all file types are included', () => {
+    const defaults = new BlackListKeyWordIndex();
+    const all = new BlackListKeyWordIndex({ allExtensions: true });
+    ['/vendor', '/.github', '/nb.ipynb'].forEach((p) => {
+      const type = p.includes('.ipynb') ? 'file' : 'folder';
+      expect(defaults.evaluate(node(p, type))).toBe(true);
+      expect(all.evaluate(node(p, type))).toBe(false);
+    });
+  });
+
+  it('always skips binaries and never skips the root', () => {
+    const all = new BlackListKeyWordIndex({ allExtensions: true });
+    expect(all.evaluate(node('/logo.png'))).toBe(true);
+    expect(all.evaluate(node('/lib.so'))).toBe(true);
+    expect(all.evaluate(node('', 'folder'))).toBe(false);
   });
 });

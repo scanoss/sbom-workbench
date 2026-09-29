@@ -14,6 +14,8 @@ export class BlackListKeyWordIndex extends BlackListAbstract {
 
   private extensions: Set<string>;
 
+  private skippedTextExtensions: Set<string>;
+
   private allExtensions: boolean;
 
   constructor(options: BlackListKeyWordIndexOptions = {}) {
@@ -26,8 +28,9 @@ export class BlackListKeyWordIndex extends BlackListAbstract {
       '.woff2',
       '.rar',
       '.jar',
-      '.ipynb',
     ]);
+
+    this.skippedTextExtensions = new Set<string>(['.ipynb']);
 
     this.vendorFolders = new Set(['node_modules', 'vendor']);
 
@@ -40,6 +43,7 @@ export class BlackListKeyWordIndex extends BlackListAbstract {
     const isFile = node.getType() === 'file';
     if (isFile && (this.extensions.has(path.extname(node.getPath())) || isBinaryPath(node.getPath()))) return true;
     if (this.allExtensions) return false;
+    if (isFile && this.skippedTextExtensions.has(path.extname(node.getPath()))) return true;
     return node.getLabel().startsWith('.') || this.vendorFolders.has(node.getLabel());
   }
 }
