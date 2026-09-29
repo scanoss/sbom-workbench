@@ -32,6 +32,7 @@ const FIXTURES: Record<string, string | Buffer> = {
   '/docs/utf16.txt': utf16('hello utf16 world'),
   '/img/logo.png': Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x00, 0x00, 0x1a, 0x0a]),
   "/src/it's.txt": 'quoted path content',
+  '/docs/intl.md': 'Diseño del año, straße und 日本語テキスト',
 };
 
 describe('keyword search index', () => {
@@ -94,6 +95,11 @@ describe('keyword search index', () => {
     expect(search('quoted')).toEqual([ids["/src/it's.txt"]]);
   });
 
+  it('finds non-ASCII keywords', () => {
+    expect(search(getQueryTerms('año').join(' '))).toEqual([ids['/docs/intl.md']]);
+    expect(search(getQueryTerms('日本語').join(' '))).toEqual([ids['/docs/intl.md']]);
+  });
+
   it('requires every term of a multi-term query', () => {
     expect(search('copyright permission')).toEqual([ids['/LICENSE']]);
   });
@@ -123,6 +129,10 @@ describe('keyword search index', () => {
 });
 
 describe('query helpers', () => {
+  it('splits queries on the same boundaries as the index', () => {
+    expect(getQueryTerms('straße año')).toEqual(['straße', 'año']);
+  });
+
   it('dedupes and drops one-char terms', () => {
     expect(getQueryTerms('Copyright (c) copyright MIT')).toEqual(['copyright', 'mit']);
   });

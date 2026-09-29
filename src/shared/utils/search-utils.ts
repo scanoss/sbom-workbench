@@ -76,7 +76,7 @@ const unStemmifyCryptoKeywords = (text: string): string[] => {
  * @param querySearch The search query
  * @param regex The regex to split the query by. The default use same regex as the tokenizer
  */
-const getTerms = (querySearch: string, regex = /[\W_]+/): string[] => {
+const getTerms = (querySearch: string, regex = /[^\p{L}\p{N}]+/u): string[] => {
   return querySearch.split(regex);
 };
 
