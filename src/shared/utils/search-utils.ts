@@ -4,16 +4,24 @@
  */
 const SEARCH_INDEX_VERSION = 2;
 
+// Dictionaries without a version file were built before versioning existed.
+const LEGACY_INDEX_VERSION = 1;
+
+const SEARCH_INDEX_FOLDER = 'dictionary';
+
 const SEARCH_INDEX_VERSION_FILE = 'version.json';
 
 const NGRAM_SIZE = 3;
+
+// Shorter keywords have no trigram, so the index can't find them.
+const MIN_KEYWORD_LENGTH = NGRAM_SIZE;
 
 // Caps the n-grams produced by very long tokens (minified code, base64 blobs).
 const MAX_TOKEN_LENGTH = 256;
 
 /**
- * Turns each token into its unique character trigrams, so a keyword matches
- * anywhere inside a word ("crypt" in "encryption").
+ * Turns each token into its unique character trigrams, so a keyword matches anywhere
+ * inside a word ("crypt" in "encryption"). Tokens shorter than a trigram are kept whole.
  */
 const toTrigrams = (tokens: string[]): string[] => {
   const grams = new Set<string>();
@@ -29,9 +37,8 @@ const toTrigrams = (tokens: string[]): string[] => {
 };
 
 /**
- * Return the configuration for the search engine. It is used by flexsearch on index and searcher creation.
- * Dedupe and numeric are disabled: they collapse repeated letters and split numbers, which yields false positives.
- * @returns A new configuration on each call
+ * Flexsearch config shared by the indexer and the searcher. Dedupe and numeric are disabled:
+ * they collapse repeated letters and split numbers, which yields false positives.
  */
 const getSearchConfig = (): Record<string, any> => ({
   tokenize: 'strict',
@@ -44,6 +51,7 @@ const getSearchConfig = (): Record<string, any> => ({
     numeric: false,
     cache: false,
     minlength: 1,
+    // The default drops long tokens entirely; toTrigrams truncates them instead.
     maxlength: Number.MAX_SAFE_INTEGER,
     prepare: (text: string) => text.toLowerCase(),
     finalize: toTrigrams,
@@ -90,7 +98,7 @@ const getQueryTerms = (query: string): string[] => Array.from(
 );
 
 /**
- * True when trigram hits need no verification: a single trigram always lies inside one token.
+ * A single 3-char term is itself a trigram, so an index hit is already a substring match.
  */
 const isExactTrigramQuery = (terms: string[]): boolean => terms.length === 1 && terms[0].length === NGRAM_SIZE;
 
@@ -101,8 +109,11 @@ const containsAllTerms = (content: string, terms: string[]): boolean => {
 
 export {
   SEARCH_INDEX_VERSION,
+  LEGACY_INDEX_VERSION,
+  SEARCH_INDEX_FOLDER,
   SEARCH_INDEX_VERSION_FILE,
   NGRAM_SIZE,
+  MIN_KEYWORD_LENGTH,
   getSearchConfig,
   getLegacySearchConfig,
   getTerms,

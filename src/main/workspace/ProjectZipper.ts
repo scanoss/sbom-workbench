@@ -8,6 +8,7 @@ import { Project } from './Project';
 import { workspace } from './Workspace';
 import packageJson from '../../../release/app/package.json';
 import AppConfig from '../../config/AppConfigModule';
+import { SEARCH_INDEX_FOLDER } from '../../shared/utils/search-utils';
 
 const AdmZip = require('adm-zip');
 
@@ -49,7 +50,7 @@ export class ProjectZipper {
     const dirContent = await fs.promises.readdir(projectPath);
     for (const file of dirContent) {
       // Skip dictionaries still being written by the indexer.
-      if (file !== 'metadata.json' && !/^dictionary\..+\.tmp$/.test(file)) {
+      if (file !== 'metadata.json' && !(file.startsWith(`${SEARCH_INDEX_FOLDER}.`) && file.endsWith('.tmp'))) {
         if (file !== 'dictionary') {
           zip.addLocalFile(path.join(projectPath, file), path.basename(projectPath) + path.sep);
         } else {

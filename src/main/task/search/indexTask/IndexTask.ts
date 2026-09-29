@@ -12,6 +12,7 @@ import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackLi
 import { Project } from '../../../workspace/Project';
 import { ScannerStage } from '../../../../api/types';
 import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
+import { SEARCH_INDEX_FOLDER } from '../../../../shared/utils/search-utils';
 
 export class IndexTask implements Scanner.IPipelineTask {
   private project: Project;
@@ -30,8 +31,7 @@ export class IndexTask implements Scanner.IPipelineTask {
 
   public async run(): Promise<boolean> {
     log.info('[ IndexTask init ]');
-    const project = workspace.getOpenProject();
-    if (!project) throw new Error('Not project opened');
+    if (!workspace.getOpenProject()) throw new Error('Not project opened');
     const allExtensions = this.project.metadata.getScannerConfig()?.allExtensions ?? false;
     const collector = new CollectFilesVisitor(new BlackListKeyWordIndex({ allExtensions }));
     this.project.getTree().getRootFolder().accept<void>(collector);
@@ -39,7 +39,7 @@ export class IndexTask implements Scanner.IPipelineTask {
 
     const files = (await modelProvider.model.file.getAllPaths()).filter((f) => paths.has(f.path));
     const projectPath = this.project.metadata.getMyPath();
-    const dictionaryPath = path.join(projectPath, 'dictionary');
+    const dictionaryPath = path.join(projectPath, SEARCH_INDEX_FOLDER);
     const indexer = new Indexer();
     const index = await indexer.index(this.fileAdapter(files), projectService.getSourceCodeBasePath());
     await indexer.saveIndex(index, dictionaryPath);

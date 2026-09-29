@@ -1,14 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import { ISearcher } from './ISearcher';
-import { getLegacySearchConfig, getSearchConfig, SEARCH_INDEX_VERSION_FILE } from '../../../../shared/utils/search-utils';
+import {
+  getLegacySearchConfig,
+  getSearchConfig,
+  LEGACY_INDEX_VERSION,
+  SEARCH_INDEX_VERSION_FILE,
+} from '../../../../shared/utils/search-utils';
 
 const { Index }  = require('flexsearch');
 
-const LEGACY_INDEX_VERSION = 1;
+const INDEX_IDLE_CLOSE_MS = 60000;
 
 /**
- * Returns the version of the dictionary stored at the given path. Dictionaries without a version file are legacy.
+ * Returns the version of the dictionary stored at the given path. Missing dictionaries or version files read as legacy.
  */
 export const readIndexVersion = (pathToDictionary: string): number => {
   try {
@@ -59,7 +64,7 @@ class Searcher {
             index.import(filename, data ?? null);
           });
         this.index = index;
-        this.closeTimer = setTimeout(() => this.closeIndex(), 60000); // Close index after 1 minute
+        this.closeTimer = setTimeout(() => this.closeIndex(), INDEX_IDLE_CLOSE_MS);
       }
     }
   }
