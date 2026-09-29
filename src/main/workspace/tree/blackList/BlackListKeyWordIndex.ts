@@ -1,30 +1,23 @@
-import { BlackListAbstract } from './BlackListAbstract';
-import Node, { NodeStatus } from '../Node';
-import { workspace } from '../../Workspace';
-
 import path from 'path';
+import { BlackListAbstract } from './BlackListAbstract';
+import Node from '../Node';
+
+const isBinaryPath = require('is-binary-path');
+
+interface BlackListKeyWordIndexOptions {
+  // Mirrors the "Include all file types" scanner option.
+  allExtensions?: boolean;
+}
 
 export class BlackListKeyWordIndex extends BlackListAbstract {
-  private scanRoot: string;
-
-  private filesBlackList: Set<string>;
-
   private vendorFolders: Set<string>;
 
   private extensions: Set<string>;
 
-  constructor() {
-    super();
-    this.filesBlackList = new Set([
-      'gradlew.bat',
-      'mvnw',
-      'mvnw.cmd',
-      'gradle-wrapper.jar',
-      'maven-wrapper.jar',
-      'thumbs.db',
-      'copying.lib',
-    ]);
+  private allExtensions: boolean;
 
+  constructor(options: BlackListKeyWordIndexOptions = {}) {
+    super();
     this.extensions = new Set<string>([
       '.jpg',
       '.png',
@@ -38,10 +31,15 @@ export class BlackListKeyWordIndex extends BlackListAbstract {
 
     this.vendorFolders = new Set(['node_modules', 'vendor']);
 
-    this.scanRoot = workspace.getOpenProject()?.getScanRoot();
+    this.allExtensions = options.allExtensions ?? false;
   }
 
   public evaluate(node: Node): boolean {
-    return node.getLabel().startsWith('.') || this.vendorFolders.has(node.getLabel()) || this.extensions.has(path.extname(node.getPath()));
+    // Root folder label is the project name, never filter it
+    if (node.getPath() === '') return false;
+    const isFile = node.getType() === 'file';
+    if (isFile && (this.extensions.has(path.extname(node.getPath())) || isBinaryPath(node.getPath()))) return true;
+    if (this.allExtensions) return false;
+    return node.getLabel().startsWith('.') || this.vendorFolders.has(node.getLabel());
   }
 }
