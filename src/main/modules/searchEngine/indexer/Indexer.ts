@@ -1,16 +1,28 @@
 import fs from 'fs';
 import log from 'electron-log';
 import { getHeapStatistics } from 'node:v8';
+import path from 'path';
 import { IIndexer } from './IIndexer';
 import { IpcChannels } from '../../../../api/ipc-channels';
-import { getSearchConfig } from '../../../../shared/utils/search-utils';
+import { getSearchConfig, SEARCH_INDEX_VERSION, SEARCH_INDEX_VERSION_FILE } from '../../../../shared/utils/search-utils';
 import { broadcastManager } from '../../../broadcastManager/BroadcastManager';
-import { workspace } from '../../../workspace/Workspace';
-import path from 'path';
-import { projectService } from '../../../services/ProjectService';
-
 
 const { Index } = require('flexsearch');
+
+const BINARY_SNIFF_BYTES = 8000;
+
+/**
+ * Returns the text content of a file, or null for binaries. UTF-16 files are detected by their BOM.
+ */
+export const readTextFile = (filePath: string): string | null => {
+  const buffer = fs.readFileSync(filePath);
+  if (buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe) return buffer.toString('utf16le', 2);
+  if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
+    return Buffer.from(buffer.subarray(2, buffer.length - (buffer.length % 2))).swap16().toString('utf16le');
+  }
+  if (buffer.subarray(0, BINARY_SNIFF_BYTES).includes(0)) return null;
+  return buffer.toString('utf-8');
+};
 
 export class Indexer {
   private MAX_FILE_SIZE_MB = 100;
@@ -23,41 +35,28 @@ export class Indexer {
     return (MAX_HEAP_SIZE_MB - currentHeapMB) < HEAP_BUFFER_MB;
   }
 
-  private async getFileSizeMB(path: string): Promise<number> {
-    try {
-      const stats = await fs.promises.stat(path);
-      return stats.size / (1024 * 1024);
-    } catch (e) {
-      console.error(`Error getting file size for ${path}:`, e);
-      return 0;
-    }
-  }
-
-  public async index(files: Array<IIndexer>) {
-    const sourceCodeBasePath = projectService.getSourceCodeBasePath()
+  public async index(files: Array<IIndexer>, basePath: string) {
     const index = new Index(getSearchConfig());
     for (let i = 0; i < files.length; i += 1) {
+      if (i % 100 === 0) {
+        this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
+          processed: (i * 100) / files.length,
+        });
+      }
+      if (this.shouldStopIndexing()) {
+        log.warn(`[ Indexer ]: heap limit reached, ${files.length - i} files were not indexed`);
+        break;
+      }
       try {
-        if (i % 100 === 0) {
-          this.sendToUI(IpcChannels.SCANNER_UPDATE_STATUS, {
-            processed: i * 100 / files.length,
-          });
-        }
-        const absoluteFilePath = path.join(sourceCodeBasePath,files[i].path);
-        // Check file size first
-        const fileSizeMB = await this.getFileSizeMB(absoluteFilePath);
+        const absoluteFilePath = path.join(basePath, files[i].path);
+        const fileSizeMB = (await fs.promises.stat(absoluteFilePath)).size / (1024 * 1024);
         if (fileSizeMB > this.MAX_FILE_SIZE_MB) {
-          console.warn(`Skipping large file: ${files[i].path} (${fileSizeMB.toFixed(2)}MB)`);
+          log.warn(`[ Indexer ]: skipping large file ${files[i].path} (${fileSizeMB.toFixed(2)}MB)`);
           // eslint-disable-next-line no-continue
           continue;
         }
-
-        if (this.shouldStopIndexing()) {
-          log.info('Skipping file indexing, maximum heap size exceeded');
-        } else {
-          const fileContent = fs.readFileSync(absoluteFilePath, 'utf-8');
-          index.add(files[i].fileId, fileContent);
-        }
+        const content = readTextFile(absoluteFilePath);
+        if (content !== null) index.add(files[i].fileId, content);
       } catch (e) {
         log.error(e);
       }
@@ -66,15 +65,20 @@ export class Indexer {
   }
 
   public async saveIndex(index: any, pathToDictionary: string) {
-    if (fs.existsSync(pathToDictionary)) {
-      fs.rmSync(pathToDictionary, { recursive: true, force: true });
-    }
-    fs.mkdirSync(pathToDictionary);
+    // Written aside and swapped in, so a search never loads a half-written dictionary.
+    const tmpPath = `${pathToDictionary.replace(/[\\/]+$/, '')}.${process.pid}-${Date.now()}.tmp`;
+    fs.mkdirSync(tmpPath);
+    const writes: Promise<void>[] = [];
     await index.export((key: any, data: string | NodeJS.ArrayBufferView) => {
-      fs.writeFile(path.join(pathToDictionary, `${key}.json`), data !== undefined ? data : '', (err) => {
-        if (err) console.log(err);
-      });
+      writes.push(fs.promises.writeFile(path.join(tmpPath, `${key}.json`), data !== undefined ? data : ''));
     });
+    await Promise.all(writes);
+    await fs.promises.writeFile(
+      path.join(tmpPath, SEARCH_INDEX_VERSION_FILE),
+      JSON.stringify({ version: SEARCH_INDEX_VERSION }),
+    );
+    fs.rmSync(pathToDictionary, { recursive: true, force: true });
+    fs.renameSync(tmpPath, pathToDictionary);
   }
 
   private sendToUI(eventName, data: any) {

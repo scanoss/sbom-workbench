@@ -1,15 +1,16 @@
 import log from 'electron-log';
 import { Scanner } from 'main/task/scanner/types';
 import i18next from 'i18next';
+import path from 'path';
 import { modelProvider } from '../../../services/ModelProvider';
+import { projectService } from '../../../services/ProjectService';
 import { Indexer } from '../../../modules/searchEngine/indexer/Indexer';
 import { IIndexer } from '../../../modules/searchEngine/indexer/IIndexer';
+import { searcher } from '../../../modules/searchEngine/searcher/Searcher';
 import { workspace } from '../../../workspace/Workspace';
 import { BlackListKeyWordIndex } from '../../../workspace/tree/blackList/BlackListKeyWordIndex';
-import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import { Project } from '../../../workspace/Project';
 import { ScannerStage } from '../../../../api/types';
-import path from 'path';
 import { CollectFilesVisitor } from '../../../workspace/tree/visitor/CollectFilesVisitor';
 
 export class IndexTask implements Scanner.IPipelineTask {
@@ -31,28 +32,25 @@ export class IndexTask implements Scanner.IPipelineTask {
     log.info('[ IndexTask init ]');
     const project = workspace.getOpenProject();
     if (!project) throw new Error('Not project opened');
-    const collector = new CollectFilesVisitor(new BlackListKeyWordIndex());
+    const allExtensions = this.project.metadata.getScannerConfig()?.allExtensions ?? false;
+    const collector = new CollectFilesVisitor(new BlackListKeyWordIndex({ allExtensions }));
     this.project.getTree().getRootFolder().accept<void>(collector);
-    const paths = collector.files.map((fi) => `'${fi.getPath()}'`).join(', ');
+    const paths = new Set(collector.files.map((fi) => fi.getPath()));
 
-    const files = await modelProvider.model.file.getAll(
-      QueryBuilderCreator.create({ paths }),
-    );
+    const files = (await modelProvider.model.file.getAllPaths()).filter((f) => paths.has(f.path));
     const projectPath = this.project.metadata.getMyPath();
     const dictionaryPath = path.join(projectPath, 'dictionary');
     const indexer = new Indexer();
-    const filesToIndex = this.fileAdapter(files);
-    const index = await indexer.index(filesToIndex);
+    const index = await indexer.index(this.fileAdapter(files), projectService.getSourceCodeBasePath());
     await indexer.saveIndex(index, dictionaryPath);
+    // The project may have been closed while indexing; saving it would persist its released tree.
+    if (workspace.getOpenProject() !== this.project) return true;
+    searcher.closeIndex();
     this.project.save();
     return true;
   }
 
-  private fileAdapter(modelFiles: any): Array<IIndexer> {
-    const filesToIndex = [];
-    modelFiles.forEach((file: any) => {
-      filesToIndex.push({ fileId: file.id, path: file.path });
-    });
-    return filesToIndex;
+  private fileAdapter(modelFiles: Array<{ id: number; path: string }>): Array<IIndexer> {
+    return modelFiles.map((file) => ({ fileId: file.id, path: file.path }));
   }
 }

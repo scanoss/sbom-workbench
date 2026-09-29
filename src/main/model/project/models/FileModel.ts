@@ -53,6 +53,11 @@ export class FileModel extends Model {
     return files;
   }
 
+  public async getAllPaths(): Promise<Array<{ id: number; path: string }>> {
+    const call = promisify(this.connection.all.bind(this.connection));
+    return call('SELECT fileId AS id, path FROM files;');
+  }
+
   public async getAllBySearch(queryBuilder?: QueryBuilder): Promise<any[]> {
     const SQLQuery = this.getSQL(queryBuilder, queries.SQL_GET_ALL_FILES_BY_SEARCH, this.getEntityMapper());
     const call:any = util.promisify(this.connection.all.bind(this.connection));

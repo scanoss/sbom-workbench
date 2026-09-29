@@ -33,16 +33,16 @@ async function indexMigration(projectPath: string) {
       QueryBuilderCreator.create(paths)
     );
     const indexer = new Indexer();
-    const filesToIndex = fileAdapter(files, metadata.scan_root);
-    const index = indexer.index(filesToIndex);
+    const filesToIndex = fileAdapter(files);
+    const index = await indexer.index(filesToIndex, metadata.scan_root);
     await indexer.saveIndex(index, `${projectPath}/dictionary/`);
   }
 }
 
-function fileAdapter(modelFiles: any, scanRoot: string): Array<IIndexer> {
+function fileAdapter(modelFiles: any): Array<IIndexer> {
   const filesToIndex = [];
   modelFiles.forEach((file: any) => {
-    filesToIndex.push({ fileId: file.id, path: `${scanRoot}${file.path}` });
+    filesToIndex.push({ fileId: file.id, path: file.path });
   });
   return filesToIndex;
 }

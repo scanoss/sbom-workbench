@@ -1,14 +1,39 @@
+import fs from 'fs';
+import path from 'path';
 import { searcher } from '../../../modules/searchEngine/searcher/Searcher';
+import { readTextFile } from '../../../modules/searchEngine/indexer/Indexer';
 import { workspace } from '../../../workspace/Workspace';
 import { ITask } from '../../Task';
 import { modelProvider } from '../../../services/ModelProvider';
+import { projectService } from '../../../services/ProjectService';
 import { ISearchTask } from './ISearchTask';
 import { QueryBuilderCreator } from '../../../model/queryBuilder/QueryBuilderCreator';
 import { AppConfigDefault } from '../../../../config/AppConfigDefault';
 import { ISearchResult } from './ISearchResult';
-import path from 'path';
+import {
+  containsAllTerms,
+  getQueryTerms,
+  isExactTrigramQuery,
+  NGRAM_SIZE,
+  SEARCH_INDEX_VERSION,
+} from '../../../../shared/utils/search-utils';
+
+const VERIFY_CHUNK_SIZE = 1000;
+
+// Files verified between yields to the event loop, so large searches don't freeze IPC.
+const VERIFY_YIELD_EVERY = 50;
+
+interface SearchState {
+  key: string;
+  candidates: number[];
+  cursor: number;
+  verified: ISearchResult[];
+}
 
 export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
+  // Keeps verified hits across pages of the same query.
+  private static state: SearchState | null = null;
+
   private search = searcher;
 
   private readonly DICTIONARY_FOLDER = 'dictionary';
@@ -23,12 +48,11 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
   public async run(params: ISearchTask): Promise<Array<ISearchResult>> {
     if (!params.params?.limit || !params.params) {
       const limit = AppConfigDefault.SEARCH_ENGINE_DEFAULT_LIMIT;
-      params.params = { limit };
+      params.params = { ...params.params, limit };
     }
-    const fileIds = this.search.search(params);
-    const results: Array<ISearchResult> = await modelProvider.model.file.getAllBySearch(
-      QueryBuilderCreator.create({ fileId: fileIds })
-    );
+    const results = this.search.getVersion() >= SEARCH_INDEX_VERSION
+      ? await this.searchTrigrams(params)
+      : await this.searchLegacy(params);
     const files = results.reduce((acc, curr) => {
       if (!acc[curr.path]) acc[curr.path] = curr;
       return acc;
@@ -37,6 +61,65 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
       return Object.values(files);
     }
     throw new Error('SearchTask is finished');
+  }
+
+  private async searchLegacy(params: ISearchTask): Promise<Array<ISearchResult>> {
+    const fileIds = this.search.search(params);
+    return modelProvider.model.file.getAllBySearch(QueryBuilderCreator.create({ fileId: fileIds }));
+  }
+
+  private async searchTrigrams(params: ISearchTask): Promise<Array<ISearchResult>> {
+    const terms = getQueryTerms(params.query ?? '');
+    const indexTerms = terms.filter((t) => t.length >= NGRAM_SIZE);
+    if (indexTerms.length === 0) return [];
+
+    const offset = params.params.offset ?? 0;
+    const end = offset + params.params.limit;
+    // The index may be rebuilt between pages, so the version is part of the key.
+    const key = [workspace.getOpenProject().getMyPath(), this.search.getVersion(), ...terms].join('\n');
+
+    let { state } = SearchTask;
+    if (offset === 0 || !state || state.key !== key) {
+      const candidates = this.search.search({ query: indexTerms.join(' '), params: { limit: Number.MAX_SAFE_INTEGER } });
+      state = { key, candidates, cursor: 0, verified: [] };
+      SearchTask.state = state;
+    }
+
+    const basePath = workspace.getOpenProject().getSourceCodePath() ? projectService.getSourceCodeBasePath() : null;
+    const canVerify = !isExactTrigramQuery(terms) && basePath !== null && fs.existsSync(basePath);
+    if (!canVerify) {
+      return this.getFilesById(state.candidates.slice(offset, end));
+    }
+
+    while (state.verified.length < end && state.cursor < state.candidates.length) {
+      const chunk = state.candidates.slice(state.cursor, state.cursor + VERIFY_CHUNK_SIZE);
+      state.cursor += chunk.length;
+      // eslint-disable-next-line no-await-in-loop
+      const rows = await this.getFilesById(chunk);
+      for (let i = 0; i < rows.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        if (i % VERIFY_YIELD_EVERY === 0) await new Promise((resolve) => { setImmediate(resolve); });
+        try {
+          const content = readTextFile(path.join(basePath, rows[i].path));
+          if (content !== null && containsAllTerms(content, terms)) state.verified.push(rows[i]);
+        } catch (e) {
+          // File removed from disk since it was indexed.
+        }
+      }
+      if (this.isFinished) break;
+    }
+    return state.verified.slice(offset, end);
+  }
+
+  private async getFilesById(fileIds: number[]): Promise<Array<ISearchResult>> {
+    if (fileIds.length === 0) return [];
+    const rows: Array<ISearchResult> = await modelProvider.model.file.getAllBySearch(
+      QueryBuilderCreator.create({ fileId: fileIds }),
+    );
+    // A file joins one row per result; keep the first so pagination counts files.
+    const byId = new Map<number, ISearchResult>();
+    rows.forEach((row) => { if (!byId.has(row.id)) byId.set(row.id, row); });
+    return fileIds.filter((id) => byId.has(id)).map((id) => byId.get(id));
   }
 
   public finish(): void {
