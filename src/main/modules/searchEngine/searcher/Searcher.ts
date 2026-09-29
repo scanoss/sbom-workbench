@@ -68,6 +68,7 @@ class Searcher {
     if (this.closeTimer) clearTimeout(this.closeTimer);
     this.closeTimer = null;
     this.index = null;
+    this.version = LEGACY_INDEX_VERSION;
   }
 }
 
