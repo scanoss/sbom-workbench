@@ -96,7 +96,7 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
       state.cursor += chunk.length;
       // eslint-disable-next-line no-await-in-loop
       const rows = await this.getFilesById(chunk);
-      for (let i = 0; i < rows.length; i += 1) {
+      for (let i = 0; i < rows.length && !this.isFinished; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         if (i % VERIFY_YIELD_EVERY === 0) await new Promise((resolve) => { setImmediate(resolve); });
         try {
