@@ -34,7 +34,6 @@
   "NGroups_one": "{{count}} 组",
   "NGroups_other": "{{count}} 组",
   "SearchByKeywords": "按关键字搜索",
-  "SearchMinKeywordLength": "关键字至少需要 3 个字符",
   "NFilesSelected_one": "{{count}} 已选择的文件",
   "NFilesSelected_other": "{{count}} 已选择的文件",
   "of": "的",

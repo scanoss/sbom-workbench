@@ -11,7 +11,7 @@ import {
   containsAllTerms,
   getLegacySearchConfig,
   getQueryTerms,
-  isExactTrigramQuery,
+  isExactIndexQuery,
   SEARCH_INDEX_VERSION,
 } from '../../shared/utils/search-utils';
 
@@ -82,6 +82,11 @@ describe('keyword search index', () => {
     expect(search('copyright')).toEqual([ids['/LICENSE'], ids['/src/main.c'], ids['/src/header.ts']]);
   });
 
+  it('finds 1 and 2 char keywords as whole words', () => {
+    expect(search('c')).toEqual([ids['/LICENSE'], ids['/src/main.c']]);
+    expect(search('x')).toEqual([ids['/src/header.ts']]);
+  });
+
   it('finds keywords inside words', () => {
     expect(search('crypt')).toEqual([ids['/src/crypto.js']]);
     expect(search('sha')).toEqual([ids['/src/hash.go']]);
@@ -144,14 +149,15 @@ describe('query helpers', () => {
     expect(getQueryTerms('straße año')).toEqual(['straße', 'año']);
   });
 
-  it('dedupes and drops one-char terms', () => {
-    expect(getQueryTerms('Copyright (c) copyright MIT')).toEqual(['copyright', 'mit']);
+  it('dedupes terms and keeps short ones', () => {
+    expect(getQueryTerms('Copyright (c) copyright MIT')).toEqual(['copyright', 'c', 'mit']);
   });
 
-  it('skips verification only for a single trigram', () => {
-    expect(isExactTrigramQuery(['sha'])).toBe(true);
-    expect(isExactTrigramQuery(['crypt'])).toBe(false);
-    expect(isExactTrigramQuery(['sha', 'rsa'])).toBe(false);
+  it('skips verification only for a single term of up to 3 chars', () => {
+    expect(isExactIndexQuery(['sha'])).toBe(true);
+    expect(isExactIndexQuery(['go'])).toBe(true);
+    expect(isExactIndexQuery(['crypt'])).toBe(false);
+    expect(isExactIndexQuery(['sha', 'rsa'])).toBe(false);
   });
 
   it('verifies substrings case-insensitively', () => {

@@ -35,6 +35,8 @@ const FILES: Record<string, string> = {
   '/false-positive.txt': 'copyr yrig right', // every trigram of "copyright", but not the word
   '/hit.txt': 'Copyright (c) 2020',
   '/sha.txt': 'sha only',
+  '/go.txt': 'written in go, not in google',
+  '/google.txt': 'google only',
 };
 
 describe('SearchTask', () => {
@@ -94,6 +96,11 @@ describe('SearchTask', () => {
     await run('copyright');
     expect(read).toHaveBeenCalled();
     read.mockRestore();
+  });
+
+  it('matches short keywords as whole words, alone or with longer terms', async () => {
+    expect(paths(await run('go'))).toEqual(['/go.txt']);
+    expect(paths(await run('go google'))).toEqual(['/go.txt']);
   });
 
   it('pages verified hits without verifying them again', async () => {

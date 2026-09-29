@@ -13,8 +13,7 @@ import { readTextFile } from '../../../utils/utils';
 import {
   containsAllTerms,
   getQueryTerms,
-  isExactTrigramQuery,
-  NGRAM_SIZE,
+  isExactIndexQuery,
   SEARCH_INDEX_FOLDER,
   SEARCH_INDEX_VERSION,
 } from '../../../../shared/utils/search-utils';
@@ -59,8 +58,7 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
 
   private async searchVerified(params: ISearchTask): Promise<Array<ISearchResult>> {
     const terms = getQueryTerms(params.query ?? '');
-    const indexTerms = terms.filter((t) => t.length >= NGRAM_SIZE);
-    if (indexTerms.length === 0) return [];
+    if (terms.length === 0) return [];
 
     const offset = params.params.offset ?? 0;
     const end = offset + params.params.limit;
@@ -68,13 +66,13 @@ export class SearchTask implements ITask<ISearchTask, Array<ISearchResult>> {
 
     let state = offset === 0 ? null : this.search.getVerifiedSearch(key);
     if (!state) {
-      const candidates = this.search.search({ query: indexTerms.join(' '), params: { limit: Number.MAX_SAFE_INTEGER } });
+      const candidates = this.search.search({ query: terms.join(' '), params: { limit: Number.MAX_SAFE_INTEGER } });
       state = { terms: key, candidates, cursor: 0, verified: [] };
       this.search.setVerifiedSearch(state);
     }
 
     const basePath = workspace.getOpenProject().getSourceCodePath() ? projectService.getSourceCodeBasePath() : null;
-    const canVerify = !isExactTrigramQuery(terms) && basePath !== null && fs.existsSync(basePath);
+    const canVerify = !isExactIndexQuery(terms) && basePath !== null && fs.existsSync(basePath);
     if (!canVerify) {
       return this.getFilesById(state.candidates.slice(offset, end));
     }

@@ -13,9 +13,6 @@ const SEARCH_INDEX_VERSION_FILE = 'version.json';
 
 const NGRAM_SIZE = 3;
 
-// Shorter keywords have no trigram, so the index can't find them.
-const MIN_KEYWORD_LENGTH = NGRAM_SIZE;
-
 // Caps the n-grams produced by very long tokens (minified code, base64 blobs).
 const MAX_TOKEN_LENGTH = 256;
 
@@ -88,19 +85,18 @@ const getTerms = (querySearch: string, regex = /[^\p{L}\p{N}]+/u): string[] => {
   return querySearch.split(regex);
 };
 
-const MIN_TERM_LENGTH = 2;
-
 /**
- * Returns the unique lowercase terms of a query, dropping those too short to search.
+ * Returns the unique lowercase terms of a query.
  */
 const getQueryTerms = (query: string): string[] => Array.from(
-  new Set(getTerms(query.toLowerCase()).filter((t) => t.length >= MIN_TERM_LENGTH)),
+  new Set(getTerms(query.toLowerCase()).filter((t) => t.length > 0)),
 );
 
 /**
- * A single 3-char term is itself a trigram, so an index hit is already a substring match.
+ * True when index hits need no verification: a 3-char term is itself a trigram, and shorter
+ * terms are indexed whole, so they match whole words as before trigrams.
  */
-const isExactTrigramQuery = (terms: string[]): boolean => terms.length === 1 && terms[0].length === NGRAM_SIZE;
+const isExactIndexQuery = (terms: string[]): boolean => terms.length === 1 && terms[0].length <= NGRAM_SIZE;
 
 const containsAllTerms = (content: string, terms: string[]): boolean => {
   const text = content.toLowerCase();
@@ -113,12 +109,11 @@ export {
   SEARCH_INDEX_FOLDER,
   SEARCH_INDEX_VERSION_FILE,
   NGRAM_SIZE,
-  MIN_KEYWORD_LENGTH,
   getSearchConfig,
   getLegacySearchConfig,
   getTerms,
   getQueryTerms,
-  isExactTrigramQuery,
+  isExactIndexQuery,
   containsAllTerms,
   unStemmifyCryptoKeywords,
 };
