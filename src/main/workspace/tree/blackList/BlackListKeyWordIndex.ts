@@ -1,47 +1,37 @@
-import { BlackListAbstract } from './BlackListAbstract';
-import Node, { NodeStatus } from '../Node';
-import { workspace } from '../../Workspace';
-
 import path from 'path';
+import { BlackListAbstract } from './BlackListAbstract';
+import Node from '../Node';
+
+const isBinaryPath = require('is-binary-path');
+
+interface BlackListKeyWordIndexOptions {
+  // Mirrors the "Include all file types" scanner option.
+  allExtensions?: boolean;
+}
 
 export class BlackListKeyWordIndex extends BlackListAbstract {
-  private scanRoot: string;
+  private defaultSkippedFolders: Set<string>;
 
-  private filesBlackList: Set<string>;
+  private defaultSkippedExtensions: Set<string>;
 
-  private vendorFolders: Set<string>;
+  private allExtensions: boolean;
 
-  private extensions: Set<string>;
-
-  constructor() {
+  constructor(options: BlackListKeyWordIndexOptions = {}) {
     super();
-    this.filesBlackList = new Set([
-      'gradlew.bat',
-      'mvnw',
-      'mvnw.cmd',
-      'gradle-wrapper.jar',
-      'maven-wrapper.jar',
-      'thumbs.db',
-      'copying.lib',
-    ]);
-
-    this.extensions = new Set<string>([
-      '.jpg',
-      '.png',
-      '.gif',
-      '.woff',
-      '.woff2',
-      '.rar',
-      '.jar',
-      '.ipynb',
-    ]);
-
-    this.vendorFolders = new Set(['node_modules', 'vendor']);
-
-    this.scanRoot = workspace.getOpenProject()?.getScanRoot();
+    this.defaultSkippedFolders = new Set(['node_modules', 'vendor']);
+    // Notebooks are text, but their saved cell outputs bloat the index.
+    this.defaultSkippedExtensions = new Set(['.ipynb']);
+    this.allExtensions = options.allExtensions ?? false;
   }
 
   public evaluate(node: Node): boolean {
-    return node.getLabel().startsWith('.') || this.vendorFolders.has(node.getLabel()) || this.extensions.has(path.extname(node.getPath()));
+    // Root folder label is the project name, never filter it.
+    if (node.getPath() === '') return false;
+    const isFile = node.getType() === 'file';
+    // Binaries hold no searchable text, so they are skipped even with "Include all file types".
+    if (isFile && isBinaryPath(node.getPath())) return true;
+    if (this.allExtensions) return false;
+    if (isFile && this.defaultSkippedExtensions.has(path.extname(node.getPath()).toLowerCase())) return true;
+    return node.getLabel().startsWith('.') || this.defaultSkippedFolders.has(node.getLabel());
   }
 }

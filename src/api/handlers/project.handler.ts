@@ -31,6 +31,7 @@ api.handle(IpcChannels.PROJECT_OPEN_SCAN, async (event, payload: any) => {
 
   const p: Project = await workspace.openProject(new ProjectFilterPath(payload.path));
   searcher.closeIndex();
+  if (payload.mode !== ProjectAccessMode.READ_ONLY) projectService.rebuildOutdatedSearchIndex(p);
   // await projectService.lockProject(p.getProjectName(), mode);
   const response: ProjectOpenResponse = {
     logical_tree: p.getTree().getRootFolder(),

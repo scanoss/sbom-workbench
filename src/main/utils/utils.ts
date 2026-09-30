@@ -11,6 +11,21 @@ export async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
+const BINARY_SNIFF_BYTES = 8000;
+
+/**
+ * Returns the text content of a file, or null for binaries. UTF-16 files are detected by their BOM.
+ */
+export function readTextFile(filePath: string): string | null {
+  const buffer = fs.readFileSync(filePath);
+  if (buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe) return buffer.toString('utf16le', 2);
+  if (buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff) {
+    return Buffer.from(buffer.subarray(2, buffer.length - (buffer.length % 2))).swap16().toString('utf16le');
+  }
+  if (buffer.subarray(0, BINARY_SNIFF_BYTES).includes(0)) return null;
+  return buffer.toString('utf-8');
+}
+
 export function toPosix(filePath: string): string {
   return filePath.replaceAll(path.sep, path.posix.sep);
 }
