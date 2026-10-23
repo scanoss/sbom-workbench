@@ -44,6 +44,8 @@ jobs:
   create-release:
     needs: [sign-windows, build-macos, build-linux]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Download Windows artifacts
