@@ -63,6 +63,31 @@ jobs:
         with:
           name: artifact_l
 
+      # Zip each installer again under a name with no version. With these
+      # assets, https://github.com/scanoss/sbom-workbench/releases/latest/download/workbench-latest-<os>.zip
+      # always gives the newest build. download.scanoss.com redirects its old
+      # workbench-latest-*.zip links there, so keep these names and the zip format.
+      # The "*.zip" glob in the next step uploads them with the other assets.
+      - name: Make stable "latest" zips
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          make_latest_zip() {
+            local name="$1" pattern="$2"
+            # Unquoted on purpose: expand the glob (nullglob gives an empty list).
+            # shellcheck disable=SC2206
+            local files=( $pattern )
+            if [ "${#files[@]}" -ne 1 ]; then
+              echo "::error::expected exactly one file for '$pattern', found ${#files[@]}"
+              exit 1
+            fi
+            zip -j "$name" "${files[0]}"
+          }
+          make_latest_zip workbench-latest-win.zip       'sbom-workbench-*-win-x64-installer.exe'
+          make_latest_zip workbench-latest-mac.zip       'sbom-workbench-*-mac-x64-installer.dmg'
+          make_latest_zip workbench-latest-arm64-mac.zip 'sbom-workbench-*-mac-arm64-installer.dmg'
+          make_latest_zip workbench-latest-linux.zip     'sbom-workbench-*-linux-x86_64-app.AppImage'
+
       - name: List all artifacts
         run: ls -la
 
